@@ -674,6 +674,9 @@ document.addEventListener('keydown',e=>{
     const btns=document.querySelectorAll('#'+quiz.target+' .quiz-choice');
     const b=btns[+e.key-1];
     if(b&&!b.disabled)b.click();
+  }else if(e.key==='0'){
+    const dn=document.getElementById('qDunno');
+    if(dn&&!dn.disabled)dn.click();
   }else if(e.key==='Enter'){
     const nx=document.getElementById('qNext');
     if(nx&&!nx.classList.contains('hide'))nextQ();
@@ -757,7 +760,7 @@ function showQ(){
       const main=quiz.mode==='mean'?esc(c.mean):esc(c.word);
       const sub=quiz.mode==='mean'?esc(c.word):esc(c.mean);
       return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span style="color:var(--sub)">'+(ci+1)+'. </span><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
-    }).join('')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · Enter 다음 · Esc 종료</div>';
+    }).join('')+'<button class="btn" id="qDunno" onclick="dontKnow('+ansIdx+')" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요 (0)</button>'+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료</div>';
 }
 function answer(ci,qi,btn){
   const correct=ci===qi;
@@ -772,6 +775,17 @@ function answer(ci,qi,btn){
     if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
     else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
   }
+}
+function dontKnow(qi){
+  const t=quiz.target;
+  document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>b.disabled=true);
+  document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
+  document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(+b.dataset.di===qi)b.classList.add('correct')});
+  const dn=document.getElementById('qDunno');if(dn)dn.disabled=true;
+  const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);saveWords();
+  const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
+  if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
+  else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
 }
 
 /* ================= 캘린더 ================= */
