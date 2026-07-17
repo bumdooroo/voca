@@ -362,7 +362,8 @@ function renderStatusChips(){
     ['ambiguous','애매해요',data.filter(x=>x.lastLevel==='ambiguous').length],
     ['known','알아요',data.filter(x=>x.lastLevel==='known').length],
     ['unchecked','미체크',data.filter(x=>!x.lastLevel).length],
-    ['wrong','틀림',data.filter(x=>(x.wrong||0)>0).length]
+    ['wrong','틀림',data.filter(x=>(x.wrong||0)>0).length],
+    ['flag','★ 체크',data.filter(x=>x.flag).length]
   ];
   configs.forEach(([value,label,count])=>{
     const c=document.createElement('span');
@@ -380,6 +381,7 @@ function visible(){
   else if(statusFilter==='known')arr=arr.filter(x=>x.lastLevel==='known');
   else if(statusFilter==='unchecked')arr=arr.filter(x=>!x.lastLevel);
   else if(statusFilter==='wrong')arr=arr.filter(x=>(x.wrong||0)>0);
+  else if(statusFilter==='flag')arr=arr.filter(x=>x.flag);
   if(wrongOnly)arr=arr.filter(x=>(x.wrong||0)>0);
   const q=document.getElementById('searchBox').value.trim().toLowerCase();
   if(q)arr=arr.filter(x=>(x.word||'').toLowerCase().includes(q)||(x.mean||'').toLowerCase().includes(q)||(x.sent||'').toLowerCase().includes(q)||(x.etym||'').toLowerCase().includes(q));
@@ -413,7 +415,7 @@ function render(){
           x.lastLevel==='known'?'<span class="study-status known">알아요</span>':'')+
         ((x.unknown||0)>0?'<span class="unkcnt" title="학습 몰라요 횟수">?'+x.unknown+'</span>':'')+
         ((x.wrong||0)>0?'<span class="wrongcnt" title="테스트 오답 횟수">✗'+x.wrong+'</span>':'')+
-        '<span class="e-act"><button class="small" onclick="editEntry('+i+')">수정</button><button class="small" onclick="delEntry('+i+')">삭제</button></span>'+
+        '<span class="e-act"><button class="small" title="체크" onclick="toggleFlag('+i+')" style="color:'+(x.flag?'#e0a800':'var(--sub)')+'">'+(x.flag?'★':'☆')+'</button><button class="small" onclick="editEntry('+i+')">수정</button><button class="small" onclick="delEntry('+i+')">삭제</button></span>'+
       '</div>'+
       (opt.m&&x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+
       (opt.s&&x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+
@@ -426,6 +428,7 @@ function render(){
 function renderAll(){renderChips();renderStatusChips();renderChunkRow();renderTestChunkRow();render()}
 
 function toggleSel(i,on){const x=data[i];if(!x)return;if(on)selected.add(x);else selected.delete(x);document.getElementById('selCnt').textContent=selected.size}
+function toggleFlag(i){const x=data[i];if(!x)return;x.flag=!x.flag;saveWords();renderStatusChips();render();}
 function selectAllVisible(){visible().forEach(x=>selected.add(x));render()}
 function clearSelection(){selected=new Set();render()}
 function deleteSelected(){
@@ -491,12 +494,12 @@ function importCSV(inp){
     const ix=(...names)=>head.findIndex(h=>names.some(n=>n&&h.includes(n)));
     const iDay=ix('day','일차'),iNo=ix('no','번호'),iWord=ix('word','단어'),iPron=ix('pron','발음'),iMean=ix('mean','뜻'),iSent=ix('sample','sent','예문');
     let iSyn=ix('syn','유사'),iEtym=ix('etym','어원','어근');
-    const iWrong=ix('wrong','오답'),iUnk=ix('unknown'),iAmb=ix('ambiguous'),iKno=ix('known'),iLast=ix('lastlevel','last'),iStu=ix('studied');
+    const iWrong=ix('wrong','오답'),iUnk=ix('unknown'),iAmb=ix('ambiguous'),iKno=ix('known'),iLast=ix('lastlevel','last'),iStu=ix('studied'),iFlag=ix('flag','체크');
     if(iWord<0||iMean<0)return alert('Word/단어, 뜻/Meaning 칼럼을 찾을 수 없습니다.');
     if(iSyn<0){const used=[iDay,iNo,iWord,iMean,iSent,iPron,iEtym,iWrong,iUnk,iAmb,iKno,iLast,iStu];for(let ci=Math.max(iSent,iMean)+1;ci<rows[0].length;ci++){if(!used.includes(ci)){iSyn=ci;break}}}
     // 기존 진행상황(오답·학습상태)을 단어 텍스트 기준으로 백업 → CSV에 값이 없으면 이어받음
     const prevMap={};
-    data.forEach(w=>{prevMap[(w.word||'').toLowerCase().trim()]={wrong:w.wrong||0,unknown:w.unknown||0,ambiguous:w.ambiguous||0,known:w.known||0,lastLevel:w.lastLevel||'',studied:w.studied||0};});
+    data.forEach(w=>{prevMap[(w.word||'').toLowerCase().trim()]={wrong:w.wrong||0,unknown:w.unknown||0,ambiguous:w.ambiguous||0,known:w.known||0,lastLevel:w.lastLevel||'',studied:w.studied||0,flag:!!w.flag};});
     const numAt=(r,i,fb)=>{if(i>=0){const v=parseInt((r[i]||'').replace(/[^0-9]/g,''));if(!isNaN(v))return v;}return fb;};
     const items=rows.slice(1).filter(r=>r[iWord]&&r[iWord].trim()).map(r=>{
       const word=r[iWord].trim();
@@ -515,7 +518,8 @@ function importCSV(inp){
         unknown:numAt(r,iUnk,pv.unknown||0),
         ambiguous:numAt(r,iAmb,pv.ambiguous||0),
         known:numAt(r,iKno,pv.known||0),
-        studied:numAt(r,iStu,pv.studied||0)
+        studied:numAt(r,iStu,pv.studied||0),
+        flag:iFlag>=0?/^(1|true|y|참|o)/i.test((r[iFlag]||'').trim()):(pv.flag||false)
       };
       if(last)o.lastLevel=last;
       return o;
@@ -530,8 +534,8 @@ function importCSV(inp){
 function exportCSV(){
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const ordered=[...data].sort((a,b)=>a.day-b.day||a.no-b.no);
-  const csv='Day,No,Word,Pronunciation,Meaning,Sample Sentences,Synonyms,Etymology,Wrong,Unknown,Ambiguous,Known,LastLevel,Studied\n'+
-    ordered.map(x=>[x.day,x.no,x.word,x.pron,x.mean,x.sent,x.syn,x.etym,x.wrong||0,x.unknown||0,x.ambiguous||0,x.known||0,x.lastLevel||'',x.studied||0].map(q).join(',')).join('\n');
+  const csv='Day,No,Word,Pronunciation,Meaning,Sample Sentences,Synonyms,Etymology,Wrong,Unknown,Ambiguous,Known,LastLevel,Studied,Flag\n'+
+    ordered.map(x=>[x.day,x.no,x.word,x.pron,x.mean,x.sent,x.syn,x.etym,x.wrong||0,x.unknown||0,x.ambiguous||0,x.known||0,x.lastLevel||'',x.studied||0,x.flag?1:0].map(q).join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
   a.download='GRE_export.csv';a.click();
@@ -604,6 +608,7 @@ function studyAnswer(level){
   else{q.known=(q.known||0)+1;study.known++;}
   saveWords();renderStatusChips();study.i++;showStudy();
 }
+function toggleFlagStudy(){const q=study.pool[study.i];if(!q)return;q.flag=!q.flag;saveWords();const b=document.getElementById('stFlag');if(b){b.textContent=q.flag?'★ 체크됨':'☆ 체크';b.style.color=q.flag?'#e0a800':'var(--sub)';}}
 function fitStudyWord(){
   const el=document.querySelector('.dict-word');if(!el)return;
   let size=28;el.style.fontSize=size+'px';let guard=0;
@@ -642,7 +647,7 @@ function showStudy(){
   const meaningText=breakNumbered(q.mean)||'등록된 뜻이 없습니다.';
   a.innerHTML='<div class="study-shell">'+
     '<div class="sc-prog"><div style="width:'+pct+'%"></div></div>'+
-    '<div class="study-head"><span class="count">'+(study.i+1)+'/'+study.pool.length+' · '+q.day+'일차 #'+q.no+'</span><button class="small" onclick="endStudy()">그만</button></div>'+
+    '<div class="study-head"><span class="count">'+(study.i+1)+'/'+study.pool.length+' · '+q.day+'일차 #'+q.no+'</span><span><button class="small" id="stFlag" onclick="toggleFlagStudy()" style="color:'+(q.flag?'#e0a800':'var(--sub)')+'">'+(q.flag?'★ 체크됨':'☆ 체크')+'</button> <button class="small" onclick="endStudy()">그만</button></span></div>'+
     '<div style="text-align:center;margin-top:2px"><div class="dict-word" style="font-size:34px">'+esc(q.word)+'</div>'+(q.pron?'<div class="dict-pron">'+esc(q.pron)+'</div>':'')+'</div>'+
     '<div class="sc-scroll">'+
       '<div class="sc-band"><div class="sc-mean">'+esc(meaningText)+'</div></div>'+
