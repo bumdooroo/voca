@@ -120,7 +120,10 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 </style>
 </head>
 <body>
-<h2>VOCA <span id="total" class="count"></span></h2>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h2 style="margin:0">VOCA <span id="total" class="count"></span></h2>
+<button id="gearBtn" onclick="toggleSettings(true)" title="설정" style="font-size:18px;padding:6px 12px;line-height:1">⚙</button>
+</div>
 
 <div class="tabs" id="mainTabs">
   <button id="tabGRE" class="on" onclick="switchTab('gre')">GRE</button>
@@ -129,31 +132,6 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 
 <!-- ============ GRE VIEW ============ -->
 <div id="greView">
-
-<div class="card" id="settingsCard">
-<h3>보기 설정</h3>
-<div class="row">
-<label class="tog"><input type="checkbox" id="optMean" checked>뜻</label>
-<label class="tog"><input type="checkbox" id="optSent" checked>예문</label>
-<label class="tog"><input type="checkbox" id="optSyn">유사어</label>
-<label class="tog"><input type="checkbox" id="optPron" checked>발음기호</label>
-<label class="tog"><input type="checkbox" id="optEtym">어근·어원</label>
-<span style="width:1px;height:16px;background:var(--line)"></span>
-<label class="tog" title="틀렸을 때도 자동으로 다음 문제로 넘어갑니다"><input type="checkbox" id="optAutoWrong">틀려도 자동 넘김</label>
-</div>
-</div>
-
-<div class="card" id="prefsCard">
-<h3>설정</h3>
-<div class="row">
-<span style="font-size:13px">정답 후 자동 넘김</span> <input type="number" id="setCorrectDelay" min="0" step="0.5" style="width:64px"> 초
-<span style="width:1px;height:16px;background:var(--line)"></span>
-<span style="font-size:13px">틀린 후 자동 넘김</span> <input type="number" id="setWrongDelay" min="0" step="0.5" style="width:64px"> 초
-<span style="width:1px;height:16px;background:var(--line)"></span>
-<span style="font-size:13px">구간 크기</span> <input type="number" id="setChunkSize" min="1" style="width:64px"> 개
-</div>
-<p class="study-tip">정답 넘김을 0으로 하면 즉시 넘어갑니다. ‘틀린 후 자동 넘김’은 위 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
-</div>
 
 <div class="card" id="studyCard">
 <h3 id="studyHead">학습</h3>
@@ -261,6 +239,37 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
   <div id="calQuizArea" class="card hide"></div>
 </div>
 
+<div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
+  <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
+      <h3 style="margin:0">설정</h3>
+      <button class="small" onclick="toggleSettings(false)">✕ 닫기</button>
+    </div>
+    <div style="margin-top:14px">
+      <div class="count" style="margin-bottom:8px">보기</div>
+      <div class="row">
+        <label class="tog"><input type="checkbox" id="optMean" checked>뜻</label>
+        <label class="tog"><input type="checkbox" id="optSent" checked>예문</label>
+        <label class="tog"><input type="checkbox" id="optSyn">유사어</label>
+        <label class="tog"><input type="checkbox" id="optPron" checked>발음기호</label>
+        <label class="tog"><input type="checkbox" id="optEtym">어근·어원</label>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="count" style="margin-bottom:8px">테스트</div>
+      <div class="row"><span style="font-size:13px">선택지(보기) 개수</span> <input type="number" id="setChoices" min="3" max="6" style="width:64px"> 개 <span class="count">(3~6)</span></div>
+      <label class="tog" style="margin-top:10px"><input type="checkbox" id="optAutoWrong">틀려도 자동 넘김</label>
+      <div class="row" style="margin-top:10px"><span style="font-size:13px">정답 후 자동 넘김</span> <input type="number" id="setCorrectDelay" min="0" step="0.5" style="width:64px"> 초</div>
+      <div class="row" style="margin-top:10px"><span style="font-size:13px">틀린 후 자동 넘김</span> <input type="number" id="setWrongDelay" min="0" step="0.5" style="width:64px"> 초</div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="count" style="margin-bottom:8px">학습</div>
+      <div class="row"><span style="font-size:13px">구간 크기</span> <input type="number" id="setChunkSize" min="1" style="width:64px"> 개</div>
+    </div>
+    <p class="study-tip" style="margin-top:16px">정답 넘김 0 = 즉시. ‘틀린 후 자동 넘김’은 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
+  </div>
+</div>
+
 <script>
 /* ================= 데이터 ================= */
 const WORD_KEY='voca_GRE';
@@ -279,7 +288,8 @@ let calendar=loadCal();
 function loadChunk(){try{return JSON.parse(localStorage.getItem('voca_chunkprog_GRE'))||{}}catch(e){return{}}}
 function saveChunk(){localStorage.setItem('voca_chunkprog_GRE',JSON.stringify(chunkProg))}
 let chunkProg=loadChunk();
-function loadSettings(){try{return Object.assign({correctDelay:2,wrongDelay:2,chunkSize:25},JSON.parse(localStorage.getItem('voca_settings_GRE'))||{})}catch(e){return{correctDelay:2,wrongDelay:2,chunkSize:25}}}
+function loadSettings(){try{return Object.assign({correctDelay:2,wrongDelay:2,chunkSize:25,choices:4},JSON.parse(localStorage.getItem('voca_settings_GRE'))||{})}catch(e){return{correctDelay:2,wrongDelay:2,chunkSize:25,choices:4}}}
+function toggleSettings(open){document.getElementById('settingsModal').classList.toggle('hide',!open);}
 function saveSettings(){localStorage.setItem('voca_settings_GRE',JSON.stringify(settings))}
 let settings=loadSettings();
 let QSIZE=settings.chunkSize||25;
@@ -528,7 +538,8 @@ function exportCSV(){
 /* ================= 학습(Study) ================= */
 let study=null;
 function setStudyMode(on){
-  ['mainTabs','settingsCard','prefsCard','testCard','listCard','addCard','studyConfig','chunkRow','studyNote','studyHead'].forEach(id=>{
+  if(on)toggleSettings(false);
+  ['mainTabs','testCard','listCard','addCard','studyConfig','chunkRow','studyNote','studyHead'].forEach(id=>{
     document.getElementById(id).classList.toggle('hide',on);
   });
 }
@@ -657,7 +668,7 @@ document.addEventListener('keydown',e=>{
   if(!quiz)return;
   const tag=(e.target&&e.target.tagName)||'';
   if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
-  if(e.key>='1'&&e.key<='4'){
+  if(e.key>='1'&&e.key<=String(Math.min(6,Math.max(3,settings.choices||4)))){
     const btns=document.querySelectorAll('#'+quiz.target+' .quiz-choice');
     const b=btns[+e.key-1];
     if(b&&!b.disabled)b.click();
@@ -672,7 +683,8 @@ document.addEventListener('keydown',e=>{
 /* ================= 테스트(연습 + 공식 공용 엔진) ================= */
 let quiz=null;
 function setQuizMode(on){
-  ['mainTabs','settingsCard','prefsCard','studyCard','listCard','addCard','testConfig','testChunkRow','testNote','testHead'].forEach(id=>{
+  if(on)toggleSettings(false);
+  ['mainTabs','studyCard','listCard','addCard','testConfig','testChunkRow','testNote','testHead'].forEach(id=>{
     document.getElementById(id).classList.toggle('hide',on);
   });
 }
@@ -730,7 +742,8 @@ function showQ(){
     return;
   }
   const q=quiz.pool[quiz.i];
-  const others=pick(quiz.pool.length>=8?quiz.pool:data,3,q);
+  const nch=Math.min(6,Math.max(3,settings.choices||4));
+  const others=pick(quiz.pool.length>=nch+2?quiz.pool:data,nch-1,q);
   const choices=[q,...others].sort(()=>Math.random()-.5);
   const ansIdx=data.indexOf(q);
   const prompt = quiz.mode==='mean'
@@ -742,7 +755,7 @@ function showQ(){
       const main=quiz.mode==='mean'?esc(c.mean):esc(c.word);
       const sub=quiz.mode==='mean'?esc(c.word):esc(c.mean);
       return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span style="color:var(--sub)">'+(ci+1)+'. </span><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
-    }).join('')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~4 선택 · Enter 다음 · Esc 종료</div>';
+    }).join('')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · Enter 다음 · Esc 종료</div>';
 }
 function answer(ci,qi,btn){
   const correct=ci===qi;
@@ -845,6 +858,8 @@ function backToCalendar(){quiz=null;document.getElementById('calQuizArea').inner
 document.getElementById('setCorrectDelay').value=settings.correctDelay;
 document.getElementById('setWrongDelay').value=settings.wrongDelay;
 document.getElementById('setChunkSize').value=settings.chunkSize;
+document.getElementById('setChoices').value=settings.choices;
+document.getElementById('setChoices').onchange=e=>{settings.choices=Math.min(6,Math.max(3,parseInt(e.target.value)||4));e.target.value=settings.choices;saveSettings();};
 document.getElementById('setCorrectDelay').onchange=e=>{settings.correctDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
 document.getElementById('setWrongDelay').onchange=e=>{settings.wrongDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
 document.getElementById('setChunkSize').onchange=e=>{settings.chunkSize=Math.max(1,parseInt(e.target.value)||25);QSIZE=settings.chunkSize;e.target.value=settings.chunkSize;saveSettings();renderChunkRow();renderTestChunkRow();};
