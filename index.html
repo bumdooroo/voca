@@ -107,6 +107,11 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .official-box{margin-top:12px;padding:12px;border:1px dashed #c7cede;border-radius:10px;background:#fbfcff}
 .test-rec{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:8px 2px;font-size:13px}
 .test-rec:last-child{border-bottom:none}
+.test-wrong{border-bottom:1px solid var(--line);padding:2px 2px 8px}
+.test-wrong summary{cursor:pointer;font-size:12px;color:var(--red);padding:4px 0}
+.tw-list{margin-top:4px}
+.tw-item{font-size:12.5px;color:#4b5563;padding:3px 0;white-space:pre-line;line-height:1.5}
+.tw-item b{color:var(--ink)}
 @media(max-width:640px){
   .dict-entry{flex-direction:column}
   .dict-left{flex:none;border-right:none;border-bottom:1px solid var(--line);text-align:center;padding:16px;overflow:hidden}
@@ -125,10 +130,7 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 <button id="gearBtn" onclick="toggleSettings(true)" title="설정" style="font-size:18px;padding:6px 12px;line-height:1">⚙</button>
 </div>
 
-<div class="tabs" id="mainTabs">
-  <button id="tabGRE" class="on" onclick="switchTab('gre')">GRE</button>
-  <button id="tabCAL" onclick="switchTab('cal')">캘린더</button>
-</div>
+<div class="tabs" id="mainTabs"></div>
 
 <!-- ============ GRE VIEW ============ -->
 <div id="greView">
@@ -272,25 +274,34 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 
 <script>
 /* ================= 데이터 ================= */
-const WORD_KEY='voca_GRE';
-const CAL_KEY='voca_calendar_GRE';
+/* ---- 단어장(덱) 관리 ---- */
+function loadDecks(){try{const d=JSON.parse(localStorage.getItem('voca_decks'));if(Array.isArray(d)&&d.length)return d;}catch(e){}return[{id:'GRE',name:'GRE'}];}
+function saveDecks(){localStorage.setItem('voca_decks',JSON.stringify(decks));}
+let decks=loadDecks();
+let CUR=(function(){const a=localStorage.getItem('voca_activeDeck');return (a&&decks.some(d=>d.id===a))?a:decks[0].id;})();
+function saveActive(){localStorage.setItem('voca_activeDeck',CUR);}
+function curDeck(){return decks.find(d=>d.id===CUR)||decks[0];}
+function WORD_KEY(){return 'voca_'+CUR;}
+function CAL_KEY(){return 'voca_calendar_'+CUR;}
+function CHUNK_KEY(){return 'voca_chunkprog_'+CUR;}
+function SET_KEY(){return 'voca_settings_'+CUR;}
 const pad=n=>String(n).padStart(2,'0');
 function dateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function todayKey(){return dateKey(new Date());}
 
-function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY))||[]}catch(e){return[]}}
-function saveWords(){localStorage.setItem(WORD_KEY,JSON.stringify(data))}
-function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY))||{}}catch(e){return{}}}
-function saveCal(){localStorage.setItem(CAL_KEY,JSON.stringify(calendar))}
+function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
+function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data))}
+function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY()))||{}}catch(e){return{}}}
+function saveCal(){localStorage.setItem(CAL_KEY(),JSON.stringify(calendar))}
 
 let data=loadWords();
 let calendar=loadCal();
-function loadChunk(){try{return JSON.parse(localStorage.getItem('voca_chunkprog_GRE'))||{}}catch(e){return{}}}
-function saveChunk(){localStorage.setItem('voca_chunkprog_GRE',JSON.stringify(chunkProg))}
+function loadChunk(){try{return JSON.parse(localStorage.getItem(CHUNK_KEY()))||{}}catch(e){return{}}}
+function saveChunk(){localStorage.setItem(CHUNK_KEY(),JSON.stringify(chunkProg))}
 let chunkProg=loadChunk();
-function loadSettings(){try{return Object.assign({correctDelay:2,wrongDelay:2,chunkSize:25,choices:4},JSON.parse(localStorage.getItem('voca_settings_GRE'))||{})}catch(e){return{correctDelay:2,wrongDelay:2,chunkSize:25,choices:4}}}
+function loadSettings(){try{return Object.assign({correctDelay:2,wrongDelay:2,chunkSize:25,choices:4},JSON.parse(localStorage.getItem(SET_KEY()))||{})}catch(e){return{correctDelay:2,wrongDelay:2,chunkSize:25,choices:4}}}
 function toggleSettings(open){document.getElementById('settingsModal').classList.toggle('hide',!open);}
-function saveSettings(){localStorage.setItem('voca_settings_GRE',JSON.stringify(settings))}
+function saveSettings(){localStorage.setItem(SET_KEY(),JSON.stringify(settings))}
 let settings=loadSettings();
 let QSIZE=settings.chunkSize||25;
 
@@ -326,10 +337,64 @@ function switchTab(t){
   mainTab=t;
   document.getElementById('greView').classList.toggle('hide',t!=='gre');
   document.getElementById('calView').classList.toggle('hide',t!=='cal');
-  document.getElementById('tabGRE').classList.toggle('on',t==='gre');
-  document.getElementById('tabCAL').classList.toggle('on',t==='cal');
+  renderTabs();
   if(t==='cal'){ if(!calSel)calSel=todayKey(); renderCalendar(); }
   else render();
+}
+function renderTabs(){
+  const el=document.getElementById('mainTabs');if(!el)return;
+  let h='';
+  decks.forEach(function(d){
+    const on=(mainTab==='gre'&&d.id===CUR);
+    h+='<button class="'+(on?'on':'')+'" onclick="switchDeck(\''+d.id+'\')" ondblclick="renameDeck(\''+d.id+'\')" title="더블클릭: 이름 변경/삭제">'+esc(d.name)+'</button>';
+  });
+  h+='<button onclick="addDeck()" title="단어장 추가">＋</button>';
+  h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')" style="margin-left:auto">캘린더</button>';
+  el.innerHTML=h;
+}
+function syncSettingsUI(){
+  document.getElementById('setCorrectDelay').value=settings.correctDelay;
+  document.getElementById('setWrongDelay').value=settings.wrongDelay;
+  document.getElementById('setChunkSize').value=settings.chunkSize;
+  document.getElementById('setChoices').value=settings.choices;
+}
+function switchDeck(id){
+  if(!decks.some(d=>d.id===id))return;
+  if(id===CUR&&mainTab==='gre')return;
+  if(study)endStudy();
+  if(quiz){quiz=null;document.getElementById('quizArea').innerHTML='';document.getElementById('calQuizArea').innerHTML='';}
+  CUR=id;saveActive();
+  data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;
+  syncSettingsUI();
+  normalizeNumbers();if(data.length)saveWords();
+  selected=new Set();filterDay=0;wrongOnly=false;statusFilter='all';
+  mainTab='gre';
+  document.getElementById('greView').classList.remove('hide');
+  document.getElementById('calView').classList.add('hide');
+  renderTabs();renderAll();
+}
+function addDeck(){
+  const name=(prompt('새 단어장 이름 (예: 토익, 토플)','')||'').trim();
+  if(!name)return;
+  const id='d'+Date.now();
+  decks.push({id:id,name:name});saveDecks();
+  switchDeck(id);
+}
+function renameDeck(id){
+  const d=decks.find(x=>x.id===id);if(!d)return;
+  const r=prompt('단어장 이름 변경 (비우면 삭제)',d.name);
+  if(r===null)return;
+  const name=r.trim();
+  if(!name){
+    if(decks.length<=1)return alert('마지막 단어장은 삭제할 수 없습니다.');
+    if(!confirm('“'+d.name+'” 단어장을 삭제할까요?\n단어·캘린더·기록이 모두 사라집니다. (되돌릴 수 없음)'))return;
+    ['voca_'+id,'voca_calendar_'+id,'voca_chunkprog_'+id,'voca_settings_'+id].forEach(k=>localStorage.removeItem(k));
+    decks=decks.filter(x=>x.id!==id);saveDecks();
+    if(CUR===id){CUR=decks[0].id;switchDeck(decks[0].id);}
+    else{renderTabs();}
+    return;
+  }
+  d.name=name;saveDecks();renderTabs();
 }
 
 /* ================= GRE: 단어장 ================= */
@@ -438,7 +503,7 @@ function deleteSelected(){
 }
 function deleteAll(){
   if(!data.length)return;
-  if(!confirm('GRE 단어 '+data.length+'개를 모두 삭제할까요? (되돌릴 수 없음)'))return;
+  if(!confirm('“'+curDeck().name+'” 단어 '+data.length+'개를 모두 삭제할까요? (되돌릴 수 없음)'))return;
   data=[];selected=new Set();saveWords();renderAll();
 }
 function toggleWrongOnly(b){wrongOnly=!wrongOnly;b.style.background=wrongOnly?'#fdeaea':'';render()}
@@ -538,7 +603,7 @@ function exportCSV(){
     ordered.map(x=>[x.day,x.no,x.word,x.pron,x.mean,x.sent,x.syn,x.etym,x.wrong||0,x.unknown||0,x.ambiguous||0,x.known||0,x.lastLevel||'',x.studied||0,x.flag?1:0].map(q).join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
-  a.download='GRE_export.csv';a.click();
+  a.download=curDeck().name+'_export.csv';a.click();
 }
 
 /* ================= 학습(Study) ================= */
@@ -775,7 +840,7 @@ function answer(ci,qi,btn){
   document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(+b.dataset.di===qi)b.classList.add('correct')});
   if(correct){quiz.score++;setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.correctDelay*1000));}
   else{
-    const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);saveWords();
+    const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
     const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
     if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
     else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
@@ -787,7 +852,7 @@ function dontKnow(qi){
   document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(+b.dataset.di===qi)b.classList.add('correct')});
   const dn=document.getElementById('qDunno');if(dn)dn.disabled=true;
-  const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);saveWords();
+  const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
   const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
   if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
   else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
@@ -846,7 +911,13 @@ function renderDayDetail(){
   // TEST 기록
   h+='<div class="count" style="margin-top:12px;font-weight:700;color:var(--ink)">TEST 기록 '+(rec.tests?rec.tests.length:0)+'건</div>';
   if(rec.tests&&rec.tests.length){
-    h+= rec.tests.map((tt,idx)=>'<div class="test-rec"><span>'+tt.greDay+'일차 · '+(tt.mode==='mean'?'뜻 고르기':'단어 고르기')+' · '+tt.score+'/'+tt.total+' · '+tt.percentage+'% · '+(tt.completedAt?tt.completedAt.slice(11,16):'')+'</span><button class="small danger" onclick="deleteTest(\''+key+'\','+idx+')">삭제</button></div>').join('');
+    h+= rec.tests.map((tt,idx)=>{
+      let row='<div class="test-rec"><span>'+tt.greDay+'일차 · '+(tt.mode==='mean'?'뜻 고르기':'단어 고르기')+' · '+tt.score+'/'+tt.total+' · '+tt.percentage+'% · '+(tt.completedAt?tt.completedAt.slice(11,16):'')+'</span><button class="small danger" onclick="deleteTest(\''+key+'\','+idx+')">삭제</button></div>';
+      if(tt.wrong&&tt.wrong.length){
+        row+='<details class="test-wrong"><summary>틀린 단어 '+tt.wrong.length+'개 보기</summary><div class="tw-list">'+tt.wrong.map(w=>'<div class="tw-item"><b>'+esc(w.word)+'</b>'+(w.mean?' — '+esc(breakNumbered(w.mean)):'')+'</div>').join('')+'</div></details>';
+      }
+      return row;
+    }).join('');
   }else h+='<p class="count">기록 없음</p>';
   el.innerHTML=h;
 }
@@ -869,24 +940,21 @@ function startOfficialTest(day,mode){
 function recordOfficial(){
   const now=new Date();const key=todayKey();const r=ensureDate(key);
   const pct=Math.round(quiz.score/quiz.pool.length*100);
-  r.tests.push({greDay:quiz.greDay,mode:quiz.mode,score:quiz.score,total:quiz.pool.length,percentage:pct,completedAt:key+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds())});
+  r.tests.push({greDay:quiz.greDay,mode:quiz.mode,score:quiz.score,total:quiz.pool.length,percentage:pct,wrong:(quiz.wrongList||[]).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no})),completedAt:key+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds())});
   saveCal();
 }
 function backToCalendar(){quiz=null;document.getElementById('calQuizArea').innerHTML='';setOfficialMode(false);renderCalendar();}
 
 /* ================= init ================= */
 ['optMean','optSent','optSyn','optPron','optEtym'].forEach(id=>document.getElementById(id).onchange=render);
-document.getElementById('setCorrectDelay').value=settings.correctDelay;
-document.getElementById('setWrongDelay').value=settings.wrongDelay;
-document.getElementById('setChunkSize').value=settings.chunkSize;
-document.getElementById('setChoices').value=settings.choices;
+syncSettingsUI();
 document.getElementById('setChoices').onchange=e=>{settings.choices=Math.min(6,Math.max(3,parseInt(e.target.value)||4));e.target.value=settings.choices;saveSettings();};
 document.getElementById('setCorrectDelay').onchange=e=>{settings.correctDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
 document.getElementById('setWrongDelay').onchange=e=>{settings.wrongDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
 document.getElementById('setChunkSize').onchange=e=>{settings.chunkSize=Math.max(1,parseInt(e.target.value)||25);QSIZE=settings.chunkSize;e.target.value=settings.chunkSize;saveSettings();renderChunkRow();renderTestChunkRow();};
 document.getElementById('sDayFrom').addEventListener('input',renderChunkRow);
 document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow);
-renderAll();
+renderTabs();renderAll();
 </script>
 </body>
 </html>
