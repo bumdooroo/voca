@@ -764,8 +764,8 @@ function showQ(){
       const di=data.indexOf(c);
       const main=quiz.mode==='mean'?esc(c.mean):esc(c.word);
       const sub=quiz.mode==='mean'?esc(c.word):esc(c.mean);
-      return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span style="color:var(--sub)">'+(ci+1)+'. </span><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
-    }).join('')+'<button class="btn" id="qDunno" onclick="dontKnow('+ansIdx+')" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요 (0)</button>'+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료</div>';
+      return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
+    }).join('')+'<button class="btn" id="qDunno" onclick="dontKnow('+ansIdx+')" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요</button>'+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료</div>';
 }
 function answer(ci,qi,btn){
   const correct=ci===qi;
