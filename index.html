@@ -361,7 +361,8 @@ function renderStatusChips(){
     ['unknown','몰라요',data.filter(x=>x.lastLevel==='unknown').length],
     ['ambiguous','애매해요',data.filter(x=>x.lastLevel==='ambiguous').length],
     ['known','알아요',data.filter(x=>x.lastLevel==='known').length],
-    ['unchecked','미체크',data.filter(x=>!x.lastLevel).length]
+    ['unchecked','미체크',data.filter(x=>!x.lastLevel).length],
+    ['wrong','틀림',data.filter(x=>(x.wrong||0)>0).length]
   ];
   configs.forEach(([value,label,count])=>{
     const c=document.createElement('span');
@@ -378,6 +379,7 @@ function visible(){
   else if(statusFilter==='ambiguous')arr=arr.filter(x=>x.lastLevel==='ambiguous');
   else if(statusFilter==='known')arr=arr.filter(x=>x.lastLevel==='known');
   else if(statusFilter==='unchecked')arr=arr.filter(x=>!x.lastLevel);
+  else if(statusFilter==='wrong')arr=arr.filter(x=>(x.wrong||0)>0);
   if(wrongOnly)arr=arr.filter(x=>(x.wrong||0)>0);
   const q=document.getElementById('searchBox').value.trim().toLowerCase();
   if(q)arr=arr.filter(x=>(x.word||'').toLowerCase().includes(q)||(x.mean||'').toLowerCase().includes(q)||(x.sent||'').toLowerCase().includes(q)||(x.etym||'').toLowerCase().includes(q));
