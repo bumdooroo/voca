@@ -1,1 +1,856 @@
-placeholder
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOCA</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1c2333;--sub:#6b7280;--acc:#4f6df5;--line:#e5e7eb;--red:#e05555;--green:#2da56a}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif}
+body{background:var(--bg);color:var(--ink);padding:16px;max-width:900px;margin:0 auto}
+h2{font-size:20px;margin-bottom:12px}
+h3{font-size:15px;margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:13px}
+button.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.small{padding:3px 8px;font-size:12px}
+button.danger{color:var(--red);border-color:#f0c4c4}
+input,select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chipwrap{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{padding:4px 10px;border-radius:14px;font-size:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.entry{border-bottom:1px solid var(--line);padding:12px 4px}
+.entry:last-child{border-bottom:none}
+.e-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.e-check{align-self:center}
+.e-day{font-size:11px;color:var(--sub);background:#eef1ff;border-radius:8px;padding:2px 7px}
+.e-no{font-size:11px;color:#9aa1ad}
+.e-word{font-size:17px;font-weight:700}
+.e-pron{font-size:12px;color:var(--sub)}
+.e-mean{margin-top:6px;font-size:14px;line-height:1.55;white-space:pre-line}
+.e-sent{margin-top:6px;font-size:12.5px;color:#4b5563;white-space:pre-line;background:#f9fafb;border-radius:8px;padding:8px 10px;line-height:1.5}
+.e-syn{margin-top:6px;font-size:12px;color:#7c3aed;white-space:pre-line;line-height:1.5}
+.e-act{margin-left:auto;display:flex;gap:4px}
+.hide{display:none!important}
+.wrongcnt{color:var(--red);font-size:12px}
+.unkcnt{color:#8a5a00;font-size:12px}
+.quiz-choice{display:block;width:100%;text-align:left;margin:6px 0;padding:10px;white-space:pre-line;line-height:1.5}
+.quiz-choice.correct{background:#e6f7ee;border-color:var(--green)}
+.quiz-choice.wrong{background:#fdeaea;border-color:var(--red)}
+.qc-sub{color:var(--sub);font-style:italic;font-size:12px}
+.quiz-word{font-size:24px;font-weight:700}
+.count{font-size:13px;color:var(--sub)}
+label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
+.study-shell{padding-top:4px}
+.study-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.study-progress{height:7px;background:#eef0f5;border-radius:999px;overflow:hidden;margin:8px 0 18px}
+.study-progress>div{height:100%;background:var(--acc);transition:width .2s ease}
+.study-label{display:block;font-size:11px;font-weight:700;color:var(--sub);margin-bottom:0;line-height:1.25;letter-spacing:.04em}
+.study-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.study-actions button{min-height:42px;font-weight:700}
+.study-actions .grow{flex:1}
+.study-actions .unknown{background:#fdeaea;border-color:#efb4b4;color:#b42323}
+.study-actions .ambiguous{background:#fff4d6;border-color:#edcf83;color:#8a5a00}
+.study-actions .known{background:#e6f7ee;border-color:#9fd8ba;color:#176b43}
+.study-status{display:inline-block;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:6px}
+.study-status.unknown{background:#fdeaea;color:#b42323}
+.study-status.ambiguous{background:#fff4d6;color:#8a5a00}
+.study-status.known{background:#e6f7ee;color:#176b43}
+.study-tip{font-size:12px;color:var(--sub);margin-top:10px;line-height:1.5}
+.study-summary{padding:10px 0}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat{background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+.stat b{display:block;font-size:20px;margin-bottom:3px}
+.etym{margin-top:6px;font-size:12.5px;color:#5b3db5;background:#f5f1ff;border-radius:8px;padding:8px 10px;white-space:pre-line;line-height:1.5}
+.dict-entry{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;margin:4px 0 2px}
+.dict-left{flex:0 0 172px;padding:16px 14px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.dict-word{font-size:27px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden}
+.dict-pron{margin-top:8px;font-size:13px;color:var(--sub)}
+.dict-right{flex:1;min-width:0}
+.dict-row{padding:11px 14px;border-bottom:1px solid #eef0f4;white-space:pre-line;line-height:1.55;font-size:14px}
+.dict-row:last-child{border-bottom:none}
+.dict-row.etym-row{font-size:12.5px;color:#6b46d0;background:#faf8ff}
+.dict-row.mean-row{color:var(--ink)}
+.dict-row.sent-row{color:#4b5563;font-size:13px}
+.dict-row.syn-row{color:#6b7280;font-size:12.5px;background:repeating-linear-gradient(45deg,#fafbfc,#fafbfc 6px,#f1f3f6 6px,#f1f3f6 7px)}
+.sc-prog{height:5px;background:#eef0f5;border-radius:999px;overflow:hidden;margin-bottom:10px}
+.sc-prog>div{height:100%;background:var(--acc)}
+.sc-band{background:#eef0f4;border-radius:10px;padding:16px 18px;text-align:center}
+.sc-mean{font-size:19px;font-weight:700;color:var(--ink);line-height:1.6;white-space:pre-line;text-align:left}
+.sc-scroll{height:320px;overflow-y:auto;margin-top:12px;padding-right:4px}
+@media(max-width:640px){.sc-scroll{height:46vh}}
+.sc-rows{padding-top:6px}
+.sc-row{border-bottom:1px solid #eef0f4;padding:11px 2px}
+.sc-row:last-child{border-bottom:none}
+.sc-lab{font-size:11px;color:var(--sub);margin-bottom:3px}
+.sc-val{font-size:13px;color:#4b5563;line-height:1.6;white-space:pre-line}
+.sc-val.syn{color:#7c3aed}
+.sc-val.etym{color:#6b46d0}
+/* Calendar */
+.cal-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.cal-title{font-size:17px;font-weight:800;min-width:120px;text-align:center}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.cal-weekdays div{text-align:center;font-size:12px;color:var(--sub);padding:2px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-cell{min-height:74px;border:1px solid var(--line);border-radius:8px;padding:5px;background:#fff;cursor:pointer;overflow:hidden}
+.cal-cell.empty{background:transparent;border:none;cursor:default}
+.cal-cell.today{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.cal-cell.sel{background:#eef1ff}
+.cal-date{font-size:12px;font-weight:700;margin-bottom:3px}
+.cal-brief{font-size:10.5px;line-height:1.35;border-radius:5px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-brief.study{background:#eef7ff;color:#1d4ed8}
+.cal-brief.test{background:#e6f7ee;color:#176b43}
+.today-badge{font-size:11px;background:var(--acc);color:#fff;border-radius:999px;padding:2px 8px;font-weight:700}
+.official-box{margin-top:12px;padding:12px;border:1px dashed #c7cede;border-radius:10px;background:#fbfcff}
+.test-rec{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:8px 2px;font-size:13px}
+.test-rec:last-child{border-bottom:none}
+@media(max-width:640px){
+  .dict-entry{flex-direction:column}
+  .dict-left{flex:none;border-right:none;border-bottom:1px solid var(--line);text-align:center;padding:16px;overflow:hidden}
+  .dict-word{font-size:24px}
+  .statgrid{grid-template-columns:1fr}
+  .study-actions button{flex:1}
+  .cal-cell{min-height:60px;padding:3px}
+  .cal-date{font-size:11px}
+  .cal-brief{font-size:9.5px}
+}
+</style>
+</head>
+<body>
+<h2>VOCA <span id="total" class="count"></span></h2>
+
+<div class="tabs" id="mainTabs">
+  <button id="tabGRE" class="on" onclick="switchTab('gre')">GRE</button>
+  <button id="tabCAL" onclick="switchTab('cal')">캘린더</button>
+</div>
+
+<!-- ============ GRE VIEW ============ -->
+<div id="greView">
+
+<div class="card" id="settingsCard">
+<h3>보기 설정</h3>
+<div class="row">
+<label class="tog"><input type="checkbox" id="optMean" checked>뜻</label>
+<label class="tog"><input type="checkbox" id="optSent" checked>예문</label>
+<label class="tog"><input type="checkbox" id="optSyn">유사어</label>
+<label class="tog"><input type="checkbox" id="optPron" checked>발음기호</label>
+<label class="tog"><input type="checkbox" id="optEtym">어근·어원</label>
+<span style="width:1px;height:16px;background:var(--line)"></span>
+<label class="tog" title="틀렸을 때도 자동으로 다음 문제로 넘어갑니다"><input type="checkbox" id="optAutoWrong">틀려도 자동 넘김</label>
+</div>
+</div>
+
+<div class="card" id="prefsCard">
+<h3>설정</h3>
+<div class="row">
+<span style="font-size:13px">정답 후 자동 넘김</span> <input type="number" id="setCorrectDelay" min="0" step="0.5" style="width:64px"> 초
+<span style="width:1px;height:16px;background:var(--line)"></span>
+<span style="font-size:13px">틀린 후 자동 넘김</span> <input type="number" id="setWrongDelay" min="0" step="0.5" style="width:64px"> 초
+<span style="width:1px;height:16px;background:var(--line)"></span>
+<span style="font-size:13px">구간 크기</span> <input type="number" id="setChunkSize" min="1" style="width:64px"> 개
+</div>
+<p class="study-tip">정답 넘김을 0으로 하면 즉시 넘어갑니다. ‘틀린 후 자동 넘김’은 위 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
+</div>
+
+<div class="card" id="studyCard">
+<h3 id="studyHead">학습</h3>
+<div class="row" id="studyConfig">
+일차 <input type="number" id="sDayFrom" min="1" value="1" style="width:70px"> ~
+<input type="number" id="sDayTo" min="1" value="1" style="width:70px">
+<input type="number" id="sCount" value="100" min="1" style="width:70px"> 개
+<select id="sOrder">
+<option value="no" selected>번호순</option>
+<option value="abc">ABC순</option>
+<option value="random">랜덤 순서</option>
+<option value="wrong">모름·애매 우선</option>
+</select>
+<button class="primary" onclick="startStudy()">전체 학습</button>
+</div>
+<div class="row" id="chunkRow" style="margin-top:8px"></div>
+<p class="study-tip" id="studyNote">한 일차(1~100번)를 순서대로 학습하고 숙지 정도를 기록합니다. 끝까지 완료하면 오늘 날짜 캘린더에 자동 기록됩니다.</p>
+<div id="studyArea"></div>
+</div>
+
+<div class="card" id="testCard">
+<h3 id="testHead">테스트 (연습)</h3>
+<div class="row" id="testConfig">
+일차 <input type="number" id="qDayFrom" min="1" value="1" style="width:70px"> ~
+<input type="number" id="qDayTo" min="1" value="1" style="width:70px">
+<input type="number" id="qCount" value="20" min="1" style="width:70px"> 개
+<select id="qMode">
+<option value="mean">뜻 고르기</option>
+<option value="word">단어 고르기</option>
+</select>
+<button class="primary" onclick="startQuiz()">전체 테스트</button>
+</div>
+<div class="row" id="testChunkRow" style="margin-top:8px"></div>
+<p class="study-tip" id="testNote">연습 테스트는 캘린더에 기록되지 않습니다. 공식 기록용 50문제 TEST는 캘린더 탭에서 시작하세요.</p>
+<div id="quizArea" style="margin-top:12px"></div>
+</div>
+
+<div class="card" id="listCard">
+<div class="row" style="justify-content:space-between">
+<h3 style="margin:0">단어장 <span id="listCount" class="count"></span></h3>
+<div class="row">
+<button onclick="exportCSV()">CSV 내보내기</button>
+<button onclick="document.getElementById('csvFile').click()">CSV 불러오기</button>
+<input type="file" id="csvFile" accept=".csv" class="hide" onchange="importCSV(this)">
+<button onclick="toggleWrongOnly(this)" id="wrongBtn">오답만 (<span id="wrongCnt">0</span>)</button>
+</div>
+</div>
+<div class="row" style="margin-top:8px">
+<button class="small" onclick="selectAllVisible()">전체선택</button>
+<button class="small" onclick="clearSelection()">선택해제</button>
+<button class="small danger" onclick="deleteSelected()">선택삭제 (<span id="selCnt">0</span>)</button>
+<button class="small danger" onclick="deleteAll()">전체삭제</button>
+</div>
+<div class="chipwrap" id="dayChips"></div>
+<div style="margin-top:10px">
+  <div class="count" style="margin-bottom:5px">학습 상태</div>
+  <div class="chipwrap" id="statusChips"></div>
+</div>
+<div class="row">
+<select id="sortSel" onchange="render()">
+<option value="dayNo" selected>일차 → 번호</option>
+<option value="abc">ABC순</option>
+<option value="dayDesc">일차 ↓</option>
+<option value="wrong">많이 틀린 순</option>
+<option value="new">최신순</option>
+</select>
+<input type="text" id="searchBox" placeholder="검색" oninput="render()">
+</div>
+<div id="list"></div>
+</div>
+
+<div class="card" id="addCard">
+<h3>빠른 추가</h3>
+<div class="row">
+<input type="number" id="aDay" placeholder="일차" style="width:70px">
+<input type="text" id="aWord" placeholder="단어" style="width:130px">
+<input type="text" id="aPron" placeholder="발음기호" style="width:110px">
+<input type="text" id="aMean" placeholder="뜻" style="flex:1;min-width:150px">
+</div>
+<div class="row" style="margin-top:6px">
+<input type="text" id="aSent" placeholder="예문" style="flex:1">
+<input type="text" id="aSyn" placeholder="유사어" style="flex:1">
+<input type="text" id="aEtym" placeholder="어근·어원" style="flex:1;min-width:180px">
+<button class="primary" onclick="quickAdd()">추가</button>
+</div>
+</div>
+
+</div><!-- /greView -->
+
+<!-- ============ CALENDAR VIEW ============ -->
+<div id="calView" class="hide">
+  <div id="calMain">
+    <div class="card">
+      <div class="cal-head">
+        <button onclick="prevMonth()">‹ 이전달</button>
+        <span class="cal-title" id="calTitle"></span>
+        <button onclick="nextMonth()">다음달 ›</button>
+        <button onclick="goToday()">오늘</button>
+      </div>
+      <div class="cal-weekdays"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="card" id="calDetail"></div>
+  </div>
+  <div id="calQuizArea" class="card hide"></div>
+</div>
+
+<script>
+/* ================= 데이터 ================= */
+const WORD_KEY='voca_GRE';
+const CAL_KEY='voca_calendar_GRE';
+const pad=n=>String(n).padStart(2,'0');
+function dateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function todayKey(){return dateKey(new Date());}
+
+function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY))||[]}catch(e){return[]}}
+function saveWords(){localStorage.setItem(WORD_KEY,JSON.stringify(data))}
+function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY))||{}}catch(e){return{}}}
+function saveCal(){localStorage.setItem(CAL_KEY,JSON.stringify(calendar))}
+
+let data=loadWords();
+let calendar=loadCal();
+function loadChunk(){try{return JSON.parse(localStorage.getItem('voca_chunkprog_GRE'))||{}}catch(e){return{}}}
+function saveChunk(){localStorage.setItem('voca_chunkprog_GRE',JSON.stringify(chunkProg))}
+let chunkProg=loadChunk();
+function loadSettings(){try{return Object.assign({correctDelay:2,wrongDelay:2,chunkSize:25},JSON.parse(localStorage.getItem('voca_settings_GRE'))||{})}catch(e){return{correctDelay:2,wrongDelay:2,chunkSize:25}}}
+function saveSettings(){localStorage.setItem('voca_settings_GRE',JSON.stringify(settings))}
+let settings=loadSettings();
+let QSIZE=settings.chunkSize||25;
+
+let mainTab='gre';
+let filterDay=0, wrongOnly=false, statusFilter='all';
+let selected=new Set();
+
+// 캘린더 상태
+const _now=new Date();
+let calY=_now.getFullYear(), calM=_now.getMonth();
+let calSel=todayKey();
+
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function breakNumbered(t){if(!t)return t;return t.replace(/\s*(\d+\.)\s/g,function(m,p1,off){return (off===0?'':'\n')+p1+' ';});}
+
+/* 일차별 1~N 번호 부여: 번호 있으면 그 순서로, 없으면 ABC 순서로 → 항상 일차 내 1..N */
+function normalizeNumbers(){
+  const byDay={};
+  data.forEach(w=>{w.day=parseInt(w.day)||1; (byDay[w.day]=byDay[w.day]||[]).push(w);});
+  Object.keys(byDay).forEach(dk=>{
+    const arr=byDay[dk];
+    const allNumbered=arr.every(w=>parseInt(w.no)>0);
+    if(allNumbered) arr.sort((a,b)=>(+a.no)-(+b.no));
+    else arr.sort((a,b)=>(a.word||'').localeCompare(b.word||'','en',{sensitivity:'base'}));
+    arr.forEach((w,i)=>w.no=i+1);
+  });
+}
+normalizeNumbers();
+if(data.length)saveWords();
+
+/* ================= 탭 전환 ================= */
+function switchTab(t){
+  mainTab=t;
+  document.getElementById('greView').classList.toggle('hide',t!=='gre');
+  document.getElementById('calView').classList.toggle('hide',t!=='cal');
+  document.getElementById('tabGRE').classList.toggle('on',t==='gre');
+  document.getElementById('tabCAL').classList.toggle('on',t==='cal');
+  if(t==='cal'){ if(!calSel)calSel=todayKey(); renderCalendar(); }
+  else render();
+}
+
+/* ================= GRE: 단어장 ================= */
+function days(){return [...new Set(data.map(x=>+x.day||0))].filter(x=>x>0).sort((a,b)=>a-b)}
+
+function renderChips(){
+  const w=document.getElementById('dayChips');w.innerHTML='';
+  const all=document.createElement('span');all.className='chip'+(filterDay===0?' on':'');all.textContent='전체 보기';
+  all.onclick=()=>{filterDay=0;render();renderChips()};w.appendChild(all);
+  days().forEach(d=>{
+    const c=document.createElement('span');c.className='chip'+(filterDay===d?' on':'');c.textContent=d+'일차';
+    c.onclick=()=>{filterDay=d;render();renderChips()};w.appendChild(c);
+  });
+  const dd=days();
+  if(dd.length){
+    const q1=document.getElementById('qDayFrom'),q2=document.getElementById('qDayTo');
+    if(!q1.value||+q1.value<1)q1.value=dd[0];
+    if(!q2.value||+q2.value<1)q2.value=dd[dd.length-1];
+    const s1=document.getElementById('sDayFrom'),s2=document.getElementById('sDayTo');
+    if(!s1.value||+s1.value<1)s1.value=dd[0];
+    if(!s2.value||+s2.value<1)s2.value=dd[0];
+  }
+}
+
+function renderStatusChips(){
+  const w=document.getElementById('statusChips');if(!w)return;w.innerHTML='';
+  const configs=[
+    ['all','전체',data.length],
+    ['unknown','몰라요',data.filter(x=>x.lastLevel==='unknown').length],
+    ['ambiguous','애매해요',data.filter(x=>x.lastLevel==='ambiguous').length],
+    ['known','알아요',data.filter(x=>x.lastLevel==='known').length],
+    ['unchecked','미체크',data.filter(x=>!x.lastLevel).length]
+  ];
+  configs.forEach(([value,label,count])=>{
+    const c=document.createElement('span');
+    c.className='chip'+(statusFilter===value?' on':'');
+    c.textContent=label+' ('+count+')';
+    c.onclick=()=>{statusFilter=value;renderStatusChips();render();};
+    w.appendChild(c);
+  });
+}
+
+function visible(){
+  let arr=data.filter(x=>filterDay===0||+x.day===filterDay);
+  if(statusFilter==='unknown')arr=arr.filter(x=>x.lastLevel==='unknown');
+  else if(statusFilter==='ambiguous')arr=arr.filter(x=>x.lastLevel==='ambiguous');
+  else if(statusFilter==='known')arr=arr.filter(x=>x.lastLevel==='known');
+  else if(statusFilter==='unchecked')arr=arr.filter(x=>!x.lastLevel);
+  if(wrongOnly)arr=arr.filter(x=>(x.wrong||0)>0);
+  const q=document.getElementById('searchBox').value.trim().toLowerCase();
+  if(q)arr=arr.filter(x=>(x.word||'').toLowerCase().includes(q)||(x.mean||'').toLowerCase().includes(q)||(x.sent||'').toLowerCase().includes(q)||(x.etym||'').toLowerCase().includes(q));
+  const s=document.getElementById('sortSel').value;
+  if(s==='abc')arr=[...arr].sort((a,b)=>(a.word||'').localeCompare(b.word||''));
+  else if(s==='dayDesc')arr=[...arr].sort((a,b)=>b.day-a.day||a.no-b.no);
+  else if(s==='wrong')arr=[...arr].sort((a,b)=>(b.wrong||0)-(a.wrong||0));
+  else if(s==='new')arr=[...arr].reverse();
+  else arr=[...arr].sort((a,b)=>a.day-b.day||a.no-b.no); // dayNo (기본)
+  return arr;
+}
+
+function render(){
+  const opt={m:optMean.checked,s:optSent.checked,y:optSyn.checked,p:optPron.checked,e:optEtym.checked};
+  const arr=visible();
+  document.getElementById('listCount').textContent=arr.length;
+  document.getElementById('total').textContent='· '+data.length+'단어';
+  document.getElementById('wrongCnt').textContent=data.filter(x=>(x.wrong||0)>0).length;
+  document.getElementById('selCnt').textContent=selected.size;
+  document.getElementById('list').innerHTML=arr.slice(0,600).map(x=>{
+    const i=data.indexOf(x);
+    return '<div class="entry">'+
+      '<div class="e-top">'+
+        '<input type="checkbox" class="e-check" '+(selected.has(x)?'checked':'')+' onchange="toggleSel('+i+',this.checked)">'+
+        '<span class="e-day">'+x.day+'일차</span>'+
+        '<span class="e-no">#'+(x.no||'')+'</span>'+
+        '<span class="e-word">'+esc(x.word)+'</span>'+
+        (opt.p&&x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+
+        (x.lastLevel==='unknown'?'<span class="study-status unknown">몰라요</span>':
+          x.lastLevel==='ambiguous'?'<span class="study-status ambiguous">애매해요</span>':
+          x.lastLevel==='known'?'<span class="study-status known">알아요</span>':'')+
+        ((x.unknown||0)>0?'<span class="unkcnt" title="학습 몰라요 횟수">?'+x.unknown+'</span>':'')+
+        ((x.wrong||0)>0?'<span class="wrongcnt" title="테스트 오답 횟수">✗'+x.wrong+'</span>':'')+
+        '<span class="e-act"><button class="small" onclick="editEntry('+i+')">수정</button><button class="small" onclick="delEntry('+i+')">삭제</button></span>'+
+      '</div>'+
+      (opt.m&&x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+
+      (opt.s&&x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+
+      (opt.y&&x.syn?'<div class="e-syn">≈ '+esc(x.syn)+'</div>':'')+
+      (opt.e&&x.etym?'<div class="etym"><b>어근</b> · '+esc(x.etym)+'</div>':'')+
+    '</div>';
+  }).join('')||'<p class="count" style="padding:12px">단어가 없습니다. CSV를 불러오세요.</p>';
+}
+
+function renderAll(){renderChips();renderStatusChips();renderChunkRow();renderTestChunkRow();render()}
+
+function toggleSel(i,on){const x=data[i];if(!x)return;if(on)selected.add(x);else selected.delete(x);document.getElementById('selCnt').textContent=selected.size}
+function selectAllVisible(){visible().forEach(x=>selected.add(x));render()}
+function clearSelection(){selected=new Set();render()}
+function deleteSelected(){
+  if(!selected.size)return alert('선택된 단어가 없습니다.');
+  if(!confirm('선택한 '+selected.size+'개 단어를 삭제할까요?'))return;
+  data=data.filter(x=>!selected.has(x));selected=new Set();normalizeNumbers();saveWords();renderAll();
+}
+function deleteAll(){
+  if(!data.length)return;
+  if(!confirm('GRE 단어 '+data.length+'개를 모두 삭제할까요? (되돌릴 수 없음)'))return;
+  data=[];selected=new Set();saveWords();renderAll();
+}
+function toggleWrongOnly(b){wrongOnly=!wrongOnly;b.style.background=wrongOnly?'#fdeaea':'';render()}
+function delEntry(i){if(confirm('삭제할까요?')){const x=data[i];selected.delete(x);data.splice(i,1);normalizeNumbers();saveWords();renderAll()}}
+function editEntry(i){
+  const x=data[i];
+  const w=prompt('단어',x.word);if(w===null)return;
+  const m=prompt('뜻',x.mean);if(m===null)return;
+  const p=prompt('발음기호',x.pron||'');if(p===null)return;
+  const s=prompt('예문',x.sent||'');if(s===null)return;
+  const y=prompt('유사어',x.syn||'');if(y===null)return;
+  const e=prompt('어근·어원',x.etym||'');if(e===null)return;
+  const dy=prompt('일차',x.day);if(dy===null)return;
+  Object.assign(x,{word:w,mean:m,pron:p,sent:s,syn:y,etym:e,day:parseInt(dy)||x.day});
+  normalizeNumbers();saveWords();renderAll();
+}
+function quickAdd(){
+  const g=id=>document.getElementById(id).value.trim();
+  if(!g('aWord')||!g('aMean'))return alert('단어와 뜻을 입력하세요');
+  const day=+g('aDay')||1;
+  const maxNo=Math.max(0,...data.filter(w=>+w.day===day).map(w=>+w.no||0));
+  data.push({day:day,no:maxNo+1,word:g('aWord'),pron:g('aPron'),mean:g('aMean'),sent:g('aSent'),syn:g('aSyn'),etym:g('aEtym'),wrong:0,studied:0,unknown:0,ambiguous:0,known:0});
+  normalizeNumbers();saveWords();
+  ['aWord','aPron','aMean','aSent','aSyn','aEtym'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+}
+
+/* ================= CSV ================= */
+function parseCSV(text){
+  const rows=[];let cur=[''],inQ=false,c=0;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){if(text[i+1]==='"'){cur[c]+='"';i++}else inQ=false}
+      else cur[c]+=ch;
+    }else{
+      if(ch==='"')inQ=true;
+      else if(ch===','){cur.push('');c++}
+      else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;rows.push(cur);cur=[''];c=0}
+      else cur[c]+=ch;
+    }
+  }
+  if(cur.length>1||cur[0])rows.push(cur);
+  return rows;
+}
+function importCSV(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const rows=parseCSV(e.target.result.replace(/^﻿/,''));
+    if(!rows.length)return alert('빈 파일입니다.');
+    const head=rows[0].map(h=>h.trim().toLowerCase());
+    const ix=(...names)=>head.findIndex(h=>names.some(n=>n&&h.includes(n)));
+    const iDay=ix('day','일차'),iNo=ix('no','번호'),iWord=ix('word','단어'),iPron=ix('pron','발음'),iMean=ix('mean','뜻'),iSent=ix('sample','sent','예문');
+    let iSyn=ix('syn','유사'),iEtym=ix('etym','어원','어근');
+    const iWrong=ix('wrong','오답'),iUnk=ix('unknown'),iAmb=ix('ambiguous'),iKno=ix('known'),iLast=ix('lastlevel','last'),iStu=ix('studied');
+    if(iWord<0||iMean<0)return alert('Word/단어, 뜻/Meaning 칼럼을 찾을 수 없습니다.');
+    if(iSyn<0){const used=[iDay,iNo,iWord,iMean,iSent,iPron,iEtym,iWrong,iUnk,iAmb,iKno,iLast,iStu];for(let ci=Math.max(iSent,iMean)+1;ci<rows[0].length;ci++){if(!used.includes(ci)){iSyn=ci;break}}}
+    // 기존 진행상황(오답·학습상태)을 단어 텍스트 기준으로 백업 → CSV에 값이 없으면 이어받음
+    const prevMap={};
+    data.forEach(w=>{prevMap[(w.word||'').toLowerCase().trim()]={wrong:w.wrong||0,unknown:w.unknown||0,ambiguous:w.ambiguous||0,known:w.known||0,lastLevel:w.lastLevel||'',studied:w.studied||0};});
+    const numAt=(r,i,fb)=>{if(i>=0){const v=parseInt((r[i]||'').replace(/[^0-9]/g,''));if(!isNaN(v))return v;}return fb;};
+    const items=rows.slice(1).filter(r=>r[iWord]&&r[iWord].trim()).map(r=>{
+      const word=r[iWord].trim();
+      const pv=prevMap[word.toLowerCase()]||{};
+      let last=iLast>=0?((r[iLast]||'').trim()||''):(pv.lastLevel||'');
+      const o={
+        day:parseInt((r[iDay]||'').replace(/[^0-9]/g,''))||1,
+        no:iNo>=0?(parseInt((r[iNo]||'').replace(/[^0-9]/g,''))||0):0,
+        word:word,
+        pron:iPron>=0?(r[iPron]||'').trim():'',
+        mean:(r[iMean]||'').trim(),
+        sent:iSent>=0?(r[iSent]||'').trim():'',
+        syn:iSyn>=0?(r[iSyn]||'').trim():'',
+        etym:iEtym>=0?(r[iEtym]||'').trim():'',
+        wrong:numAt(r,iWrong,pv.wrong||0),
+        unknown:numAt(r,iUnk,pv.unknown||0),
+        ambiguous:numAt(r,iAmb,pv.ambiguous||0),
+        known:numAt(r,iKno,pv.known||0),
+        studied:numAt(r,iStu,pv.studied||0)
+      };
+      if(last)o.lastLevel=last;
+      return o;
+    });
+    if(!items.length)return alert('불러올 데이터가 없습니다.');
+    if(data.length&&!confirm(items.length+'개 단어를 불러옵니다. 기존 '+data.length+'개를 교체할까요? (취소 시 뒤에 추가)')){data=data.concat(items)}
+    else data=items;
+    selected=new Set();normalizeNumbers();saveWords();inp.value='';renderAll();
+  };
+  rd.readAsText(f,'utf-8');
+}
+function exportCSV(){
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const ordered=[...data].sort((a,b)=>a.day-b.day||a.no-b.no);
+  const csv='Day,No,Word,Pronunciation,Meaning,Sample Sentences,Synonyms,Etymology,Wrong,Unknown,Ambiguous,Known,LastLevel,Studied\n'+
+    ordered.map(x=>[x.day,x.no,x.word,x.pron,x.mean,x.sent,x.syn,x.etym,x.wrong||0,x.unknown||0,x.ambiguous||0,x.known||0,x.lastLevel||'',x.studied||0].map(q).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
+  a.download='GRE_export.csv';a.click();
+}
+
+/* ================= 학습(Study) ================= */
+let study=null;
+function setStudyMode(on){
+  ['mainTabs','settingsCard','prefsCard','testCard','listCard','addCard','studyConfig','chunkRow','studyNote','studyHead'].forEach(id=>{
+    document.getElementById(id).classList.toggle('hide',on);
+  });
+}
+function studyPriority(x){return (x.unknown||0)*2+(x.ambiguous||0)}
+function orderPool(pool,order){
+  if(order==='abc') return [...pool].sort((a,b)=>a.day-b.day||(a.word||'').localeCompare(b.word||'','en',{sensitivity:'base'}));
+  if(order==='random') return [...pool].sort(()=>Math.random()-.5);
+  if(order==='wrong') return [...pool].sort((a,b)=>studyPriority(b)-studyPriority(a)||a.day-b.day||a.no-b.no);
+  return [...pool].sort((a,b)=>a.day-b.day||a.no-b.no);
+}
+function beginStudy(pool){study={pool,i:0,unknown:0,ambiguous:0,known:0,reviewList:[]};setStudyMode(true);showStudy();}
+function startStudy(){
+  const f=+sDayFrom.value||1,t=+sDayTo.value||f,n=+sCount.value||100,order=sOrder.value;
+  let pool=data.filter(x=>x.day>=Math.min(f,t)&&x.day<=Math.max(f,t));
+  if(!pool.length)return alert('해당 범위에 단어가 없습니다.');
+  pool=orderPool(pool,order).slice(0,Math.min(n,pool.length));
+  beginStudy(pool);
+}
+function startChunk(day,q){
+  day=+day;
+  const a=q*QSIZE+1,b=q*QSIZE+QSIZE;
+  let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
+  if(!pool.length)return alert(day+'일차 '+a+'–'+b+' 구간에 단어가 없습니다.');
+  beginStudy(orderPool(pool,document.getElementById('sOrder').value));
+}
+function startNextChunk(day){
+  day=+day;
+  const dayWords=data.filter(w=>+w.day===day);
+  if(!dayWords.length)return alert(day+'일차 단어가 없습니다.');
+  const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
+  const nq=Math.ceil(maxNo/QSIZE);
+  const done=new Set(chunkProg[day]||[]);
+  let q=-1;for(let i=0;i<nq;i++){if(!done.has(i)){q=i;break;}}
+  if(q<0)return alert(day+'일차는 모든 구간을 완료했어요. 특정 구간을 다시 하려면 구간 버튼을 눌러주세요.');
+  startChunk(day,q);
+}
+function renderChunkRow(){
+  const el=document.getElementById('chunkRow');if(!el)return;
+  const day=+document.getElementById('sDayFrom').value||1;
+  const dayWords=data.filter(w=>+w.day===day);
+  if(!dayWords.length){el.innerHTML='<span class="count">'+day+'일차 단어 없음</span>';return;}
+  const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
+  const nq=Math.ceil(maxNo/QSIZE);
+  const done=new Set(chunkProg[day]||[]);
+  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩</span>';
+  for(let q=0;q<nq;q++){
+    const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo),isDone=done.has(q);
+    h+='<button class="chip'+(isDone?' on':'')+'" onclick="startChunk('+day+','+q+')">'+a+'–'+b+(isDone?' ✓':'')+'</button>';
+  }
+  h+='<button class="chip" style="border-color:var(--acc);color:var(--acc);font-weight:700" onclick="startNextChunk('+day+')">이어서 ▶</button>';
+  el.innerHTML=h;
+}
+function endStudy(){study=null;document.getElementById('studyArea').innerHTML='';setStudyMode(false);renderChunkRow();render()}
+function studyAnswer(level){
+  if(!study||study.i>=study.pool.length)return;
+  const q=study.pool[study.i];
+  q.studied=(q.studied||0)+1;q.lastLevel=level;
+  if(level==='unknown'){q.unknown=(q.unknown||0)+1;study.unknown++;study.reviewList.push({item:q,status:'몰라요',cls:'unknown'});}
+  else if(level==='ambiguous'){q.ambiguous=(q.ambiguous||0)+1;study.ambiguous++;study.reviewList.push({item:q,status:'애매해요',cls:'ambiguous'});}
+  else{q.known=(q.known||0)+1;study.known++;}
+  saveWords();renderStatusChips();study.i++;showStudy();
+}
+function fitStudyWord(){
+  const el=document.querySelector('.dict-word');if(!el)return;
+  let size=28;el.style.fontSize=size+'px';let guard=0;
+  while(el.scrollWidth>el.clientWidth&&size>12&&guard<48){size-=1;el.style.fontSize=size+'px';guard++;}
+}
+function showStudy(){
+  const a=document.getElementById('studyArea');if(!study)return;
+  if(study.i>=study.pool.length){
+    // 완료: 완전히 학습한 일차를 오늘 날짜에 자동 기록
+    const bynos={};study.pool.forEach(w=>{(bynos[w.day]=bynos[w.day]||new Set()).add(+w.no)});
+    const recordedDays=[];
+    Object.keys(bynos).forEach(dk=>{
+      const day=+dk;
+      const dayWords=data.filter(w=>+w.day===day);
+      const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
+      const nq=Math.ceil(maxNo/QSIZE);
+      const done=new Set(chunkProg[day]||[]);
+      const before=done.size;
+      for(let q=0;q<nq;q++){let full=true;for(let nn=q*QSIZE+1;nn<=Math.min(q*QSIZE+QSIZE,maxNo);nn++){if(!bynos[day].has(nn)){full=false;break;}}if(full)done.add(q);}
+      chunkProg[day]=[...done].sort((a,b)=>a-b);
+      if(done.size>=nq&&before<nq){addStudiedDay(todayKey(),day);recordedDays.push(day);}
+    });
+    saveChunk();
+    const reviewHtml=study.reviewList.length
+      ? '<h3 style="margin-top:18px">복습할 단어 '+study.reviewList.length+'개</h3>'+
+        study.reviewList.map(r=>{const x=r.item;return '<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'<span class="study-status '+r.cls+'">'+r.status+'</span></div>'+(x.etym?'<div class="etym"><b>어근·어원</b> · '+esc(x.etym)+'</div>':'')+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>';}).join('')
+      : '<p class="count">모든 단어를 ‘알아요’로 분류했습니다.</p>';
+    const recNote=recordedDays.length?'<p class="count" style="color:#176b43;margin-top:6px">캘린더('+todayKey()+')에 '+recordedDays.sort((a,b)=>a-b).join(', ')+'일차 학습 완료가 기록되었습니다.</p>':'';
+    a.innerHTML='<div class="study-summary"><h3>학습 완료</h3>'+recNote+
+      '<div class="statgrid"><div class="stat"><b>'+study.unknown+'</b><span class="count">몰라요</span></div><div class="stat"><b>'+study.ambiguous+'</b><span class="count">애매해요</span></div><div class="stat"><b>'+study.known+'</b><span class="count">알아요</span></div></div>'+
+      '<button class="primary" onclick="endStudy()">학습 종료</button>'+reviewHtml+'</div>';
+    return;
+  }
+  const q=study.pool[study.i];
+  const pct=Math.round((study.i/study.pool.length)*100);
+  const meaningText=breakNumbered(q.mean)||'등록된 뜻이 없습니다.';
+  a.innerHTML='<div class="study-shell">'+
+    '<div class="sc-prog"><div style="width:'+pct+'%"></div></div>'+
+    '<div class="study-head"><span class="count">'+(study.i+1)+'/'+study.pool.length+' · '+q.day+'일차 #'+q.no+'</span><button class="small" onclick="endStudy()">그만</button></div>'+
+    '<div style="text-align:center;margin-top:2px"><div class="dict-word" style="font-size:34px">'+esc(q.word)+'</div>'+(q.pron?'<div class="dict-pron">'+esc(q.pron)+'</div>':'')+'</div>'+
+    '<div class="sc-scroll">'+
+      '<div class="sc-band"><div class="sc-mean">'+esc(meaningText)+'</div></div>'+
+      '<div class="sc-rows">'+
+      (q.sent?'<div class="sc-row"><div class="sc-lab">예문</div><div class="sc-val">'+esc(breakNumbered(q.sent))+'</div></div>':'')+
+      (q.syn?'<div class="sc-row"><div class="sc-lab">유사어</div><div class="sc-val syn">≈ '+esc(q.syn)+'</div></div>':'')+
+      (q.etym?'<div class="sc-row"><div class="sc-lab">어근·어원</div><div class="sc-val etym">'+esc(q.etym)+'</div></div>':'')+
+    '</div>'+
+    '</div>'+
+    '<div class="study-actions"><button class="grow unknown" onclick="studyAnswer(\'unknown\')">몰라요</button><button class="grow ambiguous" onclick="studyAnswer(\'ambiguous\')">애매해요</button><button class="grow known" onclick="studyAnswer(\'known\')">알아요</button></div>'+
+    '<div class="study-tip">키보드: 1 = 몰라요 · 2 = 애매해요 · 3 = 알아요</div>'+
+  '</div>';
+  fitStudyWord();
+}
+document.addEventListener('keydown',e=>{
+  if(!study||study.i>=study.pool.length)return;
+  const tag=(e.target&&e.target.tagName)||'';
+  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  if(e.key==='1')studyAnswer('unknown');
+  else if(e.key==='2')studyAnswer('ambiguous');
+  else if(e.key==='3')studyAnswer('known');
+  else if(e.key==='Escape')endStudy();
+});
+document.addEventListener('keydown',e=>{
+  if(!quiz)return;
+  const tag=(e.target&&e.target.tagName)||'';
+  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  if(e.key>='1'&&e.key<='4'){
+    const btns=document.querySelectorAll('#'+quiz.target+' .quiz-choice');
+    const b=btns[+e.key-1];
+    if(b&&!b.disabled)b.click();
+  }else if(e.key==='Enter'){
+    const nx=document.getElementById('qNext');
+    if(nx&&!nx.classList.contains('hide'))nextQ();
+  }else if(e.key==='Escape'){
+    if(quiz.official)backToCalendar();else endQuiz();
+  }
+});
+
+/* ================= 테스트(연습 + 공식 공용 엔진) ================= */
+let quiz=null;
+function setQuizMode(on){
+  ['mainTabs','settingsCard','prefsCard','studyCard','listCard','addCard','testConfig','testChunkRow','testNote','testHead'].forEach(id=>{
+    document.getElementById(id).classList.toggle('hide',on);
+  });
+}
+function renderTestChunkRow(){
+  const el=document.getElementById('testChunkRow');if(!el)return;
+  const day=+document.getElementById('qDayFrom').value||1;
+  const dayWords=data.filter(w=>+w.day===day);
+  if(!dayWords.length){el.innerHTML='<span class="count">'+day+'일차 단어 없음</span>';return;}
+  const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
+  const nq=Math.ceil(maxNo/QSIZE);
+  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩</span>';
+  for(let q=0;q<nq;q++){
+    const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
+    h+='<button class="chip" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+'</button>';
+  }
+  el.innerHTML=h;
+}
+function startTestChunk(day,q){
+  day=+day;
+  const a=q*QSIZE+1,b=q*QSIZE+QSIZE;
+  let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
+  if(pool.length<4)return alert(day+'일차 '+a+'–'+b+' 구간 단어가 4개 미만입니다.');
+  pool=[...pool].sort(()=>Math.random()-.5);
+  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea'};
+  setQuizMode(true);showQ();
+}
+function startQuiz(){
+  const f=+qDayFrom.value||1,t=+qDayTo.value||f,n=+qCount.value||20,mode=qMode.value;
+  let pool=data.filter(x=>x.day>=Math.min(f,t)&&x.day<=Math.max(f,t));
+  if(pool.length<4)return alert('해당 범위 단어가 4개 미만입니다.');
+  pool=[...pool].sort(()=>Math.random()-.5).slice(0,n);
+  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea'};
+  setQuizMode(true);showQ();
+}
+function endQuiz(){quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render()}
+function nextQ(){quiz.i++;showQ()}
+function pick(arr,n,ex){const r=[];const c=arr.filter(x=>x!==ex);while(r.length<n&&c.length){r.push(c.splice(Math.floor(Math.random()*c.length),1)[0])}return r}
+function showQ(){
+  const a=document.getElementById(quiz.target);
+  if(quiz.i>=quiz.pool.length){
+    if(quiz.official&&!quiz.recorded){recordOfficial();quiz.recorded=true;}
+    const wl=quiz.wrongList||[];
+    const wrongHtml = wl.length
+      ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
+        wl.map(x=>'<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'</div>'+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>').join('')
+      : '<p class="count" style="margin-top:10px">틀린 단어 없이 전부 맞혔어요! 🎉</p>';
+    const pct=Math.round(quiz.score/quiz.pool.length*100);
+    if(quiz.official){
+      a.innerHTML='<h3>공식 TEST 완료</h3><div class="statgrid"><div class="stat"><b>'+quiz.score+'/'+quiz.pool.length+'</b><span class="count">점수</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+quiz.greDay+'일차</b><span class="count">'+(quiz.mode==='mean'?'뜻 고르기':'단어 고르기')+'</span></div></div>'+
+        '<p class="count" style="color:#176b43">✔ 오늘('+todayKey()+') 날짜 캘린더에 기록되었습니다.</p>'+
+        '<button class="primary" onclick="backToCalendar()">캘린더로 돌아가기</button>'+wrongHtml;
+    }else{
+      a.innerHTML='<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)</h3><button class="primary" onclick="endQuiz()">닫기</button>'+wrongHtml;
+    }
+    return;
+  }
+  const q=quiz.pool[quiz.i];
+  const others=pick(quiz.pool.length>=8?quiz.pool:data,3,q);
+  const choices=[q,...others].sort(()=>Math.random()-.5);
+  const ansIdx=data.indexOf(q);
+  const prompt = quiz.mode==='mean'
+    ? '<div class="quiz-word">'+esc(q.word)+'</div>'+(q.pron?'<span class="e-pron">'+esc(q.pron)+'</span>':'')
+    : '<div class="e-mean" style="font-size:16px">'+esc(q.mean)+'</div>';
+  a.innerHTML='<div class="row" style="justify-content:space-between"><span class="count">'+(quiz.i+1)+'/'+quiz.pool.length+' · 점수 '+quiz.score+(quiz.official?' · 공식':'')+'</span><button class="small" onclick="'+(quiz.official?'backToCalendar()':'endQuiz()')+'">그만</button></div>'+prompt+
+    choices.map(function(c,ci){
+      const di=data.indexOf(c);
+      const main=quiz.mode==='mean'?esc(c.mean):esc(c.word);
+      const sub=quiz.mode==='mean'?esc(c.word):esc(c.mean);
+      return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span style="color:var(--sub)">'+(ci+1)+'. </span><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
+    }).join('')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~4 선택 · Enter 다음 · Esc 종료</div>';
+}
+function answer(ci,qi,btn){
+  const correct=ci===qi;
+  document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>b.disabled=true);
+  document.querySelectorAll('#'+quiz.target+' .qc-sub').forEach(s=>s.classList.remove('hide'));
+  btn.classList.add(correct?'correct':'wrong');
+  document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(+b.dataset.di===qi)b.classList.add('correct')});
+  if(correct){quiz.score++;setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.correctDelay*1000));}
+  else{
+    const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);saveWords();
+    const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
+    if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
+    else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
+  }
+}
+
+/* ================= 캘린더 ================= */
+function ensureDate(key){calendar[key]=calendar[key]||{studiedDays:[],tests:[]};if(!calendar[key].studiedDays)calendar[key].studiedDays=[];if(!calendar[key].tests)calendar[key].tests=[];return calendar[key];}
+function cleanupDate(key){const r=calendar[key];if(r&&(!r.studiedDays||!r.studiedDays.length)&&(!r.tests||!r.tests.length))delete calendar[key];}
+function addStudiedDay(key,day){day=parseInt(day);if(!day)return;const r=ensureDate(key);if(!r.studiedDays.includes(day)){r.studiedDays.push(day);r.studiedDays.sort((a,b)=>a-b);saveCal();}}
+function addStudiedManual(key){const v=document.getElementById('addDayInput').value;const d=parseInt(v);if(!d)return alert('일차 숫자를 입력하세요.');addStudiedDay(key,d);renderCalendar();}
+function removeStudied(key,day){const r=calendar[key];if(r){r.studiedDays=(r.studiedDays||[]).filter(d=>d!==day);cleanupDate(key);saveCal();renderCalendar();}}
+function deleteTest(key,idx){const r=calendar[key];if(r&&r.tests){r.tests.splice(idx,1);cleanupDate(key);saveCal();renderCalendar();}}
+
+function prevMonth(){calM--;if(calM<0){calM=11;calY--}renderCalendar()}
+function nextMonth(){calM++;if(calM>11){calM=0;calY++}renderCalendar()}
+function goToday(){const d=new Date();calY=d.getFullYear();calM=d.getMonth();calSel=todayKey();renderCalendar()}
+function selectDate(key){calSel=key;renderCalendar()}
+
+function fmtDateK(key){const p=key.split('-').map(Number);const wd=['일','월','화','수','목','금','토'][new Date(p[0],p[1]-1,p[2]).getDay()];return p[0]+'년 '+p[1]+'월 '+p[2]+'일 ('+wd+')';}
+
+function renderCalendar(){
+  document.getElementById('calTitle').textContent=calY+'년 '+(calM+1)+'월';
+  const startWd=new Date(calY,calM,1).getDay();
+  const daysInMonth=new Date(calY,calM+1,0).getDate();
+  const tk=todayKey();
+  let cells='';
+  for(let i=0;i<startWd;i++)cells+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const key=dateKey(new Date(calY,calM,d));
+    const rec=calendar[key];
+    let brief='';
+    if(rec){
+      if(rec.studiedDays&&rec.studiedDays.length)brief+='<div class="cal-brief study">학습: '+rec.studiedDays.slice().sort((a,b)=>a-b).join(',')+'일차</div>';
+      if(rec.tests&&rec.tests.length){const last=rec.tests[rec.tests.length-1];brief+='<div class="cal-brief test">TEST: '+last.score+'/'+last.total+(rec.tests.length>1?' ('+rec.tests.length+')':'')+'</div>';}
+    }
+    cells+='<div class="cal-cell'+(key===tk?' today':'')+(key===calSel?' sel':'')+'" onclick="selectDate(\''+key+'\')"><div class="cal-date">'+d+'</div>'+brief+'</div>';
+  }
+  document.getElementById('calGrid').innerHTML=cells;
+  renderDayDetail();
+}
+
+function renderDayDetail(){
+  const el=document.getElementById('calDetail');
+  const key=calSel;
+  if(!key){el.innerHTML='<p class="count">날짜를 선택하세요.</p>';return;}
+  const rec=calendar[key]||{studiedDays:[],tests:[]};
+  const studied=(rec.studiedDays||[]).slice().sort((a,b)=>a-b);
+  const isToday=key===todayKey();
+  let h='<h3>'+fmtDateK(key)+(isToday?' <span class="today-badge">오늘</span>':'')+'</h3>';
+  h+='<div class="count" style="margin-top:8px">학습한 일차</div><div class="chipwrap">';
+  h+= studied.length? studied.map(d=>'<span class="chip on">'+d+'일차 <span onclick="event.stopPropagation();removeStudied(\''+key+'\','+d+')" style="cursor:pointer">×</span></span>').join('') : '<span class="count">기록 없음</span>';
+  h+='</div>';
+  h+='<div class="row"><input type="number" id="addDayInput" placeholder="일차" style="width:80px" min="1"><button class="small" onclick="addStudiedManual(\''+key+'\')">일차 추가</button></div>';
+  // 공식 TEST
+  h+='<div class="official-box"><div class="count" style="margin-bottom:6px;font-weight:700;color:var(--ink)">공식 TEST · 50문제</div><div class="row">일차 <input type="number" id="offDay" min="1" value="'+(studied[0]||1)+'" style="width:70px"><select id="offMode"><option value="mean">뜻 고르기</option><option value="word">단어 고르기</option></select><button class="primary" onclick="startOfficialTest(document.getElementById(\'offDay\').value,document.getElementById(\'offMode\').value)">50문제 TEST 시작</button></div>'+(!isToday?'<div class="count" style="margin-top:6px;color:#8a5a00">※ 테스트 결과는 실제 수행한 오늘('+todayKey()+') 날짜에 기록됩니다.</div>':'')+'</div>';
+  // TEST 기록
+  h+='<div class="count" style="margin-top:12px;font-weight:700;color:var(--ink)">TEST 기록 '+(rec.tests?rec.tests.length:0)+'건</div>';
+  if(rec.tests&&rec.tests.length){
+    h+= rec.tests.map((tt,idx)=>'<div class="test-rec"><span>'+tt.greDay+'일차 · '+(tt.mode==='mean'?'뜻 고르기':'단어 고르기')+' · '+tt.score+'/'+tt.total+' · '+tt.percentage+'% · '+(tt.completedAt?tt.completedAt.slice(11,16):'')+'</span><button class="small danger" onclick="deleteTest(\''+key+'\','+idx+')">삭제</button></div>').join('');
+  }else h+='<p class="count">기록 없음</p>';
+  el.innerHTML=h;
+}
+
+/* ---- 공식 TEST ---- */
+function setOfficialMode(on){
+  document.getElementById('calMain').classList.toggle('hide',on);
+  document.getElementById('calQuizArea').classList.toggle('hide',!on);
+  document.getElementById('mainTabs').classList.toggle('hide',on);
+}
+function startOfficialTest(day,mode){
+  day=parseInt(day)||0;
+  if(!day)return alert('테스트할 일차를 선택하세요.');
+  const dayWords=data.filter(w=>+w.day===day);
+  if(dayWords.length<50)return alert(day+'일차 단어가 50개보다 적습니다. (현재 '+dayWords.length+'개) 50개 이상일 때 공식 TEST를 시작할 수 있습니다.');
+  const pool=[...dayWords].sort(()=>Math.random()-.5).slice(0,50);
+  quiz={pool,i:0,mode:(mode==='word'?'word':'mean'),score:0,wrongList:[],official:true,greDay:day,target:'calQuizArea',recorded:false};
+  setOfficialMode(true);showQ();
+}
+function recordOfficial(){
+  const now=new Date();const key=todayKey();const r=ensureDate(key);
+  const pct=Math.round(quiz.score/quiz.pool.length*100);
+  r.tests.push({greDay:quiz.greDay,mode:quiz.mode,score:quiz.score,total:quiz.pool.length,percentage:pct,completedAt:key+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds())});
+  saveCal();
+}
+function backToCalendar(){quiz=null;document.getElementById('calQuizArea').innerHTML='';setOfficialMode(false);renderCalendar();}
+
+/* ================= init ================= */
+['optMean','optSent','optSyn','optPron','optEtym'].forEach(id=>document.getElementById(id).onchange=render);
+document.getElementById('setCorrectDelay').value=settings.correctDelay;
+document.getElementById('setWrongDelay').value=settings.wrongDelay;
+document.getElementById('setChunkSize').value=settings.chunkSize;
+document.getElementById('setCorrectDelay').onchange=e=>{settings.correctDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
+document.getElementById('setWrongDelay').onchange=e=>{settings.wrongDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
+document.getElementById('setChunkSize').onchange=e=>{settings.chunkSize=Math.max(1,parseInt(e.target.value)||25);QSIZE=settings.chunkSize;e.target.value=settings.chunkSize;saveSettings();renderChunkRow();renderTestChunkRow();};
+document.getElementById('sDayFrom').addEventListener('input',renderChunkRow);
+document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow);
+renderAll();
+</script>
+</body>
+</html>
