@@ -1039,7 +1039,7 @@ const VAXK=['t','s','i','d'];
 const VAX_BASIC=['t','s'];
 const VCAT_ORDER=[7,4,1,5,3,2,6];
 const VMODES=[
-  ['card','① 카드 학습','처음 보는 동사를 의미·구조·결합·예문으로 익힙니다. 여기서 시작하세요.'],
+  ['quiz','① 테스트 (연습)','GRE 연습 테스트와 같은 4지선다. 틀리면 의미·구조·결합·비교·예문을 펼쳐 보여줍니다.'],
   ['sort','② 드래그 분류','방금 배운 동사를 톤·강도 기준으로 가볍게 정리합니다.'],
   ['pair','③ 페어 비교','뜻이 가까운 두 동사 중 어느 쪽이 더 강한지 고릅니다.'],
   ['recall','④ 역방향 회상','뜻·구조·결합을 보고 동사를 떠올립니다. 실제 산출 훈련.'],
@@ -1125,7 +1125,7 @@ function resetVerbs(){
 function loadVProg(){try{return JSON.parse(localStorage.getItem('voca_verbprog'))||{}}catch(e){return{}}}
 function saveVProg(){try{localStorage.setItem('voca_verbprog',JSON.stringify(vprog))}catch(e){}}
 let vprog=loadVProg();
-let vs=null, vCat=0, vMode='card', vSel=null, vPlaced=null, vSrc='all', vTyping=false;
+let vs=null, vCat=0, vMode='quiz', vSel=null, vPlaced=null, vSrc='all', vTyping=false, vQMode='mean';
 function vkey(o){return o.id||(o.v+'#'+o.c)}
 function vP(o){const k=vkey(o);if(!vprog[k])vprog[k]={n:0,e:0,days:[],rev:0,stage:-1,due:'',ax:{t:[0,0],s:[0,0],i:[0,0],d:[0,0]}};
   const p=vprog[k];if(!p.days)p.days=[];if(!p.ax)p.ax={t:[0,0],s:[0,0],i:[0,0],d:[0,0]};return p;}
@@ -1210,9 +1210,10 @@ function renderVerbs(){
   vCats().forEach(c=>{const arr=VERBS.filter(o=>o.c===c.c);const kn=arr.filter(vKnown).length;
     h+='<span class="chip'+(vCat===c.c?' on':'')+'" onclick="vSetCat('+c.c+')">'+c.c+'. '+esc(c.n)+' <span style="opacity:.65">'+kn+'/'+arr.length+'</span></span>';});
   h+='</div>';
-  const dflt=(vMode==='card'||vMode==='recall')?12:(vMode==='sort'?5:15);
+  const dflt=(vMode==='quiz')?20:(vMode==='recall'?12:(vMode==='sort'?5:15));
   h+='<div class="row" style="margin-top:14px">문항 <input type="number" id="vCount" value="'+dflt+'" min="1" style="width:70px"> '+(vMode==='sort'?'라운드':'개')+
      ' <select id="vOrder"><option value="due">복습 임박순</option><option value="new">안 해본 것 우선</option><option value="weak">취약 우선</option><option value="random">랜덤</option></select>'+
+     (vMode==='quiz'?' <select id="vQMode"><option value="mean"'+(vQMode==='mean'?' selected':'')+'>뜻 고르기</option><option value="word"'+(vQMode==='word'?' selected':'')+'>동사 고르기</option></select>':'')+
      (vMode==='recall'?' <label class="tog"><input type="checkbox" id="vTypeChk" '+(vTyping?'checked':'')+'>타이핑으로 입력</label>':'')+
      ' <button class="primary" onclick="startVerbs()">시작</button></div>';
   h+='<p class="study-tip">하루 10~12개 정도가 적당합니다. 처음 배우는 날은 ①②만, 다음 날부터 ③④⑤를 붙이세요.</p>';
@@ -1229,6 +1230,7 @@ function startVerbs(){
   const n=+document.getElementById('vCount').value||12;
   const order=document.getElementById('vOrder').value;
   const tc=document.getElementById('vTypeChk'); if(tc)vTyping=tc.checked;
+  const qm=document.getElementById('vQMode'); if(qm)vQMode=qm.value;
   let pool=vBasePool();
   if(!pool.length)return alert('조건에 맞는 동사가 없습니다. 대상이나 카테고리를 바꿔보세요.');
   const need=(vMode==='pair'||vMode==='sort'||vMode==='spec')?6:1;
@@ -1236,7 +1238,7 @@ function startVerbs(){
   const ordered=vOrder(pool,order);
   vs={mode:vMode,cat:vCat,i:0,n:n,order:order,score:0,total:0,wrong:[],
       pool:ordered.slice(0,Math.max(1,Math.min(n,ordered.length))),
-      seed:ordered,reveal:0,answered:false};
+      seed:ordered,reveal:0,answered:false,qmode:vQMode};
   document.getElementById('mainTabs').classList.add('hide');
   showVerbStep();
 }
@@ -1251,13 +1253,12 @@ function vSeedPick(){
 }
 function vHead(){
   const tot=(vs.mode==='pair'||vs.mode==='sort'||vs.mode==='spec')?vs.n:vs.pool.length;
-  return '<div class="row" style="justify-content:space-between"><span class="count">'+(vs.i+1)+'/'+tot+(vs.mode==='card'?'':' · 점수 '+vs.score)+'</span><button class="small" onclick="endVerbs()">그만</button></div>';
+  return '<div class="row" style="justify-content:space-between"><span class="count">'+(vs.i+1)+'/'+tot+' · 점수 '+vs.score+'</span><button class="small" onclick="endVerbs()">그만</button></div>';
 }
 function vDoneHTML(){
   const pct=vs.total?Math.round(vs.score/vs.total*100):0;
-  let h='<h3>'+(vs.mode==='card'?'학습 완료':'훈련 완료')+'</h3>';
-  if(vs.mode==='card'){h+='<div class="statgrid"><div class="stat"><b>'+vs.pool.length+'</b><span class="count">본 동사</span></div><div class="stat"><b>'+vs.wrong.length+'</b><span class="count">더 볼 것</span></div><div class="stat"><b>'+VSRS[0]+'일 뒤</b><span class="count">첫 복습</span></div></div>';}
-  else{h+='<div class="statgrid"><div class="stat"><b>'+vs.score+'/'+vs.total+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+vs.wrong.length+'</b><span class="count">틀린 항목</span></div></div>';}
+  let h='<h3>훈련 완료</h3>';
+  {h+='<div class="statgrid"><div class="stat"><b>'+vs.score+'/'+vs.total+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+vs.wrong.length+'</b><span class="count">틀린 항목</span></div></div>';}
   h+='<button class="primary" onclick="endVerbs()">닫기</button>';
   const uniq=[];vs.wrong.forEach(o=>{if(uniq.indexOf(o)<0)uniq.push(o)});
   if(uniq.length){h+='<h3 style="margin-top:16px;color:var(--red)">복습할 동사 '+uniq.length+'개</h3>'+uniq.map(o=>vCard(o,true)).join('');}
@@ -1279,45 +1280,86 @@ function showVerbStep(){
   const el=document.getElementById('verbsBody');if(!el||!vs)return;
   const limit=(vs.mode==='pair'||vs.mode==='sort'||vs.mode==='spec')?vs.n:vs.pool.length;
   if(vs.i>=limit){el.innerHTML=vDoneHTML();return;}
-  const f={card:vCardHTML,recall:vRecallHTML,coord:vCoordHTML,spec:vSpecHTML,pair:vPairHTML,sort:vSortHTML}[vs.mode];
+  const f={quiz:vQuizHTML,recall:vRecallHTML,coord:vCoordHTML,spec:vSpecHTML,pair:vPairHTML,sort:vSortHTML}[vs.mode];
   el.innerHTML=vHead()+f();
   if(vs.mode==='recall'&&vTyping&&!vs.answered){const t=document.getElementById('vTypeIn');if(t)t.focus();}
 }
 
-/* ---------- ① 카드 학습 ---------- */
-function vCardHTML(){
+/* ---------- ① 테스트 (연습) — GRE 연습 테스트와 동일 방식 ---------- */
+function vqLabel(x){return vs.qmode==='mean'?(x.core||x.k||''):x.v;}
+function vQuizHTML(){
   const o=vs.pool[vs.i];
-  let h='<div class="v-stage"><div class="v-word">'+esc(o.v)+'</div>'+
-    (o.a?'<div class="v-adjline">형용사 '+esc(o.a)+'</div>':'')+
-    '<div class="v-catline">'+o.c+'. '+esc(o.cn)+'</div></div>';
-  if(!vs.reveal){
-    h+='<button class="primary" style="width:100%;margin-top:12px;min-height:44px;font-weight:700" onclick="vCardReveal()">뜻 보기</button>'+
-       '<div class="study-tip">먼저 뜻을 떠올려 본 뒤 눌러주세요.</div>';
-    return h;
+  const nch=Math.min(6,Math.max(3,settings.choices||4));
+  const mine=vqLabel(o);
+  let cand=VERBS.filter(x=>x!==o&&x.c===o.c&&vqLabel(x)!==mine);
+  if(cand.length<nch-1)cand=VERBS.filter(x=>x!==o&&vqLabel(x)!==mine);
+  const used={};used[mine]=1;
+  const others=[];const sh=vShuf(cand);
+  for(let i=0;i<sh.length&&others.length<nch-1;i++){const L=vqLabel(sh[i]);if(used[L])continue;used[L]=1;others.push(sh[i]);}
+  const choices=vShuf([o].concat(others));
+  vs.qChoices=choices;vs.qAns=choices.indexOf(o);
+  let h;
+  if(vs.qmode==='mean'){
+    h='<div class="v-stage"><div class="v-word">'+esc(o.v)+'</div>'+
+      (o.a?'<div class="v-adjline">형용사 '+esc(o.a)+'</div>':'')+
+      '<div class="v-catline">'+o.c+'. '+esc(o.cn)+'</div></div>';
+  }else{
+    h='<div class="v-specbox"><div class="count">'+o.c+'. '+esc(o.cn)+'</div><div class="v-specline">'+esc(o.core||o.k)+'</div>'+
+      (o.st?'<div class="v-extra"><b>구조</b> <code>'+esc(vMaskVerb(o,o.st))+'</code></div>':'')+'</div>';
   }
-  h+='<div class="v-info">';
-  if(o.core)h+='<div class="v-core">'+esc(o.core)+'</div>';
-  if(o.k)h+='<div class="v-extra"><b>사전</b> '+esc(o.k)+'</div>';
-  if(o.st)h+='<div class="v-extra"><b>구조</b> <code>'+esc(o.st)+'</code></div>';
-  if(o.col)h+='<div class="v-extra"><b>결합</b> '+esc(o.col)+'</div>';
-  if(o.vs)h+='<div class="v-extra"><b>비교</b> '+esc(o.vs)+'</div>';
-  if(o.ex)h+='<div class="v-extra v-ex">'+esc(o.ex)+'</div>';
-  h+='<div class="v-tags" style="margin-top:10px">'+VAX_BASIC.map(ax=>'<span class="v-tag">'+VAX[ax].label+': '+o[ax].map(v=>vKo(ax,v)).join('/')+'</span>').join('')+'</div>';
-  h+='<div class="study-tip" style="margin-top:6px">첫날은 카테고리·핵심 의미·강도까지만 잡으면 충분합니다. 의도성·묘사성은 다음 복습에서.</div>';
-  h+='</div>';
-  h+='<div class="study-actions"><button class="grow unknown" onclick="vCardRate(0)">몰라요</button><button class="grow ambiguous" onclick="vCardRate(1)">애매해요</button><button class="grow known" onclick="vCardRate(2)">알아요</button></div>';
+  h+=choices.map((c,ci)=>'<button class="quiz-choice" id="vqc_'+ci+'" onclick="vQuizAnswer('+ci+')">'+esc(vqLabel(c))+'</button>').join('');
+  h+='<button class="btn" id="vqDunno" onclick="vQuizDunno()" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요</button>';
+  h+='<div id="vAfter"></div>';
+  h+='<div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료 <span style="color:#9aa1ad">(선택지 개수·자동 넘김은 ⚙ 설정에서)</span></div>';
   return h;
 }
-function vCardReveal(){vs.reveal=1;showVerbStep();}
-function vCardRate(lv){
+function vMaskVerb(o,text){
+  const base=(o.v||'').split(' ')[0];
+  if(!base)return text;
+  try{return text.replace(new RegExp(base,'gi'),'____');}catch(e){return text;}
+}
+function vQuizReveal(o,ok,pickedLabel){
+  let h='<div class="v-verdict '+(ok?'ok':'bad')+'">'+(ok?'정답':'오답')+'</div>';
+  if(!ok){
+    h+='<div class="v-info" style="margin-top:8px">';
+    h+='<div class="v-core">'+esc(o.v)+(o.a?' <span class="v-adjline" style="font-size:12px">('+esc(o.a)+')</span>':'')+'</div>';
+    if(o.core)h+='<div class="v-extra"><b>핵심</b> '+esc(o.core)+'</div>';
+    if(o.k)h+='<div class="v-extra"><b>사전</b> '+esc(o.k)+'</div>';
+    if(o.st)h+='<div class="v-extra"><b>구조</b> <code>'+esc(o.st)+'</code></div>';
+    if(o.col)h+='<div class="v-extra"><b>결합</b> '+esc(o.col)+'</div>';
+    if(o.vs)h+='<div class="v-extra"><b>비교</b> '+esc(o.vs)+'</div>';
+    if(o.ex)h+='<div class="v-extra v-ex">'+esc(o.ex)+'</div>';
+    h+='<div class="v-tags" style="margin-top:8px">'+VAX_BASIC.map(ax=>'<span class="v-tag">'+VAX[ax].label+': '+o[ax].map(v=>vKo(ax,v)).join('/')+'</span>').join('')+'</div>';
+    h+='</div>';
+  }
+  return h;
+}
+function vQuizGrade(ok){
   const o=vs.pool[vs.i];
-  const p=vP(o);p.n++;
-  const tk=todayKey();
-  if(lv===2){if(p.days.indexOf(tk)<0)p.days.push(tk);p.stage=Math.max(p.stage,0);p.due=vAddDays(tk,VSRS[0]);}
-  else{p.e++;p.stage=0;p.due=vAddDays(tk,1);vs.wrong.push(o);}
-  saveVProg();
-  vs.score+=(lv===2?1:0);vs.total++;
-  vNext();
+  vs.answered=true;
+  document.querySelectorAll('#verbsBody .quiz-choice').forEach(b=>b.disabled=true);
+  const dn=document.getElementById('vqDunno');if(dn)dn.disabled=true;
+  const cb=document.getElementById('vqc_'+vs.qAns);if(cb)cb.classList.add('correct');
+  if(ok)vs.score++;else vs.wrong.push(o);
+  vs.total++;vMark(o,ok,true);
+  const af=document.getElementById('vAfter');
+  af.innerHTML=vQuizReveal(o,ok)+
+    (ok?'':'<button class="primary" style="width:100%;margin-top:8px;min-height:42px" onclick="vNext()">다음 →</button>');
+  if(ok){setTimeout(function(){if(vs&&vs.answered)vNext();},Math.max(0,(settings.correctDelay||0)*1000));}
+  else if(document.getElementById('optAutoWrong')&&document.getElementById('optAutoWrong').checked){
+    setTimeout(function(){if(vs&&vs.answered)vNext();},Math.max(0,(settings.wrongDelay||0)*1000));
+  }
+}
+function vQuizAnswer(ci){
+  if(vs.answered)return;
+  const ok=ci===vs.qAns;
+  const b=document.getElementById('vqc_'+ci);
+  if(b)b.classList.add(ok?'correct':'wrong');
+  vQuizGrade(ok);
+}
+function vQuizDunno(){
+  if(vs.answered)return;
+  vQuizGrade(false);
 }
 
 /* ---------- ④ 역방향 회상 ---------- */
@@ -1603,12 +1645,15 @@ document.addEventListener('keydown',function(e){
     if(vs.answered){vNext();return;}
     const sb=document.getElementById('vSubmit');
     if(sb&&!sb.classList.contains('hide')){sb.click();return;}
-    if(vs.mode==='card'&&!vs.reveal){vCardReveal();return;}
   }
   if(vs.mode==='pair'&&!vs.answered&&(e.key==='1'||e.key==='2')){
     const b=document.getElementById('vpi_'+(+e.key-1));if(b&&!b.disabled)b.click();
   }
-  if(vs.mode==='card'&&vs.reveal&&(e.key==='1'||e.key==='2'||e.key==='3'))vCardRate(+e.key-1);
+  if(vs.mode==='quiz'&&!vs.answered){
+    const nch=Math.min(6,Math.max(3,settings.choices||4));
+    if(e.key>='1'&&e.key<=String(nch)){const b=document.getElementById('vqc_'+(+e.key-1));if(b&&!b.disabled)b.click();}
+    else if(e.key==='0'){const b=document.getElementById('vqDunno');if(b&&!b.disabled)b.click();}
+  }
 });
 
 /* ================= init ================= */
