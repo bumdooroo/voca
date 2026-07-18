@@ -349,6 +349,14 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
       <div class="row"><span style="font-size:13px">구간 크기</span> <input type="number" id="setChunkSize" min="1" style="width:64px"> 개</div>
     </div>
     <p class="study-tip" style="margin-top:16px">정답 넘김 0 = 즉시. ‘틀린 후 자동 넘김’은 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
+    <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div class="count" style="font-weight:700;color:var(--ink)">연습 테스트 기록 <span id="prCount" class="count"></span></div>
+        <button class="small" id="prToggle" onclick="togglePracticeLog()">보기</button>
+      </div>
+      <p class="study-tip" style="margin-top:4px">연습 테스트는 캘린더에 남지 않고 여기에만 따로 쌓입니다.</p>
+      <div id="practiceLog" class="hide" style="margin-top:8px"></div>
+    </div>
   </div>
 </div>
 
@@ -381,7 +389,11 @@ function saveChunk(){localStorage.setItem(CHUNK_KEY(),JSON.stringify(chunkProg))
 let chunkProg=loadChunk();
 function loadSettings(){const D={correctDelay:2,wrongDelay:2,chunkSize:25,choices:4,view:{m:1,s:1,y:1,p:1,e:1}};
   try{const o=Object.assign({},D,JSON.parse(localStorage.getItem(SET_KEY()))||{});o.view=Object.assign({},D.view,o.view||{});return o;}catch(e){return D}}
-function toggleSettings(open){document.getElementById('settingsModal').classList.toggle('hide',!open);}
+function toggleSettings(open){
+  document.getElementById('settingsModal').classList.toggle('hide',!open);
+  if(open){updatePracticeCount();const b=document.getElementById('practiceLog');
+    if(b&&!b.classList.contains('hide'))renderPracticeLog();}
+}
 function saveSettings(){localStorage.setItem(SET_KEY(),JSON.stringify(settings))}
 let settings=loadSettings();
 let QSIZE=settings.chunkSize||25;
@@ -449,7 +461,8 @@ function switchDeck(id){
   if(quiz){quiz=null;document.getElementById('quizArea').innerHTML='';document.getElementById('calQuizArea').innerHTML='';}
   CUR=id;saveActive();
   data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;
-  syncSettingsUI();syncViewUI();
+  syncSettingsUI();syncViewUI();updatePracticeCount();
+  {const b=document.getElementById('practiceLog');if(b&&!b.classList.contains('hide'))renderPracticeLog();}
   normalizeNumbers();if(data.length)saveWords();
   selected=new Set();filterDay=0;wrongOnly=false;statusFilter='all';
   mainTab='gre';
@@ -691,6 +704,75 @@ function exportCSV(){
   a.download=curDeck().name+'_export.csv';a.click();
 }
 
+/* ================= 연습 테스트 기록 (설정창 전용) ================= */
+function PR_KEY(){return 'voca_practice_'+CUR;}
+function loadPractice(){try{return JSON.parse(localStorage.getItem(PR_KEY()))||[]}catch(e){return[]}}
+function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr))}catch(e){}}
+function recordPractice(){
+  if(!quiz||!quiz.pool||!quiz.pool.length)return;
+  const arr=loadPractice();
+  const now=new Date();
+  arr.push({key:todayKey(),time:pad(now.getHours())+':'+pad(now.getMinutes()),
+    label:quiz.label||'',mode:quiz.mode,score:quiz.score,total:quiz.pool.length,
+    pct:Math.round(quiz.score/quiz.pool.length*100),
+    wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no}))});
+  if(arr.length>300)arr.splice(0,arr.length-300);
+  savePractice(arr);
+  updatePracticeCount();
+}
+function updatePracticeCount(){
+  const el=document.getElementById('prCount');if(!el)return;
+  const n=loadPractice().length;
+  el.textContent=n?'· '+n+'건':'· 없음';
+}
+function togglePracticeLog(){
+  const box=document.getElementById('practiceLog'),btn=document.getElementById('prToggle');
+  if(!box)return;
+  const open=box.classList.contains('hide');
+  box.classList.toggle('hide',!open);
+  if(btn)btn.textContent=open?'접기':'보기';
+  if(open)renderPracticeLog();
+}
+function deletePractice(i){
+  const arr=loadPractice();arr.splice(arr.length-1-i,1);savePractice(arr);
+  renderPracticeLog();updatePracticeCount();
+}
+function clearPractice(){
+  if(!confirm('연습 테스트 기록을 모두 삭제할까요? (되돌릴 수 없음)'))return;
+  savePractice([]);renderPracticeLog();updatePracticeCount();
+}
+function exportPracticeCSV(){
+  const arr=loadPractice();
+  if(!arr.length)return alert('기록이 없습니다.');
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const csv='Date,Time,Range,Mode,Score,Total,Percent,WrongWords\n'+
+    arr.map(r=>[r.key,r.time,r.label,(r.mode==='mean'?'뜻 고르기':'단어 고르기'),r.score,r.total,r.pct,
+      (r.wrong||[]).map(x=>x.word).join(' / ')].map(q).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));
+  a.download=curDeck().name+'_practice_log.csv';a.click();
+}
+function renderPracticeLog(){
+  const box=document.getElementById('practiceLog');if(!box)return;
+  const arr=loadPractice();
+  if(!arr.length){box.innerHTML='<p class="count">아직 기록이 없습니다.</p>';return;}
+  const rev=arr.slice().reverse();
+  const n=rev.length, avg=Math.round(rev.reduce((s,r)=>s+r.pct,0)/n);
+  let h='<div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="count">'+n+'건 · 평균 '+avg+'%</span>'+
+    '<span class="row"><button class="small" onclick="exportPracticeCSV()">CSV</button><button class="small danger" onclick="clearPractice()">전체삭제</button></span></div>';
+  h+=rev.map((r,i)=>{
+    let row='<div class="test-rec"><span>'+esc(r.key)+' '+esc(r.time)+' · '+esc(r.label||'')+' · '+
+      (r.mode==='mean'?'뜻':'단어')+' · '+r.score+'/'+r.total+' · '+r.pct+'%</span>'+
+      '<button class="small danger" onclick="deletePractice('+i+')">삭제</button></div>';
+    if(r.wrong&&r.wrong.length){
+      row+='<details class="test-wrong"><summary>틀린 단어 '+r.wrong.length+'개 보기</summary><div class="tw-list">'+
+        r.wrong.map(x=>'<div class="tw-item"><b>'+esc(x.word)+'</b>'+(x.mean?' — '+esc(breakNumbered(x.mean)):'')+'</div>').join('')+'</div></details>';
+    }
+    return row;
+  }).join('');
+  box.innerHTML=h;
+}
+
 /* ================= 학습(Study) ================= */
 let study=null;
 function setStudyMode(on){
@@ -869,7 +951,7 @@ function startTestChunk(day,q){
   let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
   if(pool.length<4)return alert(day+'일차 '+a+'–'+b+' 구간 단어가 4개 미만입니다.');
   pool=[...pool].sort(()=>Math.random()-.5);
-  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea'};
+  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
   setQuizMode(true);showQ();
 }
 function startQuiz(){
@@ -877,7 +959,7 @@ function startQuiz(){
   let pool=data.filter(x=>x.day>=Math.min(f,t)&&x.day<=Math.max(f,t));
   if(pool.length<4)return alert('해당 범위 단어가 4개 미만입니다.');
   pool=[...pool].sort(()=>Math.random()-.5).slice(0,n);
-  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea'};
+  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',label:(Math.min(f,t)===Math.max(f,t)?Math.min(f,t)+'일차':Math.min(f,t)+'~'+Math.max(f,t)+'일차')+' '+pool.length+'문항'};
   setQuizMode(true);showQ();
 }
 function endQuiz(){quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render()}
@@ -886,7 +968,7 @@ function pick(arr,n,ex){const r=[];const c=arr.filter(x=>x!==ex);while(r.length<
 function showQ(){
   const a=document.getElementById(quiz.target);
   if(quiz.i>=quiz.pool.length){
-    if(quiz.official&&!quiz.recorded){recordOfficial();quiz.recorded=true;}
+    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else recordPractice(); quiz.recorded=true; }
     const wl=[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no));
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
@@ -1746,7 +1828,7 @@ document.getElementById('setWrongDelay').onchange=e=>{settings.wrongDelay=Math.m
 document.getElementById('setChunkSize').onchange=e=>{settings.chunkSize=Math.max(1,parseInt(e.target.value)||25);QSIZE=settings.chunkSize;e.target.value=settings.chunkSize;saveSettings();renderChunkRow();renderTestChunkRow();};
 document.getElementById('sDayFrom').addEventListener('input',renderChunkRow);
 document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow);
-renderTabs();renderAll();
+renderTabs();renderAll();updatePracticeCount();
 </script>
 </body>
 </html>
