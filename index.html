@@ -40,6 +40,7 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;fon
 .quiz-choice{display:block;width:100%;text-align:left;margin:6px 0;padding:10px;white-space:pre-line;line-height:1.5}
 .quiz-choice.correct{background:#e6f7ee;border-color:var(--green)}
 .quiz-choice.wrong{background:#fdeaea;border-color:var(--red)}
+.dunno-wrong{background:#fdeaea!important;border-color:var(--red)!important;color:#b42323!important;font-weight:700}
 .qc-sub{color:var(--sub);font-style:italic;font-size:12px}
 .quiz-word{font-size:24px;font-weight:700}
 .count{font-size:13px;color:var(--sub)}
@@ -781,9 +782,10 @@ function showStudy(){
       if(done.size>=nq&&before<nq){addStudiedDay(todayKey(),day);recordedDays.push(day);}
     });
     saveChunk();
+    const reviewSorted=[...study.reviewList].sort((a,b)=>(a.item.day-b.item.day)||(a.item.no-b.item.no));
     const reviewHtml=study.reviewList.length
       ? '<h3 style="margin-top:18px">복습할 단어 '+study.reviewList.length+'개</h3>'+
-        study.reviewList.map(r=>{const x=r.item;return '<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'<span class="study-status '+r.cls+'">'+r.status+'</span></div>'+(x.etym?'<div class="etym"><b>어근·어원</b> · '+esc(x.etym)+'</div>':'')+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>';}).join('')
+        reviewSorted.map(r=>{const x=r.item;return '<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'<span class="study-status '+r.cls+'">'+r.status+'</span></div>'+(x.etym?'<div class="etym"><b>어근·어원</b> · '+esc(x.etym)+'</div>':'')+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>';}).join('')
       : '<p class="count">모든 단어를 ‘알아요’로 분류했습니다.</p>';
     const recNote=recordedDays.length?'<p class="count" style="color:#176b43;margin-top:6px">캘린더('+todayKey()+')에 '+recordedDays.sort((a,b)=>a-b).join(', ')+'일차 학습 완료가 기록되었습니다.</p>':'';
     a.innerHTML='<div class="study-summary"><h3>학습 완료</h3>'+recNote+
@@ -885,7 +887,7 @@ function showQ(){
   const a=document.getElementById(quiz.target);
   if(quiz.i>=quiz.pool.length){
     if(quiz.official&&!quiz.recorded){recordOfficial();quiz.recorded=true;}
-    const wl=quiz.wrongList||[];
+    const wl=[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no));
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
         wl.map(x=>'<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'</div>'+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>').join('')
@@ -935,7 +937,7 @@ function dontKnow(qi){
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>b.disabled=true);
   document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(+b.dataset.di===qi)b.classList.add('correct')});
-  const dn=document.getElementById('qDunno');if(dn)dn.disabled=true;
+  const dn=document.getElementById('qDunno');if(dn){dn.disabled=true;dn.classList.add('dunno-wrong');}
   const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
   const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
   if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
@@ -998,7 +1000,8 @@ function renderDayDetail(){
     h+= rec.tests.map((tt,idx)=>{
       let row='<div class="test-rec"><span>'+tt.greDay+'일차 · '+(tt.mode==='mean'?'뜻 고르기':'단어 고르기')+' · '+tt.score+'/'+tt.total+' · '+tt.percentage+'% · '+(tt.completedAt?tt.completedAt.slice(11,16):'')+'</span><button class="small danger" onclick="deleteTest(\''+key+'\','+idx+')">삭제</button></div>';
       if(tt.wrong&&tt.wrong.length){
-        row+='<details class="test-wrong"><summary>틀린 단어 '+tt.wrong.length+'개 보기</summary><div class="tw-list">'+tt.wrong.map(w=>'<div class="tw-item"><b>'+esc(w.word)+'</b>'+(w.mean?' — '+esc(breakNumbered(w.mean)):'')+'</div>').join('')+'</div></details>';
+        const twSorted=[...tt.wrong].sort((a,b)=>((a.day||0)-(b.day||0))||((a.no||0)-(b.no||0)));
+        row+='<details class="test-wrong"><summary>틀린 단어 '+tt.wrong.length+'개 보기</summary><div class="tw-list">'+twSorted.map(w=>'<div class="tw-item"><b>'+esc(w.word)+'</b>'+(w.mean?' — '+esc(breakNumbered(w.mean)):'')+'</div>').join('')+'</div></details>';
       }
       return row;
     }).join('');
@@ -1024,7 +1027,7 @@ function startOfficialTest(day,mode){
 function recordOfficial(){
   const now=new Date();const key=todayKey();const r=ensureDate(key);
   const pct=Math.round(quiz.score/quiz.pool.length*100);
-  r.tests.push({greDay:quiz.greDay,mode:quiz.mode,score:quiz.score,total:quiz.pool.length,percentage:pct,wrong:(quiz.wrongList||[]).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no})),completedAt:key+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds())});
+  r.tests.push({greDay:quiz.greDay,mode:quiz.mode,score:quiz.score,total:quiz.pool.length,percentage:pct,wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no})),completedAt:key+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds())});
   saveCal();
 }
 function backToCalendar(){quiz=null;document.getElementById('calQuizArea').innerHTML='';setOfficialMode(false);renderCalendar();}
@@ -1334,6 +1337,7 @@ function vDoneHTML(){
   {h+='<div class="statgrid"><div class="stat"><b>'+vs.score+'/'+vs.total+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+vs.wrong.length+'</b><span class="count">틀린 항목</span></div></div>';}
   h+='<button class="primary" onclick="endVerbs()">닫기</button>';
   const uniq=[];vs.wrong.forEach(o=>{if(uniq.indexOf(o)<0)uniq.push(o)});
+  uniq.sort((a,b)=>(a.c-b.c)||String(a.id||'').localeCompare(String(b.id||'')));
   if(uniq.length){h+='<h3 style="margin-top:16px;color:var(--red)">복습할 동사 '+uniq.length+'개</h3>'+uniq.map(o=>vCard(o,true)).join('');}
   saveVProg();
   return h;
@@ -1407,11 +1411,11 @@ function vQuizReveal(o,ok,pickedLabel){
   }
   return h;
 }
-function vQuizGrade(ok){
+function vQuizGrade(ok,viaDunno){
   const o=vs.pool[vs.i];
   vs.answered=true;
   document.querySelectorAll('#verbsBody .quiz-choice').forEach(b=>b.disabled=true);
-  const dn=document.getElementById('vqDunno');if(dn)dn.disabled=true;
+  const dn=document.getElementById('vqDunno');if(dn){dn.disabled=true;if(viaDunno)dn.classList.add('dunno-wrong');}
   const cb=document.getElementById('vqc_'+vs.qAns);if(cb)cb.classList.add('correct');
   if(ok)vs.score++;else vs.wrong.push(o);
   vs.total++;vMark(o,ok,true);
@@ -1432,7 +1436,7 @@ function vQuizAnswer(ci){
 }
 function vQuizDunno(){
   if(vs.answered)return;
-  vQuizGrade(false);
+  vQuizGrade(false,true);
 }
 
 /* ---------- ④ 역방향 회상 ---------- */
