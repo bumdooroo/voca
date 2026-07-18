@@ -122,6 +122,72 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
   .cal-date{font-size:11px}
   .cal-brief{font-size:9.5px}
 }
+/* Verbs 훈련 */
+.v-stage{text-align:center;padding:14px 6px 6px}
+.v-word{font-size:34px;font-weight:800;letter-spacing:-.01em}
+.v-adjline{font-size:12.5px;color:#7c3aed;margin-top:5px}
+.v-korline{font-size:15px;color:var(--ink);margin-top:8px;line-height:1.5}
+.v-catline{font-size:11.5px;color:var(--sub);margin-top:6px}
+.v-axis{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px;background:#fff}
+.v-axis.v-ok{border-color:#9fd8ba;background:#f4fbf7}
+.v-axis.v-near{border-color:#edcf83;background:#fffdf5}
+.v-axis.v-bad{border-color:#efb4b4;background:#fdf6f6}
+.v-axhead{display:flex;justify-content:space-between;align-items:baseline}
+.v-axlab{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.04em}
+.v-axnow{font-size:14px;font-weight:700;color:var(--acc)}
+.v-range{width:100%;margin:10px 0 2px;accent-color:var(--acc)}
+.v-axticks{display:flex;justify-content:space-between;font-size:11px;color:var(--sub)}
+.v-axres{font-size:12px;color:#4b5563;margin-top:7px;line-height:1.5}
+.v-mark{font-weight:700;border-radius:999px;padding:1px 7px;font-size:11px;margin-right:4px}
+.v-mark.ok{background:#e6f7ee;color:#176b43}
+.v-mark.near{background:#fff4d6;color:#8a5a00}
+.v-mark.bad{background:#fdeaea;color:#b42323}
+.v-verdict{margin-top:12px;border-radius:10px;padding:11px 13px;font-size:13.5px;font-weight:700;text-align:center}
+.v-verdict.ok{background:#e6f7ee;color:#176b43}
+.v-verdict.bad{background:#fdeaea;color:#b42323}
+.v-specbox{background:#eef1ff;border-radius:10px;padding:12px 14px;margin:8px 0 12px}
+.v-specline{font-size:17px;font-weight:700;margin:5px 0;line-height:1.5}
+.v-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px}
+.v-gitem{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:9px 11px;line-height:1.35}
+.v-gitem b{font-size:14px}
+.v-gitem span{font-size:11.5px;color:var(--sub)}
+.v-gitem.sel{background:#eef1ff;border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.v-gitem.hit{background:#e6f7ee;border-color:var(--green)}
+.v-gitem.miss{background:#fff4d6;border-color:#edcf83}
+.v-gitem.fp{background:#fdeaea;border-color:var(--red)}
+.v-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.v-pitem{display:flex;flex-direction:column;align-items:center;gap:5px;padding:22px 12px;min-height:118px;justify-content:center}
+.v-pitem b{font-size:21px}
+.v-pitem .v-kor{font-size:12px;color:var(--sub);text-align:center;line-height:1.4}
+.v-pnum{font-size:10.5px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+.v-pitem.hit{background:#e6f7ee;border-color:var(--green)}
+.v-pitem.fp{background:#fdeaea;border-color:var(--red)}
+.v-tray{display:flex;flex-wrap:wrap;gap:7px;min-height:56px;padding:9px;border:1px dashed #c7cede;border-radius:10px;background:#fbfcff}
+.v-card{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 10px;text-align:left;cursor:grab;line-height:1.3}
+.v-card b{font-size:13.5px}
+.v-card span{font-size:11px;color:var(--sub)}
+.v-card.sel{background:#eef1ff;border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.v-card.hit{background:#e6f7ee;border-color:var(--green)}
+.v-card.fp{background:#fdeaea;border-color:var(--red)}
+.v-fix{color:#b42323;font-weight:700;font-size:10.5px}
+.v-buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.v-bucket{border:1px solid var(--line);border-radius:10px;padding:9px;background:#fff;min-height:110px;cursor:pointer}
+.v-bklab{font-size:12px;font-weight:700;color:var(--sub);text-align:center;padding-bottom:7px;border-bottom:1px solid var(--line);margin-bottom:7px}
+.v-bkbody{display:flex;flex-direction:column;gap:5px}
+.v-rescard{border-bottom:1px solid var(--line);padding:9px 2px}
+.v-resline{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.v-resline b{font-size:15px}
+.v-resline .v-adj{font-size:11.5px;color:#7c3aed}
+.v-resline .v-kor{font-size:12.5px;color:var(--sub)}
+.v-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.v-tag{font-size:10.5px;border-radius:999px;padding:2px 8px;background:#f1f3f6;color:#4b5563}
+@media(max-width:640px){
+  .v-pair{grid-template-columns:1fr}
+  .v-buckets{grid-template-columns:1fr}
+  .v-grid{grid-template-columns:1fr 1fr}
+  .v-word{font-size:28px}
+}
+
 </style>
 </head>
 <body>
@@ -241,6 +307,11 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
   <div id="calQuizArea" class="card hide"></div>
 </div>
 
+<!-- ============ VERBS VIEW ============ -->
+<div id="verbsView" class="hide">
+  <div class="card" id="verbsBody"></div>
+</div>
+
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
@@ -337,8 +408,10 @@ function switchTab(t){
   mainTab=t;
   document.getElementById('greView').classList.toggle('hide',t!=='gre');
   document.getElementById('calView').classList.toggle('hide',t!=='cal');
+  document.getElementById('verbsView').classList.toggle('hide',t!=='verbs');
   renderTabs();
   if(t==='cal'){ if(!calSel)calSel=todayKey(); renderCalendar(); }
+  else if(t==='verbs'){ renderVerbs(); }
   else render();
 }
 function renderTabs(){
@@ -349,7 +422,8 @@ function renderTabs(){
     h+='<button class="'+(on?'on':'')+'" onclick="switchDeck(\''+d.id+'\')" ondblclick="renameDeck(\''+d.id+'\')" title="더블클릭: 이름 변경/삭제">'+esc(d.name)+'</button>';
   });
   h+='<button onclick="addDeck()" title="단어장 추가">＋</button>';
-  h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')" style="margin-left:auto">캘린더</button>';
+  h+='<button id="tabVERB" class="'+(mainTab==='verbs'?'on':'')+'" onclick="switchTab(\'verbs\')" style="margin-left:auto">Verbs</button>';
+  h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')">캘린더</button>';
   el.innerHTML=h;
 }
 function syncSettingsUI(){
@@ -371,6 +445,7 @@ function switchDeck(id){
   mainTab='gre';
   document.getElementById('greView').classList.remove('hide');
   document.getElementById('calView').classList.add('hide');
+  document.getElementById('verbsView').classList.add('hide');
   renderTabs();renderAll();
 }
 function addDeck(){
@@ -944,6 +1019,359 @@ function recordOfficial(){
   saveCal();
 }
 function backToCalendar(){quiz=null;document.getElementById('calQuizArea').innerHTML='';setOfficialMode(false);renderCalendar();}
+
+const VERBS=[{"v":"ameliorate","a":"ameliorative","k":"개선하다, 완화하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"facilitate","a":"facilitative","k":"용이하게 하다, 촉진하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"galvanize","a":"galvanic","k":"자극하여 행동하게 하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"cultivate","a":"cultivating","k":"육성하다, 조성하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["weak"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"invigorate","a":"invigorating","k":"활성화하다, 기운 나게 하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"bolster","a":"","k":"강화하다, 지지하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"buttress","a":"","k":"지지하다, 강화하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"expedite","a":"expeditious","k":"신속히 처리하다, 촉진하다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"animate","a":"animating","k":"생기를 불어넣다","c":1,"cn":"Causation & Influence","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"engender","a":"","k":"낳다, 야기하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"catalyze","a":"catalytic","k":"촉진하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["neutral"],"d":["strongly descriptive"]},{"v":"propagate","a":"propagative","k":"전파하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"instantiate","a":"","k":"구체화하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"accentuate","a":"accentuating","k":"강조하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"amplify","a":"amplifying","k":"증폭하다, 강화하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["neutral"],"d":["strongly descriptive"]},{"v":"consolidate","a":"consolidating","k":"통합하다, 강화하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"potentiate","a":"potentiating","k":"증강시키다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"activate","a":"activating","k":"활성화하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"mobilize","a":"mobilizing","k":"동원하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"actuate","a":"actuating","k":"작동시키다, 촉발하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"induce","a":"inductive","k":"유발하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"modulate","a":"modulating","k":"조절하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"mediate","a":"mediating","k":"매개하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"regulate","a":"regulative","k":"규제하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"condition","a":"conditional","k":"조건짓다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"predispose","a":"predisposing ~","k":"하게 만들다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"prime","a":"priming","k":"준비시키다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"elicit","a":"— (","k":"반응을) 이끌어내다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"transduce","a":"transductive","k":"변환하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["neutral"],"d":["strongly descriptive"]},{"v":"transmit","a":"transmissive","k":"전달하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"cascade","a":"","k":"연쇄작용을 일으키다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"obviate","a":"obviating","k":"제거하다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"attenuate","a":"attenuating","k":"약화시키다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["accidental","neutral","deliberate"],"d":["strongly descriptive"]},{"v":"truncate","a":"truncating","k":"잘라내다, 줄이다","c":1,"cn":"Causation & Influence","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"curtail","a":"curtailing","k":"축소하다","c":1,"cn":"Causation & Influence","t":["neutral","negative"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"inhibit","a":"inhibiting","k":"억제하다","c":1,"cn":"Causation & Influence","t":["neutral","negative"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"compromise","a":"compromising","k":"약화시키다","c":1,"cn":"Causation & Influence","t":["neutral","negative"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"instigate","a":"instigative","k":"선동하다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"incite","a":"inciting","k":"선동하다, 야기하다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"provoke","a":"provocative","k":"도발하다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"exacerbate","a":"exacerbating","k":"악화시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["accidental","neutral"],"d":["mildly descriptive"]},{"v":"aggravate","a":"aggravating","k":"악화시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["moderate"],"i":["accidental","neutral"],"d":["mildly descriptive"]},{"v":"undermine","a":"undermining","k":"약화시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["moderate"],"i":["accidental","neutral","deliberate"],"d":["mildly descriptive"]},{"v":"vitiate","a":"vitiating","k":"손상시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"subvert","a":"subversive","k":"전복시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"thwart","a":"thwarting","k":"좌절시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"erode","a":"eroding","k":"침식시키다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"occlude","a":"occlusive","k":"막다, 차단하다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["strong"],"i":["neutral"],"d":["strongly descriptive"]},{"v":"stifle","a":"stifling","k":"억누르다, 방해하다","c":1,"cn":"Causation & Influence","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"surge","a":"surging","k":"급증하다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["strong"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"accelerate","a":"accelerating","k":"가속화되다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["strong"],"i":["accidental"],"d":["non-descriptive"]},{"v":"advance","a":"advancing","k":"진전하다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"augment","a":"augmenting","k":"증가하다, 확대되다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"intensify","a":"intensifying","k":"심화되다, 강해지다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"proliferate","a":"proliferating","k":"급증하다, 확산되다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["strong"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"diversify","a":"diversifying","k":"다양해지다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"accumulate","a":"accumulating","k":"누적되다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"expand","a":"expanding","k":"확장되다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"materialize","a":"materializing","k":"나타나다, 실현되다","c":2,"cn":"Change & State Transition","t":["positive"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"transform","a":"transforming","k":"변화하다, 변형되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["strong"],"i":["neutral"],"d":["strongly descriptive"]},{"v":"convert","a":"converting","k":"전환되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"transition","a":"transitioning","k":"전환하다, 이행하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"evolve","a":"evolving","k":"진화하다, 발달하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"mutate","a":"mutating","k":"변이되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"adapt","a":"adapting","k":"적응하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"reconfigure","a":"reconfiguring","k":"재구성되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"reorganize","a":"reorganizing","k":"재조직되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"restructure","a":"restructuring","k":"재편되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"modify","a":"modifying","k":"수정되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"adjust","a":"adjusting","k":"조정되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"reshape","a":"reshaping","k":"재구성되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"reorient","a":"reorienting","k":"방향을 재조정하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"morph","a":"morphing","k":"형태가 변하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"normalize","a":"normalizing","k":"정상화되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"crystallize","a":"crystallizing","k":"명확해지다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"emerge","a":"emerging","k":"나타나다, 등장하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"fragment","a":"fragmenting","k":"조각나다, 분열되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"fluctuate","a":"fluctuating","k":"변동하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"oscillate","a":"oscillating","k":"진동하다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"vary","a":"varying","k":"달라지다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"alternate","a":"alternating","k":"번갈아 일어나다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"swing","a":"swinging","k":"흔들리다, 바뀌다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"decline","a":"declining","k":"감소하다, 하락하다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"wane","a":"waning","k":"쇠퇴하다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"abate","a":"abating","k":"약해지다, 누그러지다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"recede","a":"receding","k":"물러나다, 줄어들다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"plummet","a":"plummeting","k":"급락하다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["strong"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"contract","a":"contracting","k":"축소되다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"shrink","a":"shrinking","k":"줄어들다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"wither","a":"withering","k":"시들다, 약해지다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"dwindle","a":"dwindling","k":"감소하다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"deteriorate","a":"deteriorating","k":"악화되다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["strong"],"i":["accidental"],"d":["non-descriptive"]},{"v":"dilute","a":"diluting","k":"희석되다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["weak"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"devolve","a":"devolving","k":"악화되다, 퇴보하다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"stagnate","a":"stagnating","k":"정체되다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"dissipate","a":"dissipating","k":"소멸되다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"escalate","a":"escalating","k":"악화되다, 심화되다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["strong"],"i":["neutral"],"d":["mildly descriptive"]},{"v":"taper","a":"tapering","k":"점차 줄어들다","c":2,"cn":"Change & State Transition","t":["negative"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"disperse","a":"dispersing","k":"흩어지다, 분산되다","c":2,"cn":"Change & State Transition","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"harmonize","a":"harmonizing","k":"조화를 이루다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"reconcile","a":"reconciling","k":"조화시키다, 일치시키다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"align","a":"aligning","k":"정렬되다, 조화되다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"coordinate","a":"coordinating","k":"조화하다, 조정하다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"cohere","a":"coherent","k":"밀접하게 연결되다, 일관성을 갖다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"resonate","a":"(with) resonating","k":"공명하다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["weak"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"adhere","a":"(to) adhering ~","k":"에 부합하다, 준수하다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"approximate","a":"approximating","k":"유사하다, 근사하다","c":3,"cn":"Comparison & Relation","t":["positive"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"resemble","a":"resembling","k":"닮다, 유사하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"mirror","a":"mirroring","k":"반영하다, 닮다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"echo","a":"echoing (","k":"특징·패턴을) 반영하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"parallel","a":"paralleling","k":"유사하다, 평행하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"correspond","a":"corresponding","k":"일치하다, 부합하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["neutral"],"d":["non-descriptive"]},{"v":"match","a":"matching","k":"부합하다, 일치하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"simulate","a":"simulating","k":"흉내 내다, 유사 양상을 보이다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"replicate","a":"replicating","k":"재현하다, 유사하게 나타나다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"reflect","a":"reflecting","k":"반영하다 (관계·유사성)","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"differ","a":"differing","k":"다르다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"diverge","a":"diverging","k":"갈라지다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"deviate","a":"deviating","k":"벗어나다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"contrast","a":"contrasting","k":"대비되다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"oppose","a":"opposing","k":"대립되다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"counterpose","a":"counterposing","k":"대조시키다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"contradict","a":"contradicting","k":"모순되다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"juxtapose","a":"juxtaposing","k":"병치하여 비교하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"situate","a":"situating","k":"배치하다, 위치시키다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"contextualize","a":"contextualizing","k":"맥락화하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"frame","a":"framing","k":"틀짓다, 관점에서 규정하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"position","a":"positioning","k":"위치시키다, 자리매김하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"map","a":"mapping (","k":"구조·관계를) 도식화하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"anchor","a":"anchoring","k":"고정시키다, 위치를 확립하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"embed","a":"embedding","k":"내재시키다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"locate","a":"locating","k":"위치를 정하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"correlate","a":"correlating","k":"상관관계가 있다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"converge","a":"converging","k":"수렴하다, 비슷해지다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"counterbalance","a":"counterbalancing","k":"균형을 이루다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"equate","a":"equating","k":"동일시하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"outstrip","a":"outstripping","k":"능가하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["strong"],"i":["accidental"],"d":["non-descriptive"]},{"v":"exceed","a":"exceeding","k":"초과하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"surpass","a":"surpassing","k":"능가하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"outweigh","a":"outweighing ~","k":"보다 크다, 더 중요하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"eclipse","a":"eclipsing","k":"가리다, 능가하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["strong"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"overshadow","a":"overshadowing","k":"가리다, 압도하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["strong"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"fall","a":"short —","k":"모자라다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"lag","a":"behind lagging","k":"뒤처지다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["non-descriptive"]},{"v":"predominate","a":"predominating","k":"우세하다, 두드러지다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"distinguish","a":"distinguishing","k":"구별하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"differentiate","a":"differentiating","k":"구별하다, 차별화하다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"demarcate","a":"demarcating","k":"경계 짓다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"bifurcate","a":"bifurcating","k":"두 갈래로 나뉘다","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["strongly descriptive"]},{"v":"discriminate","a":"discriminating","k":"구별하다 (비차별 의미)","c":3,"cn":"Comparison & Relation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"elucidate","a":"elucidating","k":"명확히 밝히다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"explicate","a":"explicating (","k":"개념·의미를) 자세히 설명하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"clarify","a":"clarifying","k":"명확히 하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"illuminate","a":"illuminating","k":"밝히다, 해명하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"articulate","a":"articulating","k":"명료하게 표현하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"unravel","a":"unraveling (","k":"복잡한 내용을) 풀다, 해명하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"unpack","a":"unpacking (","k":"의미·구조를) 풀어 설명하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"distill","a":"distilling","k":"핵심을 추출하다","c":4,"cn":"Analysis & Interpretation","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"interpret","a":"interpreting","k":"해석하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"infer","a":"inferring","k":"추론하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"deduce","a":"deducing","k":"연역하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"construe","a":"construing","k":"해석하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"signify","a":"signifying","k":"의미하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"decipher","a":"deciphering (","k":"난해한 것을) 해독하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"translate","a":"(conceptual) translating (","k":"개념을) 해석하여 옮기다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"analyze","a":"analyzing","k":"분석하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"examine","a":"examining","k":"조사하다, 검토하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"inspect","a":"inspecting","k":"면밀히 조사하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"probe","a":"probing","k":"면밀히 탐색하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"investigate","a":"investigating","k":"조사하다, 연구하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"scrutinize","a":"scrutinizing","k":"정밀하게 조사하다","c":4,"cn":"Analysis & Interpretation","t":["neutral","negative"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"dissect","a":"dissecting (","k":"구조를) 해부하다, 분석하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"parse","a":"parsing","k":"구문 분석하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"deconstruct","a":"deconstructing","k":"구조를 해체하여 분석하다","c":4,"cn":"Analysis & Interpretation","t":["neutral","negative"],"s":["strong"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"trace","a":"tracing (","k":"과정·계보를) 추적하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"model","a":"modeling (","k":"구조를) 모델링하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"uncover","a":"uncovering","k":"드러내다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"reveal","a":"revealing","k":"밝히다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"explain","a":"explaining","k":"설명하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"account","a":"for accounting for (","k":"원인·이유를) 설명하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"rationalize","a":"rationalizing","k":"논리적으로 설명하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"conceptualize","a":"conceptualizing","k":"개념화하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"theorize","a":"theorizing","k":"이론화하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"postulate","a":"postulating","k":"가정하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"hypothesize","a":"hypothesizing","k":"가설을 세우다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"suggest","a":"suggesting","k":"시사하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"imply","a":"implying","k":"암시하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"point","a":"to — ~","k":"을 가리키다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"indicate","a":"indicating","k":"나타내다, 보여주다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["non-descriptive"]},{"v":"cast","a":"(as) casting (","k":"개념·사안을) 어떤 방식으로 규정하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"portray","a":"portraying","k":"묘사하다, 제시하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"represent","a":"representing","k":"나타내다, 표현하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"derive","a":"deriving","k":"도출하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"extrapolate","a":"extrapolating","k":"외삽하다, 추론하여 확장하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"generalize","a":"generalizing","k":"일반화하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"abstract","a":"abstracting","k":"추상화하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"synthesize","a":"synthesizing","k":"종합하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"isolate","a":"isolating (","k":"요소를) 분리하여 규명하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"allude","a":"(to) alluding","k":"암시하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"intimate","a":"intimating","k":"은연중에 암시하다","c":4,"cn":"Analysis & Interpretation","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"endorse","a":"endorsing","k":"승인하다, 지지하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"legitimize","a":"legitimizing","k":"정당화하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"sanction","a":"sanctioning","k":"승인하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"ratify","a":"ratifying","k":"비준하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"uphold","a":"upholding","k":"지지하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"justify","a":"justifying","k":"정당화하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"warrant","a":"warranting","k":"정당화하다, 근거를 부여하다","c":5,"cn":"Evaluation & Judgment","t":["positive"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"assess","a":"assessing","k":"평가하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"evaluate","a":"evaluating","k":"평가하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"appraise","a":"appraising","k":"평가하다, 감정하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"critique","a":"critiquing","k":"비평하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"review","a":"reviewing","k":"검토하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"gauge","a":"gauging","k":"판단하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"measure","a":"measuring","k":"측정·평가하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"weigh","a":"weighing","k":"따져보다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"verify","a":"verifying","k":"검증하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"validate","a":"validating","k":"타당성을 입증하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"confirm","a":"confirming","k":"확인하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"corroborate","a":"corroborating","k":"확증하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"authenticate","a":"authenticating","k":"진위를 확인하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"substantiate","a":"substantiating","k":"입증하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"audit","a":"auditing","k":"검증·감사하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"qualify","a":"qualifying","k":"제한하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"temper","a":"tempering (","k":"주장을) 완화하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"moderate","a":"moderating","k":"조절하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"mitigate","a":"mitigating","k":"완화하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"emphasize","a":"emphasizing","k":"강조하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"underscore","a":"underscoring","k":"강조하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"highlight","a":"highlighting","k":"부각하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"characterize","a":"characterizing","k":"특징짓다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"deem","a":"deeming ~","k":"로 간주하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"conclude","a":"concluding","k":"결론짓다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"determine","a":"determining","k":"판단하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"challenge","a":"challenging","k":"문제 삼다, 이의를 제기하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"dismiss","a":"dismissing","k":"일축하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"reject","a":"rejecting","k":"거부하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"dispute","a":"disputing","k":"이의를 제기하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"contest","a":"contesting","k":"다투다, 이의를 제기하다","c":5,"cn":"Evaluation & Judgment","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"refute","a":"refuting","k":"반박하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"rebut","a":"rebutting","k":"반박하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"repudiate","a":"repudiating","k":"부인하다, 거부하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"discredit","a":"discrediting","k":"신뢰를 떨어뜨리다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"invalidate","a":"invalidating","k":"무효화하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"nullify","a":"nullifying","k":"무효화하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"undermine","a":"undermining","k":"약화시키다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"marginalize","a":"marginalizing","k":"소외시키다, 중요성 축소","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"devalue","a":"devaluing","k":"가치·중요성을 떨어뜨리다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"discount","a":"discounting","k":"평가절하하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"mischaracterize","a":"mischaracterizing","k":"부정확하게 묘사하다","c":5,"cn":"Evaluation & Judgment","t":["negative"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"classify","a":"classifying","k":"분류하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"categorize","a":"categorizing","k":"범주화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"codify","a":"codifying","k":"체계화하다, 법칙화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"systematize","a":"systematizing","k":"체계적으로 정리하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"typify","a":"typifying","k":"전형화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"typologize","a":"typologizing","k":"유형화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"structure","a":"structuring","k":"구조화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"stratify","a":"stratifying","k":"계층화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"partition","a":"partitioning","k":"구획하다, 분할하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"segment","a":"segmenting","k":"분절하다, 구분하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"cluster","a":"clustering","k":"군집화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"align","a":"aligning","k":"정렬하다, 일치시키다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"map","a":"mapping (","k":"개념을) 도식화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"arrange","a":"arranging","k":"배열하다, 정리하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"define","a":"defining","k":"정의하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"delineate","a":"delineating (","k":"경계·특징을) 기술하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"demarcate","a":"demarcating","k":"경계를 구분하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"specify","a":"specifying","k":"명시하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"articulate","a":"articulating","k":"명확히 표현하다, 정의하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"outline","a":"outlining","k":"개요를 제시하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"delimit","a":"delimiting","k":"범위를 한정하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"determine","a":"determining","k":"범위·정의 등을 결정하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"situate","a":"situating (","k":"개념을) 위치시키다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"embed","a":"embedding (","k":"개념을) 내포시키다, 포함하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"characterize","a":"characterizing","k":"특징짓다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"distinguish","a":"distinguishing","k":"구별하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"differentiate","a":"differentiating","k":"차별화하다, 구분하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"segregate","a":"segregating","k":"분리하다, 구분하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"isolate","a":"isolating","k":"고립시키다, 분리하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"separate","a":"out separating out","k":"떼어내다, 분리해내다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"designate","a":"designating","k":"지명하다, 지정하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"assign","a":"to assigning (","k":"범주에) 배정하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"classify","a":"as classifying ~","k":"로 분류하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"code","a":"coding (","k":"질적 자료를) 코드화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"affiliate","a":"affiliating","k":"속하게 하다, 소속시키다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"subsume","a":"subsuming","k":"포괄하다, 포함시키다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"incorporate","a":"incorporating","k":"포함시키다, 편입하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"index","a":"indexing","k":"색인화하다, 목록화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"formulate","a":"formulating (","k":"개념을) 공식화하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"construct","a":"constructing (","k":"개념을) 구성하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"operationalize","a":"operationalizing (","k":"개념을) 조작적으로 정의하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"define","a":"operationally —","k":"조작적 정의를 내리다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"configure","a":"configuring","k":"구성하다, 배열하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"establish","a":"establishing (","k":"범주·정의를) 확립하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"anchor","a":"anchoring (","k":"개념을) 고정하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"bracket","a":"bracketing (","k":"개념적으로) 범주화해 묶다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"contextualize","a":"within contextualizing","k":"맥락 속에 위치시키다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"classify","a":"within classifying (","k":"큰 틀 내에서) 분류하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"systematize","a":"around systematizing","k":"체계를 형성하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"organize","a":"into organizing (","k":"구조적 집합으로) 조직하다","c":6,"cn":"Classification & Definition Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"frame","a":"framing (","k":"사안을) 구성하다, 틀짓다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"cast","a":"casting (","k":"사안을 ~로) 규정하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"situate","a":"situating (","k":"논지를) 위치시키다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"locate","a":"locating (","k":"주장을) 자리매김하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"contextualize","a":"contextualizing","k":"맥락 속에 배치하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"foreground","a":"foregrounding","k":"전면에 내세우다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"background","a":"","k":"배경화하다, 후순위에 두다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"highlight","a":"highlighting","k":"부각하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"emphasize","a":"emphasizing","k":"강조하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"underscore","a":"underscoring","k":"강조하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"signal","a":"signaling","k":"신호를 보내다, 시사하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"convey","a":"conveying","k":"전달하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"express","a":"expressing","k":"표현하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"argue","a":"arguing","k":"주장하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"contend","a":"contending (","k":"강하게) 주장하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"maintain","a":"maintaining","k":"주장하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"assert","a":"asserting","k":"단언하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"claim","a":"claiming","k":"주장하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"propose","a":"proposing","k":"제안하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"posit","a":"positing (","k":"이론·주장을) 설정하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"advance","a":"advancing (","k":"주장을) 제기하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"submit","a":"submitting (","k":"주장을) 제출하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"hypothesize","a":"hypothesizing","k":"가설을 제기하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"speculate","a":"speculating","k":"추측하다, 가정하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"suggest","a":"suggesting","k":"제안하다, 시사하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"acknowledge","a":"acknowledging","k":"인정하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"concede","a":"conceding (","k":"일부를) 인정하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"recognize","a":"recognizing","k":"인지하다, 인정하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"imply","a":"implying","k":"암시하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["accidental"],"d":["mildly descriptive"]},{"v":"allude","a":"alluding","k":"넌지시 언급하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"gesture","a":"toward gesturing toward (","k":"논지를) 암시적으로 향하게 하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["strongly descriptive"]},{"v":"elaborate","a":"elaborating (","k":"주장을) 부연하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"expand","a":"expanding (","k":"논지를) 확장하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"develop","a":"developing (","k":"논지를) 전개하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"revisit","a":"revisiting (","k":"논점을) 다시 다루다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"return","a":"to returning to (","k":"논지로) 되돌아가다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"move","a":"to moving to (","k":"다음 논점으로) 이동하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"shift","a":"to shifting to (","k":"논점·초점을) 바꾸다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"transition","a":"to transitioning to","k":"전환하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"turn","a":"to turning to (","k":"주제로) 넘어가다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["weak"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"pivot","a":"to pivoting to","k":"초점을 전환하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"introduce","a":"introducing","k":"소개하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"present","a":"presenting","k":"제시하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"offer","a":"offering (","k":"관점·설명을) 제시하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"set","a":"forth setting forth (","k":"주장을) 명확히 제시하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"lay","a":"out laying out (","k":"구조를) 펼쳐 보이다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"posit","a":"positing (","k":"전제·입장을) 세우다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["non-descriptive"]},{"v":"delineate","a":"(rhetorical sense) delineating","k":"개략적으로 제시하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"position","a":"positioning (","k":"입장을) 자리매김하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["moderate"],"i":["deliberate"],"d":["mildly descriptive"]},{"v":"articulate","a":"(rhetorical sense) articulating","k":"명확하게 제시하다","c":7,"cn":"Presentation & Framing Verbs","t":["neutral"],"s":["strong"],"i":["deliberate"],"d":["mildly descriptive"]}];
+/* ================= VERBS 훈련 ================= */
+const VAX={
+  t:{label:'톤',scale:['negative','neutral','positive'],ko:['부정','중립','긍정'],more:'더 긍정적인'},
+  s:{label:'강도',scale:['weak','moderate','strong'],ko:['약함','보통','강함'],more:'더 강한'},
+  i:{label:'의도성',scale:['accidental','neutral','deliberate'],ko:['우발적','중립','의도적'],more:'더 의도적인'},
+  d:{label:'묘사성',scale:['non-descriptive','mildly descriptive','strongly descriptive'],ko:['비묘사','약간 묘사','강한 묘사'],more:'더 묘사적인'}
+};
+const VAXK=['t','s','i','d'];
+const VMODES=[
+  ['coord','좌표 맞히기','동사를 보고 4축 슬라이더로 직접 배치합니다. 뉘앙스 감각을 만드는 단계.'],
+  ['spec','스펙 → 동사 소환','제시된 조건에 맞는 동사를 전부 골라냅니다. 실제 글쓰기와 같은 방향.'],
+  ['pair','페어 비교','두 동사 중 어느 쪽이 더 강한지/긍정적인지 고릅니다. 빠른 감각 보정.'],
+  ['sort','드래그 분류','카드를 클릭해 바구니로 분류합니다. 대량으로 빠르게 훑기.']
+];
+const VCATS=(function(){const m={};VERBS.forEach(o=>{m[o.c]=o.cn});return Object.keys(m).map(k=>({c:+k,n:m[k]})).sort((a,b)=>a.c-b.c);})();
+
+function loadVStats(){try{return JSON.parse(localStorage.getItem('voca_verbstats'))||{}}catch(e){return{}}}
+function saveVStats(){localStorage.setItem('voca_verbstats',JSON.stringify(vstats))}
+let vstats=loadVStats();
+let vs=null, vCat=0, vMode='coord', vSel=null, vPlaced=null;
+
+function vkey(o){return o.v+'#'+o.c}
+function vstat(o){const k=vkey(o);if(!vstats[k])vstats[k]={n:0,e:0};return vstats[k]}
+function vMark(o,ok){const s=vstat(o);s.n++;if(!ok)s.e++;}
+function vRate(o){const s=vstats[vkey(o)];return (!s||!s.n)?-1:s.e/s.n}
+function vPool(){return vCat?VERBS.filter(o=>o.c===vCat):VERBS.slice()}
+function vShuf(a){return a.slice().sort(()=>Math.random()-.5)}
+function vRand(a){return a[Math.floor(Math.random()*a.length)]}
+function vIdx(ax,val){return VAX[ax].scale.indexOf(val)}
+function vAccIdx(o,ax){return o[ax].map(v=>vIdx(ax,v)).filter(x=>x>=0)}
+function vPrim(o,ax){return o[ax][0]}
+function vSingle(o,ax){return o[ax].length===1}
+function vKo(ax,val){const i=vIdx(ax,val);return i>=0?VAX[ax].ko[i]:val}
+function vSetMode(m){vMode=m;renderVerbs()}
+function vSetCat(c){vCat=+c;renderVerbs()}
+
+function vOrderPool(pool,order,n){
+  let p;
+  if(order==='weak')p=pool.slice().sort((a,b)=>{const ra=vRate(a),rb=vRate(b);if(ra<0&&rb<0)return Math.random()-.5;if(ra<0)return 1;if(rb<0)return -1;return rb-ra;});
+  else if(order==='new')p=pool.slice().sort((a,b)=>{const sa=vstats[vkey(a)],sb=vstats[vkey(b)];const na=sa?sa.n:0,nb=sb?sb.n:0;return na-nb||Math.random()-.5;});
+  else p=vShuf(pool);
+  return p.slice(0,Math.max(1,Math.min(n,p.length)));
+}
+
+/* ---------- 홈 ---------- */
+function renderVerbs(){
+  if(vs){showVerbStep();return;}
+  const el=document.getElementById('verbsBody');if(!el)return;
+  const done=Object.keys(vstats).length;
+  let h='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">Verbs 훈련</h3><span class="count">'+VERBS.length+'개 동사 · 7개 카테고리 · 연습한 동사 '+done+'개</span></div>';
+  h+='<div class="count" style="margin-top:14px;margin-bottom:6px">훈련 방식</div><div class="chipwrap">';
+  VMODES.forEach(m=>{h+='<span class="chip'+(vMode===m[0]?' on':'')+'" onclick="vSetMode(\''+m[0]+'\')">'+m[1]+'</span>';});
+  h+='</div>';
+  const md=VMODES.find(m=>m[0]===vMode);
+  h+='<p class="study-tip" style="margin-top:4px">'+(md?md[2]:'')+'</p>';
+  h+='<div class="count" style="margin-top:14px;margin-bottom:6px">카테고리</div><div class="chipwrap">';
+  h+='<span class="chip'+(vCat===0?' on':'')+'" onclick="vSetCat(0)">전체 ('+VERBS.length+')</span>';
+  VCATS.forEach(c=>{const n=VERBS.filter(o=>o.c===c.c).length;h+='<span class="chip'+(vCat===c.c?' on':'')+'" onclick="vSetCat('+c.c+')">'+c.c+'. '+esc(c.n)+' ('+n+')</span>';});
+  h+='</div>';
+  h+='<div class="row" style="margin-top:14px">문항 <input type="number" id="vCount" value="'+(vMode==='sort'?5:20)+'" min="1" style="width:70px"> '+(vMode==='sort'?'라운드':'개')+
+     ' <select id="vOrder"><option value="random">랜덤</option><option value="weak">취약 동사 우선</option><option value="new">안 해본 것 우선</option></select>'+
+     ' <button class="primary" onclick="startVerbs()">시작</button></div>';
+  const weak=VERBS.filter(o=>vRate(o)>0).sort((a,b)=>vRate(b)-vRate(a)).slice(0,12);
+  if(weak.length){
+    h+='<div class="count" style="margin-top:18px;margin-bottom:6px">자주 틀리는 동사</div><div class="chipwrap">';
+    weak.forEach(o=>{h+='<span class="chip" style="border-color:#f0c4c4;color:#b42323" title="'+esc(o.k)+'">'+esc(o.v)+' '+Math.round(vRate(o)*100)+'%</span>';});
+    h+='</div>';
+  }
+  el.innerHTML=h;
+}
+
+function startVerbs(){
+  const n=+document.getElementById('vCount').value||20;
+  const order=document.getElementById('vOrder').value;
+  let pool=vPool();
+  if(vMode==='pair'||vMode==='sort'){
+    if(pool.length<6)return alert('이 카테고리는 동사가 너무 적습니다.');
+  }else if(pool.length<4)return alert('이 카테고리는 동사가 너무 적습니다.');
+  vs={mode:vMode,cat:vCat,i:0,n:n,order:order,score:0,total:0,wrong:[],pool:vOrderPool(pool,order,n),answered:false};
+  vSetVerbsChrome(true);
+  showVerbStep();
+}
+function endVerbs(){vs=null;vSel=null;vPlaced=null;saveVStats();vSetVerbsChrome(false);renderVerbs();}
+function vSetVerbsChrome(on){document.getElementById('mainTabs').classList.toggle('hide',on);}
+function vNext(){vs.i++;vs.answered=false;vSel=null;vPlaced=null;showVerbStep();}
+
+function vHead(){
+  const tot=(vs.mode==='pair'||vs.mode==='sort')?vs.n:vs.pool.length;
+  return '<div class="row" style="justify-content:space-between"><span class="count">'+(vs.i+1)+'/'+tot+' · 점수 '+vs.score+'</span><button class="small" onclick="endVerbs()">그만</button></div>';
+}
+function vDone(){
+  const tot=vs.total||1;
+  const pct=Math.round(vs.score/tot*100);
+  let h='<h3>훈련 완료</h3><div class="statgrid"><div class="stat"><b>'+vs.score+'/'+vs.total+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+vs.wrong.length+'</b><span class="count">틀린 항목</span></div></div>';
+  h+='<button class="primary" onclick="endVerbs()">닫기</button>';
+  if(vs.wrong.length){
+    h+='<h3 style="margin-top:16px;color:var(--red)">복습할 동사 '+vs.wrong.length+'개</h3>';
+    h+=vs.wrong.map(o=>vCard(o,true)).join('');
+  }
+  saveVStats();
+  return h;
+}
+function vCard(o,full){
+  let h='<div class="v-rescard"><div class="v-resline"><b>'+esc(o.v)+'</b>'+(o.a?'<span class="v-adj">('+esc(o.a)+')</span>':'')+'<span class="v-kor">'+esc(o.k)+'</span></div>';
+  if(full)h+='<div class="v-tags">'+VAXK.map(ax=>'<span class="v-tag v-'+ax+'">'+VAX[ax].label+': '+o[ax].map(v=>vKo(ax,v)).join('/')+'</span>').join('')+'</div>';
+  h+='</div>';
+  return h;
+}
+function showVerbStep(){
+  const el=document.getElementById('verbsBody');if(!el||!vs)return;
+  const limit=(vs.mode==='pair'||vs.mode==='sort')?vs.n:vs.pool.length;
+  if(vs.i>=limit){el.innerHTML=vDone();return;}
+  if(vs.mode==='coord')el.innerHTML=vHead()+vCoordHTML();
+  else if(vs.mode==='spec')el.innerHTML=vHead()+vSpecHTML();
+  else if(vs.mode==='pair')el.innerHTML=vHead()+vPairHTML();
+  else el.innerHTML=vHead()+vSortHTML();
+}
+
+/* ---------- 1. 좌표 맞히기 ---------- */
+function vCoordHTML(){
+  const o=vs.pool[vs.i];
+  let h='<div class="v-stage"><div class="v-word">'+esc(o.v)+'</div>'+
+    (o.a?'<div class="v-adjline">형용사 '+esc(o.a)+'</div>':'')+
+    '<div class="v-korline">'+esc(o.k)+'</div>'+
+    '<div class="v-catline">'+o.c+'. '+esc(o.cn)+'</div></div>';
+  h+='<div id="vAxes">';
+  VAXK.forEach(ax=>{
+    const A=VAX[ax],mid=Math.floor((A.scale.length-1)/2);
+    h+='<div class="v-axis" id="vaxrow_'+ax+'"><div class="v-axhead"><span class="v-axlab">'+A.label+'</span><span class="v-axnow" id="vaxnow_'+ax+'">'+A.ko[mid]+'</span></div>'+
+      '<input type="range" class="v-range" id="vax_'+ax+'" min="0" max="'+(A.scale.length-1)+'" value="'+mid+'" step="1" oninput="vAxMove(\''+ax+'\')">'+
+      '<div class="v-axticks">'+A.ko.map(k=>'<span>'+k+'</span>').join('')+'</div>'+
+      '<div class="v-axres" id="vaxres_'+ax+'"></div></div>';
+  });
+  h+='</div><button class="primary" id="vSubmit" style="width:100%;margin-top:10px;min-height:42px;font-weight:700" onclick="vCoordSubmit()">확인</button>';
+  h+='<div id="vAfter"></div><div class="study-tip">슬라이더를 옮겨 이 동사의 뉘앙스를 배치하세요. 4축 모두 맞히면 정답.</div>';
+  return h;
+}
+function vAxMove(ax){
+  const v=+document.getElementById('vax_'+ax).value;
+  document.getElementById('vaxnow_'+ax).textContent=VAX[ax].ko[v];
+}
+function vCoordSubmit(){
+  if(vs.answered)return;
+  vs.answered=true;
+  const o=vs.pool[vs.i];
+  let tot=0;
+  VAXK.forEach(ax=>{
+    const A=VAX[ax];
+    const ui=+document.getElementById('vax_'+ax).value;
+    const acc=vAccIdx(o,ax);
+    const err=Math.min.apply(null,acc.map(ci=>Math.abs(ui-ci)));
+    tot+=err;
+    const cls=err===0?'ok':(err===1?'near':'bad');
+    const correct=o[ax].map(v=>vKo(ax,v)).join(' 또는 ');
+    document.getElementById('vaxres_'+ax).innerHTML='<span class="v-mark '+cls+'">'+(err===0?'정확':(err===1?'한 칸 차이':'빗나감'))+'</span> 정답: <b>'+correct+'</b> · 내 선택: '+A.ko[ui];
+    document.getElementById('vaxrow_'+ax).classList.add('v-'+cls);
+    document.getElementById('vax_'+ax).disabled=true;
+  });
+  const ok=tot===0;
+  if(ok)vs.score++;else vs.wrong.push(o);
+  vs.total++;vMark(o,ok);saveVStats();
+  document.getElementById('vSubmit').classList.add('hide');
+  document.getElementById('vAfter').innerHTML='<div class="v-verdict '+(ok?'ok':'bad')+'">'+(ok?'완벽 · 4축 모두 정확':'오차 합계 '+tot+'칸')+'</div>'+
+    '<button class="primary" style="width:100%;margin-top:8px;min-height:42px" onclick="vNext()">다음 →</button>';
+}
+
+/* ---------- 2. 스펙 → 동사 소환 ---------- */
+function vSpecHTML(){
+  const pool=vPool();
+  let spec=null,tries=0;
+  while(tries++<200){
+    const seed=vRand(pool);
+    const cat=seed.c;
+    const inCat=VERBS.filter(o=>o.c===cat);
+    if(inCat.length<8)continue;
+    const t=vPrim(seed,'t'),s=vPrim(seed,'s');
+    const match=inCat.filter(o=>o.t.indexOf(t)>=0&&o.s.indexOf(s)>=0);
+    if(match.length<2||match.length>7)continue;
+    const non=vShuf(inCat.filter(o=>match.indexOf(o)<0)).slice(0,Math.max(4,12-match.length));
+    spec={cat:cat,catName:inCat[0].cn,t:t,s:s,match:match,grid:vShuf(match.concat(non))};
+    break;
+  }
+  if(!spec){vs.i=vs.pool.length;return vDone();}
+  vs.spec=spec;vSel=new Set();
+  let h='<div class="v-specbox"><div class="count">'+spec.cat+'. '+esc(spec.catName)+'</div>'+
+    '<div class="v-specline">톤 <b>'+vKo('t',spec.t)+'</b> · 강도 <b>'+vKo('s',spec.s)+'</b></div>'+
+    '<div class="count">이 조건에 맞는 동사를 전부 고르세요 ('+spec.match.length+'개)</div></div>';
+  h+='<div class="v-grid" id="vGrid">'+spec.grid.map((o,gi)=>
+    '<button class="v-gitem" id="vgi_'+gi+'" onclick="vSpecToggle('+gi+')"><b>'+esc(o.v)+'</b><span>'+esc(o.k)+'</span></button>').join('')+'</div>';
+  h+='<button class="primary" id="vSubmit" style="width:100%;margin-top:10px;min-height:42px;font-weight:700" onclick="vSpecSubmit()">확인</button><div id="vAfter"></div>';
+  return h;
+}
+function vSpecToggle(gi){
+  if(vs.answered)return;
+  const b=document.getElementById('vgi_'+gi);
+  if(vSel.has(gi)){vSel.delete(gi);b.classList.remove('sel');}
+  else{vSel.add(gi);b.classList.add('sel');}
+}
+function vSpecSubmit(){
+  if(vs.answered)return;
+  vs.answered=true;
+  const spec=vs.spec;
+  let hit=0,miss=0,fp=0;
+  spec.grid.forEach((o,gi)=>{
+    const isM=spec.match.indexOf(o)>=0, picked=vSel.has(gi);
+    const b=document.getElementById('vgi_'+gi);
+    b.disabled=true;
+    if(isM&&picked){hit++;b.classList.add('hit');}
+    else if(isM&&!picked){miss++;b.classList.add('miss');}
+    else if(!isM&&picked){fp++;b.classList.add('fp');}
+    if(isM)vMark(o,picked);
+    if(isM&&!picked)vs.wrong.push(o);
+  });
+  const ok=(miss===0&&fp===0);
+  if(ok)vs.score++;
+  vs.total++;saveVStats();
+  document.getElementById('vSubmit').classList.add('hide');
+  document.getElementById('vAfter').innerHTML='<div class="v-verdict '+(ok?'ok':'bad')+'">'+
+    (ok?'완벽 · 정확히 다 골랐어요':'맞힘 '+hit+' · 놓침 '+miss+' · 잘못 고름 '+fp)+'</div>'+
+    '<div class="study-tip">초록=정답으로 고름 · 노랑=놓친 정답 · 빨강=조건에 안 맞음</div>'+
+    '<button class="primary" style="width:100%;margin-top:8px;min-height:42px" onclick="vNext()">다음 →</button>';
+}
+
+/* ---------- 3. 페어 비교 ---------- */
+function vPairHTML(){
+  const pool=vPool();
+  let pair=null,tries=0;
+  while(tries++<300){
+    const ax=vRand(VAXK);
+    const a=vRand(pool);
+    if(!vSingle(a,ax))continue;
+    const same=pool.filter(o=>o.c===a.c&&o!==a&&vSingle(o,ax)&&vIdx(ax,vPrim(o,ax))!==vIdx(ax,vPrim(a,ax)));
+    if(!same.length)continue;
+    const b=vRand(same);
+    pair={ax:ax,a:a,b:b};break;
+  }
+  if(!pair){vs.i=vs.n;return vDone();}
+  vs.pair=pair;
+  const A=VAX[pair.ax];
+  const two=vShuf([pair.a,pair.b]);
+  vs.pairShown=two;
+  let h='<div class="v-specbox"><div class="count">'+pair.a.c+'. '+esc(pair.a.cn)+' · '+A.label+'</div><div class="v-specline">어느 쪽이 <b>'+A.more+'</b>가요?</div></div>';
+  h+='<div class="v-pair">'+two.map((o,idx)=>
+    '<button class="v-pitem" id="vpi_'+idx+'" onclick="vPairPick('+idx+')"><span class="v-pnum">'+(idx+1)+'</span><b>'+esc(o.v)+'</b><span class="v-kor">'+esc(o.k)+'</span></button>').join('')+'</div>';
+  h+='<div id="vAfter"></div><div class="study-tip">키보드: 1 / 2 · 정답은 바로 넘어갑니다.</div>';
+  return h;
+}
+function vPairPick(idx){
+  if(vs.answered)return;
+  vs.answered=true;
+  const ax=vs.pair.ax, two=vs.pairShown;
+  const i0=vIdx(ax,vPrim(two[0],ax)), i1=vIdx(ax,vPrim(two[1],ax));
+  const winner=i0>i1?0:1;
+  const ok=idx===winner;
+  document.getElementById('vpi_'+winner).classList.add('hit');
+  if(!ok)document.getElementById('vpi_'+idx).classList.add('fp');
+  [0,1].forEach(k=>{document.getElementById('vpi_'+k).disabled=true;});
+  if(ok)vs.score++;else vs.wrong.push(two[idx]);
+  vs.total++;vMark(two[idx],ok);vMark(two[1-idx],ok);saveVStats();
+  const A=VAX[ax];
+  document.getElementById('vAfter').innerHTML='<div class="v-verdict '+(ok?'ok':'bad')+'">'+
+    esc(two[0].v)+' = '+vKo(ax,vPrim(two[0],ax))+' · '+esc(two[1].v)+' = '+vKo(ax,vPrim(two[1],ax))+'</div>'+
+    '<button class="primary" style="width:100%;margin-top:8px;min-height:42px" onclick="vNext()">다음 →</button>';
+  if(ok)setTimeout(function(){if(vs&&vs.answered)vNext();},700);
+}
+
+/* ---------- 4. 드래그 분류 ---------- */
+function vSortHTML(){
+  const pool=vPool();
+  let ax=null,cards=null,tries=0;
+  while(tries++<60){
+    const a=vRand(VAXK);
+    const ok=pool.filter(o=>vSingle(o,a));
+    const byVal={};
+    VAX[a].scale.forEach(v=>{byVal[v]=ok.filter(o=>vPrim(o,a)===v)});
+    const usable=VAX[a].scale.filter(v=>byVal[v].length>=2);
+    if(usable.length<2)continue;
+    let picked=[];
+    usable.forEach(v=>{picked=picked.concat(vShuf(byVal[v]).slice(0,3))});
+    if(picked.length<4)continue;
+    ax=a;cards=vShuf(picked).slice(0,9);break;
+  }
+  if(!ax){vs.i=vs.n;return vDone();}
+  vs.sortAx=ax;vs.sortCards=cards;vPlaced={};vSel=null;
+  const A=VAX[ax];
+  let h='<div class="v-specbox"><div class="v-specline">기준: <b>'+A.label+'</b></div><div class="count">카드를 클릭한 뒤 바구니를 클릭하면 들어갑니다. (드래그도 가능)</div></div>';
+  h+='<div class="v-tray" id="vTray">'+cards.map((o,ci)=>vSortCardHTML(o,ci)).join('')+'</div>';
+  h+='<div class="v-buckets">'+A.scale.map((v,bi)=>
+    '<div class="v-bucket" id="vbk_'+bi+'" onclick="vSortDrop('+bi+')" ondragover="event.preventDefault()" ondrop="vSortDropEv(event,'+bi+')"><div class="v-bklab">'+A.ko[bi]+'</div><div class="v-bkbody" id="vbkb_'+bi+'"></div></div>').join('')+'</div>';
+  h+='<button class="primary" id="vSubmit" style="width:100%;margin-top:10px;min-height:42px;font-weight:700" onclick="vSortSubmit()">채점</button><div id="vAfter"></div>';
+  return h;
+}
+function vSortCardHTML(o,ci){
+  return '<button class="v-card" id="vcd_'+ci+'" draggable="true" ondragstart="vSortDrag(event,'+ci+')" onclick="vSortSelect('+ci+')"><b>'+esc(o.v)+'</b><span>'+esc(o.k)+'</span></button>';
+}
+function vSortDrag(ev,ci){vSel=ci;try{ev.dataTransfer.setData('text/plain',String(ci))}catch(e){}}
+function vSortDropEv(ev,bi){ev.preventDefault();let ci=vSel;try{const t=ev.dataTransfer.getData('text/plain');if(t!=='')ci=+t}catch(e){}if(ci!=null)vSortPlace(ci,bi);}
+function vSortSelect(ci){
+  if(vs.answered)return;
+  document.querySelectorAll('.v-card.sel').forEach(function(e){e.classList.remove('sel')});
+  if(vSel===ci){vSel=null;return;}
+  vSel=ci;
+  const c=document.getElementById('vcd_'+ci);if(c)c.classList.add('sel');
+}
+function vSortDrop(bi){if(vs.answered)return;if(vSel==null)return;vSortPlace(vSel,bi);vSel=null;}
+function vSortPlace(ci,bi){
+  if(vs.answered)return;
+  vPlaced[ci]=bi;
+  const card=document.getElementById('vcd_'+ci);
+  if(card){card.classList.remove('sel');document.getElementById('vbkb_'+bi).appendChild(card);}
+}
+function vSortSubmit(){
+  if(vs.answered)return;
+  const ax=vs.sortAx,A=VAX[ax];
+  const unplaced=vs.sortCards.filter((o,ci)=>vPlaced[ci]==null).length;
+  if(unplaced)return alert('아직 분류하지 않은 카드가 '+unplaced+'개 있습니다.');
+  vs.answered=true;
+  let right=0;
+  vs.sortCards.forEach((o,ci)=>{
+    const want=vIdx(ax,vPrim(o,ax)), got=vPlaced[ci];
+    const card=document.getElementById('vcd_'+ci);
+    const ok=want===got;
+    if(ok){right++;if(card)card.classList.add('hit');}
+    else{if(card){card.classList.add('fp');card.innerHTML+='<span class="v-fix">→ '+A.ko[want]+'</span>';}vs.wrong.push(o);}
+    vMark(o,ok);
+    if(card)card.disabled=true;
+  });
+  const all=vs.sortCards.length;
+  if(right===all)vs.score++;
+  vs.total++;saveVStats();
+  document.getElementById('vSubmit').classList.add('hide');
+  document.getElementById('vAfter').innerHTML='<div class="v-verdict '+(right===all?'ok':'bad')+'">'+right+'/'+all+' 정확</div>'+
+    '<button class="primary" style="width:100%;margin-top:8px;min-height:42px" onclick="vNext()">다음 →</button>';
+}
+
+/* ---------- 키보드 ---------- */
+document.addEventListener('keydown',function(e){
+  if(!vs)return;
+  const tag=(e.target&&e.target.tagName)||'';
+  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  if(e.key==='Escape'){endVerbs();return;}
+  if(e.key==='Enter'){
+    if(vs.answered){vNext();return;}
+    const sb=document.getElementById('vSubmit');
+    if(sb&&!sb.classList.contains('hide'))sb.click();
+    return;
+  }
+  if(vs.mode==='pair'&&!vs.answered&&(e.key==='1'||e.key==='2')){
+    const b=document.getElementById('vpi_'+(+e.key-1));if(b&&!b.disabled)b.click();
+  }
+});
 
 /* ================= init ================= */
 ['optMean','optSent','optSyn','optPron','optEtym'].forEach(id=>document.getElementById(id).onchange=render);
