@@ -769,16 +769,59 @@ function exportPracticeCSV(){
   a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));
   a.download=curDeck().name+'_practice_log_'+ymd()+'.csv';a.click();
 }
+function importPracticeCSV(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(e){
+    let rows;
+    try{rows=parseCSV(e.target.result.replace(/^\ufeff/,''));}catch(err){inp.value='';return alert('CSV를 읽을 수 없습니다.');}
+    if(rows.length<2){inp.value='';return alert('빈 파일입니다.');}
+    const head=rows[0].map(h=>h.trim().toLowerCase());
+    const ix=function(){const names=[].slice.call(arguments);return head.findIndex(h=>names.some(n=>h===n||h.indexOf(n)>=0));};
+    const iDate=ix('date','날짜'),iRange=ix('range','범위'),iMode=ix('mode','유형'),iScore=ix('score','점수'),
+      iTotal=ix('total','총'),iPct=ix('percent','정답률'),iWrong=ix('wrong','틀린');
+    if(iDate<0||iTotal<0){inp.value='';return alert('Date / Total 칼럼을 찾을 수 없습니다.\n연습 기록 CSV가 맞는지 확인하세요.');}
+    const g=(r,i)=>i>=0?(r[i]||'').trim():'';
+    const items=rows.slice(1).filter(r=>g(r,iDate)).map(r=>{
+      const total=parseInt(g(r,iTotal))||0, score=parseInt(g(r,iScore))||0;
+      let pct=parseInt(g(r,iPct));if(isNaN(pct))pct=total?Math.round(score/total*100):0;
+      const label=g(r,iRange), modeRaw=g(r,iMode);
+      const mode=(modeRaw.indexOf('단어')>=0||modeRaw.toLowerCase().indexOf('word')>=0)?'word':'mean';
+      const wraw=g(r,iWrong);
+      const wrong=wraw?wraw.split('/').map(x=>x.trim()).filter(Boolean).map(wd=>({word:wd,mean:'',day:0,no:0})):[];
+      let chunk=null;
+      const m=label.match(/^(\d+)\s*일차\s*(\d+)\s*[–\-~]\s*(\d+)/);
+      if(m){const from=+m[2];chunk={day:+m[1],q:Math.floor((from-1)/QSIZE),from:from,to:+m[3]};}
+      return {key:g(r,iDate),time:'',label:label,mode:mode,score:score,total:total,pct:pct,chunk:chunk,wrong:wrong};
+    });
+    inp.value='';
+    if(!items.length)return alert('불러올 기록이 없습니다.');
+    const cur=loadPractice();
+    let merged;
+    if(cur.length&&!confirm(items.length+'건을 기존 '+cur.length+'건에 추가할까요?\n(취소 = 기존 기록을 교체)')) merged=items;
+    else merged=cur.concat(items);
+    merged.sort((a,b)=>String(a.key).localeCompare(String(b.key))||String(a.time).localeCompare(String(b.time)));
+    if(merged.length>300)merged.splice(0,merged.length-300);
+    savePractice(merged);
+    renderPracticeLog();updatePracticeCount();renderTestChunkRow();
+    alert(items.length+'건을 불러왔습니다.');
+  };
+  rd.readAsText(f,'utf-8');
+}
 function renderPracticeLog(){
   const box=document.getElementById('practiceLog');if(!box)return;
   const arr=loadPractice();
-  if(!arr.length){box.innerHTML='<p class="count">아직 기록이 없습니다.</p>';return;}
-  const n=arr.length, avg=Math.round(arr.reduce((s,r)=>s+r.pct,0)/n);
+  const n=arr.length, avg=n?Math.round(arr.reduce((s,r)=>s+r.pct,0)/n):0;
   const groups={}, order=[];
   arr.forEach((r,idx)=>{if(!groups[r.key]){groups[r.key]=[];order.push(r.key);}groups[r.key].push({r:r,idx:idx});});
   const dates=order.slice().sort().reverse();
-  let h='<div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="count">'+n+'건 · '+dates.length+'일 · 평균 '+avg+'%</span>'+
-    '<span class="row"><button class="small" onclick="exportPracticeCSV()">CSV</button><button class="small danger" onclick="clearPractice()">전체삭제</button></span></div>';
+  const bar='<div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="count">'+(n?n+'건 · '+dates.length+'일 · 평균 '+avg+'%':'기록 없음')+'</span>'+
+    '<span class="row"><button class="small" onclick="exportPracticeCSV()">내보내기</button>'+
+    '<button class="small" onclick="document.getElementById(\'practiceCsvFile\').click()">불러오기</button>'+
+    '<input type="file" id="practiceCsvFile" accept=".csv" class="hide" onchange="importPracticeCSV(this)">'+
+    (n?'<button class="small danger" onclick="clearPractice()">전체삭제</button>':'')+'</span></div>';
+  if(!n){box.innerHTML=bar+'<p class="count">아직 기록이 없습니다. CSV로 이전 기록을 불러올 수 있어요.</p>';return;}
+  let h=bar;
   h+=dates.map((dk,di)=>{
     const items=groups[dk].slice().reverse();
     const cnt=items.length, dAvg=Math.round(items.reduce((s,x)=>s+x.r.pct,0)/cnt);
