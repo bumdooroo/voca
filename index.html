@@ -363,6 +363,16 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
       <p class="study-tip" style="margin-top:4px">연습 테스트는 캘린더에 남지 않고 여기에만 따로 쌓입니다.</p>
       <div id="practiceLog" class="hide" style="margin-top:8px"></div>
     </div>
+    <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
+      <div class="count" style="font-weight:700;color:var(--ink)">전체 백업</div>
+      <p class="study-tip" style="margin-top:4px">모든 단어장 · 캘린더 · 진도 · 설정 · 기록을 파일 하나로 저장하고 통째로 되돌립니다.</p>
+      <div class="row" style="margin-top:8px">
+        <button class="small" onclick="exportBackup()">전체 저장</button>
+        <button class="small" onclick="document.getElementById('backupFile').click()">전체 불러오기</button>
+        <input type="file" id="backupFile" accept=".json,.vocabak" class="hide" onchange="importBackup(this)">
+      </div>
+      <p class="study-tip" style="margin-top:6px;color:#8a5a00">불러오면 현재 모든 데이터가 백업 파일 내용으로 <b>교체</b>됩니다.</p>
+    </div>
   </div>
 </div>
 
@@ -805,6 +815,42 @@ function importPracticeCSV(inp){
     savePractice(merged);
     renderPracticeLog();updatePracticeCount();renderTestChunkRow();
     alert(items.length+'건을 불러왔습니다.');
+  };
+  rd.readAsText(f,'utf-8');
+}
+/* ================= 전체 백업 / 복원 ================= */
+const BACKUP_VER=1;
+function exportBackup(){
+  const store={};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&(k.indexOf('voca')===0)) store[k]=localStorage.getItem(k);
+  }
+  const payload={app:'voca',type:'full-backup',ver:BACKUP_VER,savedAt:new Date().toISOString(),store:store};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(payload)],{type:'application/json'}));
+  a.download='voca_backup_'+ymd()+'.json';a.click();
+}
+function importBackup(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(e){
+    let payload;
+    try{payload=JSON.parse(e.target.result);}catch(err){inp.value='';return alert('백업 파일을 읽을 수 없습니다.');}
+    const store=payload&&payload.store;
+    if(!store||typeof store!=='object'||payload.app!=='voca'){inp.value='';return alert('이 앱의 전체 백업 파일이 아닙니다.');}
+    const keys=Object.keys(store).filter(k=>k.indexOf('voca')===0);
+    if(!keys.length){inp.value='';return alert('백업에 데이터가 없습니다.');}
+    let deckN=0;
+    try{const dk=JSON.parse(store['voca_decks']||'[]');deckN=dk.length;}catch(e2){}
+    const when=payload.savedAt?payload.savedAt.slice(0,10):'?';
+    if(!confirm('백업('+when+' · 단어장 '+deckN+'개)으로 되돌립니다.\n현재 모든 데이터가 교체됩니다. 계속할까요?')){inp.value='';return;}
+    const old=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('voca')===0)old.push(k);}
+    old.forEach(k=>localStorage.removeItem(k));
+    keys.forEach(k=>{try{localStorage.setItem(k,store[k]);}catch(e3){}});
+    inp.value='';
+    alert('복원 완료. 페이지를 새로고침합니다.');
+    location.reload();
   };
   rd.readAsText(f,'utf-8');
 }
