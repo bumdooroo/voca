@@ -715,6 +715,13 @@ function exportCSV(){
 function PR_KEY(){return 'voca_practice_'+CUR;}
 function loadPractice(){try{return JSON.parse(localStorage.getItem(PR_KEY()))||[]}catch(e){return[]}}
 function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr))}catch(e){}}
+/* 연습 테스트 구간별 완료 횟수 (25개씩 · 3회 이상 = 완료) */
+const TEST_GOAL=3;
+function TC_KEY(){return 'voca_testchunk_'+CUR;}
+function loadTestChunk(){try{return JSON.parse(localStorage.getItem(TC_KEY()))||{}}catch(e){return{}}}
+function saveTestChunk(o){try{localStorage.setItem(TC_KEY(),JSON.stringify(o))}catch(e){}}
+function testChunkCount(day,q){const o=loadTestChunk();return (o[day]&&o[day][q])||0;}
+function bumpTestChunk(day,q){const o=loadTestChunk();if(!o[day])o[day]={};o[day][q]=(o[day][q]||0)+1;saveTestChunk(o);}
 function recordPractice(){
   if(!quiz||!quiz.pool||!quiz.pool.length)return;
   const arr=loadPractice();
@@ -956,10 +963,11 @@ function renderTestChunkRow(){
   if(!dayWords.length){el.innerHTML='<span class="count">'+day+'일차 단어 없음</span>';return;}
   const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
   const nq=Math.ceil(maxNo/QSIZE);
-  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩</span>';
+  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩 · '+TEST_GOAL+'회 목표</span>';
   for(let q=0;q<nq;q++){
     const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
-    h+='<button class="chip" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+'</button>';
+    const cnt=testChunkCount(day,q);
+    h+='<button class="chip'+(cnt>=TEST_GOAL?' on':'')+'" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+cnt+'/'+TEST_GOAL+'</b></button>';
   }
   el.innerHTML=h;
 }
@@ -969,7 +977,7 @@ function startTestChunk(day,q){
   let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
   if(pool.length<4)return alert(day+'일차 '+a+'–'+b+' 구간 단어가 4개 미만입니다.');
   pool=[...pool].sort(()=>Math.random()-.5);
-  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
+  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',chunk:{day:day,q:q},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
   setQuizMode(true);showQ();
 }
 function startQuiz(){
@@ -980,7 +988,7 @@ function startQuiz(){
   quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',label:(Math.min(f,t)===Math.max(f,t)?Math.min(f,t)+'일차':Math.min(f,t)+'~'+Math.max(f,t)+'일차')+' '+pool.length+'문항'};
   setQuizMode(true);showQ();
 }
-function endQuiz(){clearQuizTimer();quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render()}
+function endQuiz(){clearQuizTimer();quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();}
 function clearQuizTimer(){if(quiz&&quiz._tid){clearInterval(quiz._tid);quiz._tid=null;}}
 function startQuizTimer(){
   clearQuizTimer();
@@ -1007,7 +1015,7 @@ function pick(arr,n,ex){const r=[];const c=arr.filter(x=>x!==ex);while(r.length<
 function showQ(){
   const a=document.getElementById(quiz.target);
   if(quiz.i>=quiz.pool.length){
-    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else recordPractice(); quiz.recorded=true; }
+    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else { recordPractice(); if(quiz.chunk)bumpTestChunk(quiz.chunk.day,quiz.chunk.q); } quiz.recorded=true; }
     const wl=[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no));
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
