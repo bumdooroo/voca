@@ -715,13 +715,12 @@ function exportCSV(){
 function PR_KEY(){return 'voca_practice_'+CUR;}
 function loadPractice(){try{return JSON.parse(localStorage.getItem(PR_KEY()))||[]}catch(e){return[]}}
 function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr))}catch(e){}}
-/* 연습 테스트 구간별 완료 횟수 (25개씩 · 3회 이상 = 완료) */
+/* 연습 테스트 구간별 완료 횟수 — 연습 기록에서 직접 집계 (3회 이상 = 완료) */
 const TEST_GOAL=3;
-function TC_KEY(){return 'voca_testchunk_'+CUR;}
-function loadTestChunk(){try{return JSON.parse(localStorage.getItem(TC_KEY()))||{}}catch(e){return{}}}
-function saveTestChunk(o){try{localStorage.setItem(TC_KEY(),JSON.stringify(o))}catch(e){}}
-function testChunkCount(day,q){const o=loadTestChunk();return (o[day]&&o[day][q])||0;}
-function bumpTestChunk(day,q){const o=loadTestChunk();if(!o[day])o[day]={};o[day][q]=(o[day][q]||0)+1;saveTestChunk(o);}
+function testChunkCount(day,q){
+  const from=q*QSIZE+1;
+  return loadPractice().filter(r=>r.chunk&&(+r.chunk.day===+day)&&(+r.chunk.from===from)).length;
+}
 function recordPractice(){
   if(!quiz||!quiz.pool||!quiz.pool.length)return;
   const arr=loadPractice();
@@ -729,6 +728,7 @@ function recordPractice(){
   arr.push({key:todayKey(),time:pad(now.getHours())+':'+pad(now.getMinutes()),
     label:quiz.label||'',mode:quiz.mode,score:quiz.score,total:quiz.pool.length,
     pct:Math.round(quiz.score/quiz.pool.length*100),
+    chunk:quiz.chunk||null,
     wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no}))});
   if(arr.length>300)arr.splice(0,arr.length-300);
   savePractice(arr);
@@ -751,11 +751,11 @@ function deletePractice(absIdx){
   const arr=loadPractice();
   if(absIdx<0||absIdx>=arr.length)return;
   arr.splice(absIdx,1);savePractice(arr);
-  renderPracticeLog();updatePracticeCount();
+  renderPracticeLog();updatePracticeCount();renderTestChunkRow();
 }
 function clearPractice(){
   if(!confirm('연습 테스트 기록을 모두 삭제할까요? (되돌릴 수 없음)'))return;
-  savePractice([]);renderPracticeLog();updatePracticeCount();
+  savePractice([]);renderPracticeLog();updatePracticeCount();renderTestChunkRow();
 }
 function exportPracticeCSV(){
   const arr=loadPractice();
@@ -977,7 +977,7 @@ function startTestChunk(day,q){
   let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
   if(pool.length<4)return alert(day+'일차 '+a+'–'+b+' 구간 단어가 4개 미만입니다.');
   pool=[...pool].sort(()=>Math.random()-.5);
-  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',chunk:{day:day,q:q},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
+  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',chunk:{day:day,q:q,from:a,to:Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
   setQuizMode(true);showQ();
 }
 function startQuiz(){
@@ -1015,7 +1015,7 @@ function pick(arr,n,ex){const r=[];const c=arr.filter(x=>x!==ex);while(r.length<
 function showQ(){
   const a=document.getElementById(quiz.target);
   if(quiz.i>=quiz.pool.length){
-    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else { recordPractice(); if(quiz.chunk)bumpTestChunk(quiz.chunk.day,quiz.chunk.q); } quiz.recorded=true; }
+    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else recordPractice(); quiz.recorded=true; }
     const wl=[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no));
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
