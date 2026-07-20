@@ -382,6 +382,7 @@ function SET_KEY(){return 'voca_settings_'+CUR;}
 const pad=n=>String(n).padStart(2,'0');
 function dateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function todayKey(){return dateKey(new Date());}
+function ymd(){return todayKey().slice(2).replace(/-/g,'');}
 
 function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
 function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data))}
@@ -708,7 +709,7 @@ function exportCSV(){
     ordered.map(x=>[x.day,x.no,x.word,x.pron,x.mean,x.sent,x.syn,x.etym,x.wrong||0,x.unknown||0,x.ambiguous||0,x.known||0,x.lastLevel||'',x.studied||0,x.flag?1:0].map(q).join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
-  a.download=curDeck().name+'_export.csv';a.click();
+  a.download=curDeck().name+'_export_'+ymd()+'.csv';a.click();
 }
 
 /* ================= 연습 테스트 기록 (설정창 전용) ================= */
@@ -761,12 +762,12 @@ function exportPracticeCSV(){
   const arr=loadPractice();
   if(!arr.length)return alert('기록이 없습니다.');
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const csv='Date,Time,Range,Mode,Score,Total,Percent,WrongWords\n'+
-    arr.map(r=>[r.key,r.time,r.label,(r.mode==='mean'?'뜻 고르기':'단어 고르기'),r.score,r.total,r.pct,
+  const csv='Date,Range,Mode,Score,Total,Percent,WrongWords\n'+
+    arr.map(r=>[r.key,r.label,(r.mode==='mean'?'뜻 고르기':'단어 고르기'),r.score,r.total,r.pct,
       (r.wrong||[]).map(x=>x.word).join(' / ')].map(q).join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));
-  a.download=curDeck().name+'_practice_log.csv';a.click();
+  a.download=curDeck().name+'_practice_log_'+ymd()+'.csv';a.click();
 }
 function renderPracticeLog(){
   const box=document.getElementById('practiceLog');if(!box)return;
@@ -1251,7 +1252,7 @@ function exportVerbsCSV(){
       o.t.join('/'),o.s.join('/'),o.i.join('/'),o.d.join('/'),o.note||''].map(q).join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
-  a.download='verbs_master.csv';a.click();
+  a.download='verbs_master_'+ymd()+'.csv';a.click();
 }
 function resetVerbs(){
   if(!confirm('기본 데이터('+VERBS_DEFAULT.length+'개)로 되돌릴까요? 불러온 CSV는 사라집니다. (학습 진도는 유지)'))return;
