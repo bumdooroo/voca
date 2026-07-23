@@ -373,6 +373,12 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
       </div>
       <p class="study-tip" style="margin-top:6px;color:#8a5a00">불러오면 현재 모든 데이터가 백업 파일 내용으로 <b>교체</b>됩니다.</p>
     </div>
+    <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
+      <div class="count" style="font-weight:700;color:var(--red)">전체 초기화</div>
+      <p class="study-tip" style="margin-top:4px">모든 단어장 · 캘린더 · 진도 · 설정 · 기록을 삭제하고 처음 상태로 되돌립니다. (되돌릴 수 없음)</p>
+      <button class="small danger" style="margin-top:8px" onclick="resetAll()">전체 초기화</button>
+      <p class="study-tip" style="margin-top:6px;color:#8a5a00">먼저 ‘전체 저장’으로 백업해두는 걸 권장합니다.</p>
+    </div>
   </div>
 </div>
 
@@ -853,6 +859,14 @@ function importBackup(inp){
     location.reload();
   };
   rd.readAsText(f,'utf-8');
+}
+function resetAll(){
+  if(!confirm('정말 전체 초기화할까요?\n모든 단어장·캘린더·진도·설정·기록이 삭제됩니다. (되돌릴 수 없음)'))return;
+  if(!confirm('마지막 확인입니다. 백업 없이 진행하면 복구할 수 없습니다.\n그래도 전체 초기화하시겠어요?'))return;
+  const old=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('voca')===0)old.push(k);}
+  old.forEach(k=>localStorage.removeItem(k));
+  alert('전체 초기화되었습니다. 페이지를 새로고침합니다.');
+  location.reload();
 }
 function renderPracticeLog(){
   const box=document.getElementById('practiceLog');if(!box)return;
