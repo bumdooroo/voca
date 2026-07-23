@@ -1077,11 +1077,12 @@ function renderTestChunkRow(){
   if(!dayWords.length){el.innerHTML='<span class="count">'+day+'일차 단어 없음</span>';return;}
   const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
   const nq=Math.ceil(maxNo/QSIZE);
-  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩 · 4회 목표</span>';
+  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩</span>';
   for(let q=0;q<nq;q++){
     const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
     const p=testChunkProgress(day,q);
-    h+='<button class="chip'+(p.done?' tc-done':'')+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (뜻 3 + 단어 1 완료 시 빨강)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.prog+'/'+p.goal+'</b></button>';
+    const cls=p.done?' tc-done':(p.prog>=3?' on':'');
+    h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (3↑ 파랑 · 뜻3+단어1 빨강)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.prog+'/3</b></button>';
   }
   el.innerHTML=h;
 }
