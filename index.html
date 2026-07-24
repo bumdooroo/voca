@@ -23,6 +23,8 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;fon
 .chip{padding:4px 10px;border-radius:14px;font-size:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
 .chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 .chip.tc-done{background:var(--red);color:#fff;border-color:var(--red)}
+.chip.tc-super{background:linear-gradient(90deg,#f94144,#f8961e,#f9c74f,#43aa8b,#4d96ff,#9b5de5,#f94144);background-size:220% 100%;color:#fff;border-color:transparent;font-weight:700;text-shadow:0 1px 1px rgba(0,0,0,.25);animation:tcrainbow 3.5s linear infinite}
+@keyframes tcrainbow{0%{background-position:0% 50%}100%{background-position:220% 50%}}
 .entry{border-bottom:1px solid var(--line);padding:12px 4px}
 .entry:last-child{border-bottom:none}
 .e-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
@@ -746,7 +748,8 @@ function testChunkCounts(day,q){
 function testChunkProgress(day,q){
   const c=testChunkCounts(day,q);
   const prog=Math.min(c.mean,TEST_MEAN_GOAL)+Math.min(c.word,TEST_WORD_GOAL);
-  return {prog:prog, goal:TEST_GOAL, done:(c.mean>=TEST_MEAN_GOAL&&c.word>=TEST_WORD_GOAL), mean:c.mean, word:c.word};
+  const total=c.mean+c.word;
+  return {prog:prog, goal:TEST_GOAL, done:(c.mean>=TEST_MEAN_GOAL&&c.word>=TEST_WORD_GOAL), sup:total>5, total:total, mean:c.mean, word:c.word};
 }
 function recordPractice(){
   if(!quiz||!quiz.pool||!quiz.pool.length)return;
@@ -1081,8 +1084,8 @@ function renderTestChunkRow(){
   for(let q=0;q<nq;q++){
     const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
     const p=testChunkProgress(day,q);
-    const cls=p.done?' tc-done':(p.prog>=3?' on':'');
-    h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (3↑ 파랑 · 뜻3+단어1 빨강)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.prog+'/3</b></button>';
+    const cls=p.sup?' tc-super':(p.done?' tc-done':(p.prog>=3?' on':''));
+    h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (총 '+p.total+'회 · 3↑ 파랑 · 뜻3+단어1 빨강 · 6회↑ 무지개)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.prog+'/3</b></button>';
   }
   el.innerHTML=h;
 }
