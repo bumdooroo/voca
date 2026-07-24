@@ -1222,7 +1222,7 @@ function renderCalendar(){
     let brief='';
     if(rec){
       if(rec.studiedDays&&rec.studiedDays.length)brief+='<div class="cal-brief study">학습: '+rec.studiedDays.slice().sort((a,b)=>a-b).join(',')+'일차</div>';
-      if(rec.tests&&rec.tests.length){const last=rec.tests[rec.tests.length-1];brief+='<div class="cal-brief test">TEST: '+last.score+'/'+last.total+(rec.tests.length>1?' ('+rec.tests.length+')':'')+'</div>';}
+      if(rec.tests&&rec.tests.length){const tt=rec.tests;const last=tt[tt.length-1];const tdays=[...new Set(tt.map(x=>x.greDay))].sort((a,b)=>a-b);brief+='<div class="cal-brief test">'+tdays.join(',')+'일차 '+last.score+'/'+last.total+(tt.length>1?' ('+tt.length+')':'')+'</div>';}
     }
     cells+='<div class="cal-cell'+(key===tk?' today':'')+(key===calSel?' sel':'')+'" onclick="selectDate(\''+key+'\')"><div class="cal-date">'+d+'</div>'+brief+'</div>';
   }
