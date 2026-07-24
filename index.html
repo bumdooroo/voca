@@ -1163,15 +1163,20 @@ function showQ(){
     }).join('')+'<button class="btn" id="qDunno" onclick="dontKnow('+ansIdx+')" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요</button>'+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.etym?'<div class="etym"><b>어근·어원</b> · '+esc(q.etym)+'</div>':'')+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료</div>';
   startQuizTimer();
 }
-function qLabelOf(x){return quiz.mode==='mean'?((x&&x.mean)||''):((x&&x.word)||'');}
+function qAnsMatch(ai,qi){
+  if(+ai===+qi)return true;
+  const a=data[ai],b=data[qi];
+  if(!a||!b)return false;
+  if(quiz.mode==='mean'){ return !!a.mean && a.mean===b.mean; }   /* 뜻 고르기: 같은 뜻이면 정답 */
+  else { return !!a.mean && a.mean===b.mean; }                    /* 단어 고르기: 뜻이 같은 단어면 정답 */
+}
 function answer(ci,qi,btn){
   clearQuizTimer();
-  const correctText=qLabelOf(data[qi]);
-  const correct=(ci===qi)||(qLabelOf(data[ci])===correctText);
+  const correct=qAnsMatch(ci,qi);
   document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>b.disabled=true);
   document.querySelectorAll('#'+quiz.target+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   btn.classList.add(correct?'correct':'wrong');
-  document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(qLabelOf(data[+b.dataset.di])===correctText)b.classList.add('correct')});
+  document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
   if(correct){quiz.score++;setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.correctDelay*1000));}
   else{
     const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
@@ -1183,10 +1188,9 @@ function answer(ci,qi,btn){
 function dontKnow(qi){
   clearQuizTimer();
   const t=quiz.target;
-  const correctText=qLabelOf(data[qi]);
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>b.disabled=true);
   document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
-  document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(qLabelOf(data[+b.dataset.di])===correctText)b.classList.add('correct')});
+  document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
   const dn=document.getElementById('qDunno');if(dn){dn.disabled=true;dn.classList.add('dunno-wrong');}
   const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
   const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
