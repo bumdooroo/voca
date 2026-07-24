@@ -1085,7 +1085,7 @@ function renderTestChunkRow(){
     const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
     const p=testChunkProgress(day,q);
     const cls=p.sup?' tc-super':(p.done?' tc-done':(p.prog>=3?' on':''));
-    h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (총 '+p.total+'회 · 3↑ 파랑 · 뜻3+단어1 빨강 · 6회↑ 무지개)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.prog+'/3</b></button>';
+    h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (총 '+p.total+'회 · 3↑ 파랑 · 뜻3+단어1 빨강 · 6회↑ 무지개)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.total+'/3</b></button>';
   }
   el.innerHTML=h;
 }
