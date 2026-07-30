@@ -1180,10 +1180,13 @@ function startQuiz(){
   setQuizMode(true);showQ();
 }
 function freqDayBounds(){
-  const fv=+((document.getElementById('freqDayFrom')||{}).value)||1;
-  const tv=+((document.getElementById('freqDayTo')||{}).value);
-  const to=tv>0?tv:9999;
-  return {lo:Math.min(fv,to),hi:Math.max(fv,to)};
+  const fe=document.getElementById('freqDayFrom'), te=document.getElementById('freqDayTo');
+  const fv=Math.max(1,+((fe||{}).value)||1);
+  const traw=te?String(te.value).trim():'';
+  const tv=+traw;
+  if(traw==='')return {lo:fv,hi:9999};      /* 끝 비움 = 첫째 일차부터 전체 */
+  if(tv<=1)return {lo:fv,hi:fv};            /* 둘째가 1 = 첫째 일차 단독 */
+  return {lo:Math.min(fv,tv),hi:Math.max(fv,tv)};  /* 둘째가 2↑ = 작은쪽~큰쪽 범위 */
 }
 function freqPool(){
   const min=Math.max(1,+((document.getElementById('freqMin')||{}).value)||1);
@@ -1212,12 +1215,11 @@ function updateFreqAvail(){
   }
   const bd=document.getElementById('freqDayBadge');
   if(bd){
-    const fv=+((document.getElementById('freqDayFrom')||{}).value)||0;
-    const tv=+((document.getElementById('freqDayTo')||{}).value)||0;
-    if(fv>0&&tv>0&&fv===tv){
-      const c=tcFreqDayCount(fv);
+    const b=freqDayBounds();
+    if(b.lo===b.hi&&b.hi<9999){
+      const day=b.lo, c=tcFreqDayCount(day);
       const cls=c>=5?'tc-super':(c>=3?'tc-done':(c>=1?'on':''));
-      bd.className='chip '+cls; bd.textContent=fv+'일차 '+c+'회';
+      bd.className='chip '+cls; bd.textContent=day+'일차 '+c+'회';
       bd.title='이 일차 빈출 테스트 완료 횟수 (1회 파랑·3회 빨강·5회 무지개)';
       bd.style.display='';
     }else{bd.style.display='none';}
