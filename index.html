@@ -241,6 +241,9 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .tcse-edititem:hover{background:#f5f7ff}
 .tcse-wrongitem{padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tcse-badge{font-size:10.5px;color:#b5179e;background:#fbeaf6;border-radius:6px;padding:1px 6px;margin-left:2px}
+.tcse-freq{font-size:10.5px;color:#0b6b5e;background:#e2f6f1;border-radius:6px;padding:1px 6px;margin-left:2px;font-weight:700}
+.chip.tc-freqchip{cursor:pointer}
+.chip.tc-freqchip b{color:#0b6b5e}
 @media(max-width:640px){
   .tcse-q{font-size:15px}
   .tcse-choice{padding:10px}
@@ -451,7 +454,7 @@ function todayKey(){return dateKey(new Date());}
 function ymd(){return todayKey().slice(2).replace(/-/g,'');}
 
 function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
-function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data))}
+function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data));if(typeof tcFreqCache!=='undefined')tcFreqCache=null;}
 function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY()))||{}}catch(e){return{}}}
 function saveCal(){localStorage.setItem(CAL_KEY(),JSON.stringify(calendar))}
 
@@ -606,7 +609,8 @@ function renderStatusChips(){
     ['unchecked','미체크',data.filter(x=>!x.lastLevel).length],
     ['wrong','틀림',data.filter(x=>(x.wrong||0)>0).length],
     ['flag','★ 체크',data.filter(x=>x.flag).length],
-    ['tcse','TCSE 오답',data.filter(x=>tcMissed(x.word)>0).length]
+    ['tcse','TCSE 오답',data.filter(x=>tcMissed(x.word)>0).length],
+    ['tcsefreq','TCSE 빈출',data.filter(x=>tcFreqOf(x.word)>0).length]
   ];
   configs.forEach(([value,label,count])=>{
     const c=document.createElement('span');
@@ -626,6 +630,7 @@ function visible(){
   else if(statusFilter==='wrong')arr=arr.filter(x=>(x.wrong||0)>0);
   else if(statusFilter==='flag')arr=arr.filter(x=>x.flag);
   else if(statusFilter==='tcse')arr=arr.filter(x=>tcMissed(x.word)>0);
+  else if(statusFilter==='tcsefreq')arr=arr.filter(x=>tcFreqOf(x.word)>0);
   if(wrongOnly)arr=arr.filter(x=>(x.wrong||0)>0);
   const q=document.getElementById('searchBox').value.trim().toLowerCase();
   if(q)arr=arr.filter(x=>(x.word||'').toLowerCase().includes(q)||(x.mean||'').toLowerCase().includes(q)||(x.sent||'').toLowerCase().includes(q)||(x.etym||'').toLowerCase().includes(q));
@@ -635,6 +640,7 @@ function visible(){
   else if(s==='wrong')arr=[...arr].sort((a,b)=>(b.wrong||0)-(a.wrong||0));
   else if(s==='new')arr=[...arr].reverse();
   else arr=[...arr].sort((a,b)=>a.day-b.day||a.no-b.no); // dayNo (기본)
+  if(statusFilter==='tcsefreq')arr=[...arr].sort((a,b)=>tcFreqOf(b.word)-tcFreqOf(a.word)||a.day-b.day||a.no-b.no);
   return arr;
 }
 
@@ -659,6 +665,7 @@ function render(){
           x.lastLevel==='known'?'<span class="study-status known">알아요</span>':'')+
         ((x.unknown||0)>0?'<span class="unkcnt" title="학습 몰라요 횟수">?'+x.unknown+'</span>':'')+
         ((x.wrong||0)>0?'<span class="wrongcnt" title="테스트 오답 횟수">✗'+x.wrong+'</span>':'')+
+        (tcFreqOf(x.word)>0?'<span class="tcse-freq" title="TCSE 정답 선지 등장 횟수">빈출 '+tcFreqOf(x.word)+'</span>':'')+
         (tcSeen(x.word)>0?'<span class="tcse-badge" title="TCSE 오답/등장">TCSE '+tcMissed(x.word)+'/'+tcSeen(x.word)+'</span>':'')+
         '<span class="e-act"><button class="small" title="체크" onclick="toggleFlag('+i+')" style="color:'+(x.flag?'#e0a800':'var(--sub)')+'">'+(x.flag?'★':'☆')+'</button><button class="small" onclick="editEntry('+i+')">수정</button><button class="small" onclick="delEntry('+i+')">삭제</button></span>'+
       '</div>'+
@@ -2130,7 +2137,7 @@ function tcseImport(inp){
       resetProg=confirm('진행 기록·연결·통계도 초기화할까요?\n확인 = 전부 초기화 / 취소 = 기록 유지');
     }
     if(!tcSave(v.items))return;
-    TCSE=v.items;
+    TCSE=v.items;tcFreqCache=null;
     if(resetProg){tcProg={};tcLinks={};tcWStat={};localStorage.removeItem(TCSE_PROG);localStorage.removeItem(TCSE_LINK);localStorage.removeItem(TCSE_WSTAT);localStorage.removeItem(TCSE_HIST);}
     tcseSession=null;renderTcse();
     const s=tcseSummary(v.items);
@@ -2220,11 +2227,22 @@ function renderTcse(){
   h+='<div class="row" style="margin-top:12px"><button class="small danger" onclick="tcResetProgress()">진행 기록 초기화</button>'+
      '<button class="small" onclick="document.getElementById(\'tcseCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="tcseCsvFile" accept=".csv" class="hide" onchange="tcseImport(this)"></div>';
+  const fr=tcFreq();const words=tcGreWords();const top=Object.keys(fr).sort((a,b)=>fr[b]-fr[a]);
+  h+='<div class="count" style="margin-top:18px;margin-bottom:6px;font-weight:700;color:var(--ink)">TCSE 빈출 단어 <span class="count">· 정답 선지 등장 순 (GRE 연결 기준)</span></div>';
+  if(top.length){
+    h+='<div class="chipwrap" id="tcFreqWrap">'+top.slice(0,40).map(function(w){
+      const gw=words.find(x=>x.word===w);
+      return '<span class="chip tc-freqchip"'+(gw?' onclick="openGreWord('+JSON.stringify(w).replace(/"/g,'&quot;')+','+gw.day+','+(gw.no||0)+')"':'')+' title="'+(gw?esc((gw.mean||'').split('\n')[0]):'GRE 미연결')+'">'+esc(w)+' <b>'+fr[w]+'</b></span>';
+    }).join('')+'</div>';
+    if(top.length>40)h+='<p class="count" style="margin-top:4px">상위 40개 표시 (총 '+top.length+'개 연결)</p>';
+  }else{
+    h+='<p class="count">아직 GRE 단어장과 연결된 정답 단어가 없습니다. GRE 덱에 단어가 있어야 자동 연결됩니다.</p>';
+  }
   el.innerHTML=h;
 }
 function tcResetProgress(){
   if(!confirm('TCSE 진행 기록·연결·통계를 모두 초기화할까요? (문제 데이터는 유지)'))return;
-  tcProg={};tcLinks={};tcWStat={};
+  tcProg={};tcLinks={};tcWStat={};tcFreqCache=null;
   [TCSE_PROG,TCSE_LINK,TCSE_WSTAT,TCSE_HIST].forEach(k=>localStorage.removeItem(k));
   renderTcse();
 }
@@ -2412,7 +2430,7 @@ function tcEditSearch(qid,L,term){
   list.innerHTML=words.map(w=>'<div class="tcse-edititem" onclick="tcSetLink(\''+qid+'\',\''+L+'\',['+JSON.stringify(w.word).replace(/"/g,'&quot;')+'])"><b>'+esc(w.word)+'</b> <span class="count">'+esc((w.mean||'').split('\n')[0].slice(0,30))+'</span></div>').join('')||'<div class="count">검색 결과 없음</div>';
 }
 function tcSetLink(qid,L,words){
-  tcLinks[qid+':'+L]=words.slice();tcSaveLinks();
+  tcLinks[qid+':'+L]=words.slice();tcSaveLinks();tcFreqCache=null;
   // 현재 문제 다시 렌더(피드백 유지)
   if(tcseSession&&tcseSession.answered){const q=tcseSession.pool[tcseSession.i];const gre=tcBuildGreIndex();
     const box=document.querySelector('.tcse-linkbox');if(box)box.innerHTML='<div class="count" style="margin-bottom:4px">연결된 GRE 단어</div>'+tcLinkPanelHTML(q,gre);}
@@ -2479,6 +2497,15 @@ document.addEventListener('keydown',function(e){
 });
 
 /* TCSE 헬퍼(GRE 목록용) */
+let tcFreqCache=null;
+function tcBuildFreq(){
+  const gre=tcBuildGreIndex();const freq={};
+  TCSE.forEach(function(q){var seen={};q.answer.forEach(function(L){
+    tcLinkFor(q,L,gre).forEach(function(w){if(seen[w])return;seen[w]=1;freq[w]=(freq[w]||0)+1;});});});
+  return freq;
+}
+function tcFreq(){if(!tcFreqCache)tcFreqCache=tcBuildFreq();return tcFreqCache;}
+function tcFreqOf(w){return tcFreq()[w]||0;}
 function tcSeen(w){const st=tcWStat[w];return st?st.seen:0;}
 function tcMissed(w){const st=tcWStat[w];return st?st.missed:0;}
 /* ================= init ================= */
