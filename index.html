@@ -1140,8 +1140,8 @@ document.addEventListener('keydown',e=>{
 let quiz=null;
 function setQuizMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','studyCard','listCard','addCard','testConfig','testChunkRow','testNote','testHead'].forEach(id=>{
-    document.getElementById(id).classList.toggle('hide',on);
+  ['mainTabs','studyCard','listCard','addCard','testConfig','testChunkRow','freqTestRow','testNote','testHead'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.toggle('hide',on);
   });
 }
 function renderTestChunkRow(){
