@@ -294,7 +294,15 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 <button class="primary" onclick="startQuiz()">전체 테스트</button>
 </div>
 <div class="row" id="testChunkRow" style="margin-top:8px"></div>
-<p class="study-tip" id="testNote">연습 테스트는 캘린더에 기록되지 않습니다. 공식 기록용 50문제 TEST는 캘린더 탭에서 시작하세요.</p>
+<div class="row" id="freqTestRow" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">
+  <span class="count" style="font-weight:700;color:#0b6b5e">TCSE 빈출</span>
+  최소 <input type="number" id="freqMin" value="2" min="1" style="width:56px">회↑
+  <input type="number" id="freqCount" value="20" min="1" style="width:64px">개
+  <select id="freqMode"><option value="mean">뜻 고르기</option><option value="word">단어 고르기</option></select>
+  <button class="primary" onclick="startFreqQuiz()" style="background:#0b6b5e;border-color:#0b6b5e">빈출 단어 테스트</button>
+  <span class="count" id="freqAvail"></span>
+</div>
+<p class="study-tip" id="testNote">연습 테스트는 캘린더에 기록되지 않습니다. 공식 기록용 50문제 TEST는 캘린더 탭에서 시작하세요. ‘TCSE 빈출’은 TCSE 정답으로 자주 나온 GRE 단어만 골라 테스트합니다(빈도 높은 순).</p>
 <div id="quizArea" style="margin-top:12px"></div>
 </div>
 
@@ -675,6 +683,7 @@ function render(){
       (opt.e&&x.etym?'<div class="etym"><b>어근</b> · '+esc(x.etym)+'</div>':'')+
     '</div>';
   }).join('')||'<p class="count" style="padding:12px">단어가 없습니다. CSV를 불러오세요.</p>';
+  if(typeof updateFreqAvail==='function')updateFreqAvail();
 }
 
 function renderAll(){renderChips();renderStatusChips();renderChunkRow();renderTestChunkRow();render()}
@@ -1167,6 +1176,23 @@ function startQuiz(){
   pool=[...pool].sort(()=>Math.random()-.5).slice(0,n);
   quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',label:(Math.min(f,t)===Math.max(f,t)?Math.min(f,t)+'일차':Math.min(f,t)+'~'+Math.max(f,t)+'일차')+' '+pool.length+'문항'};
   setQuizMode(true);showQ();
+}
+function startFreqQuiz(){
+  const min=Math.max(1,+document.getElementById('freqMin').value||1);
+  const n=+document.getElementById('freqCount').value||20, mode=document.getElementById('freqMode').value;
+  let pool=data.filter(x=>tcFreqOf(x.word)>=min);
+  if(!pool.length)return alert('빈출 단어가 없습니다.\nTCSE 문제 CSV를 먼저 불러오고(TCSE 탭), GRE 단어와 연결되어야 합니다.');
+  if(pool.length<4)return alert('조건에 맞는 빈출 단어가 4개 미만입니다. 최소 빈도를 낮춰보세요. (현재 '+pool.length+'개)');
+  pool=[...pool].sort((a,b)=>tcFreqOf(b.word)-tcFreqOf(a.word)||a.day-b.day||a.no-b.no).slice(0,Math.max(4,Math.min(n,pool.length)));
+  pool=[...pool].sort(()=>Math.random()-.5);
+  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',label:'TCSE 빈출('+min+'회↑) '+pool.length+'문항'};
+  setQuizMode(true);showQ();
+}
+function updateFreqAvail(){
+  const el=document.getElementById('freqAvail');if(!el)return;
+  const min=Math.max(1,+((document.getElementById('freqMin')||{}).value)||1);
+  const cnt=data.filter(x=>tcFreqOf(x.word)>=min).length;
+  el.textContent=cnt?('· 조건 '+cnt+'개'):('· 빈출 없음 (TCSE 로드 필요)');
 }
 function endQuiz(){clearQuizTimer();quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();}
 function clearQuizTimer(){if(quiz&&quiz._tid){clearInterval(quiz._tid);quiz._tid=null;}}
@@ -2522,6 +2548,8 @@ document.getElementById('setWrongDelay').onchange=e=>{settings.wrongDelay=Math.m
 document.getElementById('setChunkSize').onchange=e=>{settings.chunkSize=Math.max(1,parseInt(e.target.value)||25);QSIZE=settings.chunkSize;e.target.value=settings.chunkSize;saveSettings();renderChunkRow();renderTestChunkRow();};
 document.getElementById('sDayFrom').addEventListener('input',renderChunkRow);
 document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow);
+{const fm=document.getElementById('freqMin');if(fm)fm.addEventListener('input',updateFreqAvail);}
+updateFreqAvail();
 renderTabs();renderAll();updatePracticeCount();
 </script>
 </body>
