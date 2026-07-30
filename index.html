@@ -17,7 +17,7 @@ button.small{padding:3px 8px;font-size:12px}
 button.danger{color:var(--red);border-color:#f0c4c4}
 input,select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 .chipwrap{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .chip{padding:4px 10px;border-radius:14px;font-size:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
@@ -204,6 +204,48 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .v-info{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;margin-top:6px}
 .v-core{font-size:17px;font-weight:700;line-height:1.55;margin-bottom:8px}
 .v-extra code{background:#f1f3f6;border-radius:5px;padding:1px 6px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+/* TCSE */
+.tcse-help{margin-top:14px;font-size:12.5px;color:#4b5563;background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:12px 14px;line-height:1.6}
+.tcse-meta{display:flex;align-items:center;gap:6px;margin:4px 0 10px;flex-wrap:wrap}
+.tcse-type{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;color:#fff}
+.tcse-type.tc-TC1{background:#4f6df5}.tcse-type.tc-TC2{background:#7c3aed}.tcse-type.tc-TC3{background:#b5179e}.tcse-type.tc-SE{background:#2da56a}
+.tcse-diff{font-size:11px;border-radius:6px;padding:2px 7px;background:#eef0f4;color:#4b5563}
+.tcse-diff.d-easy{background:#e6f7ee;color:#176b43}.tcse-diff.d-medium{background:#fff4d6;color:#8a5a00}.tcse-diff.d-hard{background:#fdeaea;color:#b42323}
+.tcse-q{font-size:16px;line-height:1.7;margin:6px 0 14px;white-space:pre-line;word-break:break-word}
+.tcse-grouplab{font-size:12px;font-weight:700;color:var(--sub);margin:10px 0 4px}
+.tcse-choice{display:block;width:100%;text-align:left;margin:6px 0;padding:11px 12px;line-height:1.5;white-space:normal;word-break:break-word}
+.tcse-choice .tcse-cl{display:inline-block;min-width:20px;font-weight:700;color:var(--sub)}
+.tcse-choice.sel{background:#eef1ff;border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.tcse-choice.correct{background:#e6f7ee;border-color:var(--green)}
+.tcse-choice.correct .tcse-cl{color:var(--green)}
+.tcse-choice.wrong{background:#fdeaea;border-color:var(--red)}
+.tcse-choice.wrong .tcse-cl{color:var(--red)}
+.tcse-msg{font-size:12.5px;color:#b42323;margin-top:6px;min-height:0}
+.tcse-note{margin-top:8px;font-size:12.5px;color:#8a5a00;background:#fff8e6;border:1px solid #edcf83;border-radius:8px;padding:8px 10px;line-height:1.5}
+.tcse-src{margin-top:6px;font-size:12px}
+.tcse-src a{color:var(--acc)}
+.tcse-linkbox{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.tcse-ansrow{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #eef0f4}
+.tcse-ansrow:last-child{border-bottom:none}
+.tcse-ans-letter{flex:0 0 24px;height:24px;border-radius:6px;background:#e6f7ee;color:#176b43;font-weight:700;text-align:center;line-height:24px;font-size:12px}
+.tcse-ans-body{flex:1;min-width:0}
+.tcse-ans-choice{font-size:13.5px;font-weight:600;line-height:1.4}
+.tcse-chips{margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}
+.tcse-wchip{font-size:12px;background:#eef1ff;color:var(--acc);border-radius:999px;padding:2px 9px}
+.tcse-wchip .tcse-wmean{color:var(--sub);font-size:11px}
+.tcse-wdetail{font-size:12px;color:#4b5563;margin-top:5px;line-height:1.5}
+.tcse-edit{margin-top:8px;border:1px dashed var(--line);border-radius:8px;padding:8px}
+.tcse-editcur{font-size:12px;color:var(--sub);margin:6px 0}
+.tcse-editlist{max-height:180px;overflow-y:auto}
+.tcse-edititem{padding:6px 4px;border-bottom:1px solid #eef0f4;cursor:pointer;font-size:13px}
+.tcse-edititem:hover{background:#f5f7ff}
+.tcse-wrongitem{padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tcse-badge{font-size:10.5px;color:#b5179e;background:#fbeaf6;border-radius:6px;padding:1px 6px;margin-left:2px}
+@media(max-width:640px){
+  .tcse-q{font-size:15px}
+  .tcse-choice{padding:10px}
+}
+
 </style>
 </head>
 <body>
@@ -327,6 +369,11 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 <div id="verbsView" class="hide">
   <div class="card" id="verbsBody"></div>
   <div class="card" id="verbsListCard"></div>
+</div>
+
+<!-- ============ TCSE VIEW ============ -->
+<div id="tcseView" class="hide">
+  <div class="card" id="tcseBody"></div>
 </div>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
@@ -457,9 +504,11 @@ function switchTab(t){
   document.getElementById('greView').classList.toggle('hide',t!=='gre');
   document.getElementById('calView').classList.toggle('hide',t!=='cal');
   document.getElementById('verbsView').classList.toggle('hide',t!=='verbs');
+  document.getElementById('tcseView').classList.toggle('hide',t!=='tcse');
   renderTabs();
   if(t==='cal'){ if(!calSel)calSel=todayKey(); renderCalendar(); }
   else if(t==='verbs'){ renderVerbs(); }
+  else if(t==='tcse'){ renderTcse(); }
   else render();
 }
 function renderTabs(){
@@ -471,6 +520,7 @@ function renderTabs(){
   });
   h+='<button onclick="addDeck()" title="단어장 추가">＋</button>';
   h+='<button id="tabVERB" class="'+(mainTab==='verbs'?'on':'')+'" onclick="switchTab(\'verbs\')" style="margin-left:auto">Verbs</button>';
+  h+='<button id="tabTCSE" class="'+(mainTab==='tcse'?'on':'')+'" onclick="switchTab(\'tcse\')">TCSE</button>';
   h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')">캘린더</button>';
   el.innerHTML=h;
 }
@@ -486,6 +536,7 @@ function switchDeck(id){
   if(id===CUR&&mainTab==='gre')return;
   if(study)endStudy();
   if(quiz){quiz=null;document.getElementById('quizArea').innerHTML='';document.getElementById('calQuizArea').innerHTML='';}
+  if(typeof tcseSession!=='undefined'&&tcseSession){tcseSession=null;document.getElementById('mainTabs').classList.remove('hide');}
   CUR=id;saveActive();
   data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;
   syncSettingsUI();syncViewUI();updatePracticeCount();
@@ -496,6 +547,7 @@ function switchDeck(id){
   document.getElementById('greView').classList.remove('hide');
   document.getElementById('calView').classList.add('hide');
   document.getElementById('verbsView').classList.add('hide');
+  const _tv=document.getElementById('tcseView');if(_tv)_tv.classList.add('hide');
   renderTabs();renderAll();
 }
 function addDeck(){
@@ -553,7 +605,8 @@ function renderStatusChips(){
     ['known','알아요',data.filter(x=>x.lastLevel==='known').length],
     ['unchecked','미체크',data.filter(x=>!x.lastLevel).length],
     ['wrong','틀림',data.filter(x=>(x.wrong||0)>0).length],
-    ['flag','★ 체크',data.filter(x=>x.flag).length]
+    ['flag','★ 체크',data.filter(x=>x.flag).length],
+    ['tcse','TCSE 오답',data.filter(x=>tcMissed(x.word)>0).length]
   ];
   configs.forEach(([value,label,count])=>{
     const c=document.createElement('span');
@@ -572,6 +625,7 @@ function visible(){
   else if(statusFilter==='unchecked')arr=arr.filter(x=>!x.lastLevel);
   else if(statusFilter==='wrong')arr=arr.filter(x=>(x.wrong||0)>0);
   else if(statusFilter==='flag')arr=arr.filter(x=>x.flag);
+  else if(statusFilter==='tcse')arr=arr.filter(x=>tcMissed(x.word)>0);
   if(wrongOnly)arr=arr.filter(x=>(x.wrong||0)>0);
   const q=document.getElementById('searchBox').value.trim().toLowerCase();
   if(q)arr=arr.filter(x=>(x.word||'').toLowerCase().includes(q)||(x.mean||'').toLowerCase().includes(q)||(x.sent||'').toLowerCase().includes(q)||(x.etym||'').toLowerCase().includes(q));
@@ -605,6 +659,7 @@ function render(){
           x.lastLevel==='known'?'<span class="study-status known">알아요</span>':'')+
         ((x.unknown||0)>0?'<span class="unkcnt" title="학습 몰라요 횟수">?'+x.unknown+'</span>':'')+
         ((x.wrong||0)>0?'<span class="wrongcnt" title="테스트 오답 횟수">✗'+x.wrong+'</span>':'')+
+        (tcSeen(x.word)>0?'<span class="tcse-badge" title="TCSE 오답/등장">TCSE '+tcMissed(x.word)+'/'+tcSeen(x.word)+'</span>':'')+
         '<span class="e-act"><button class="small" title="체크" onclick="toggleFlag('+i+')" style="color:'+(x.flag?'#e0a800':'var(--sub)')+'">'+(x.flag?'★':'☆')+'</button><button class="small" onclick="editEntry('+i+')">수정</button><button class="small" onclick="delEntry('+i+')">삭제</button></span>'+
       '</div>'+
       (opt.m&&x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+
@@ -1990,6 +2045,442 @@ document.addEventListener('keydown',function(e){
   }
 });
 
+/* ================= TCSE 문제풀이 ================= */
+const TCSE_KEY='voca_tcse_data', TCSE_PROG='voca_tcse_progress', TCSE_HIST='voca_tcse_history', TCSE_LINK='voca_tcse_link_overrides', TCSE_WSTAT='voca_tcse_word_stats';
+const TC_LETTERS='ABCDEFGHI';
+const TC_RULES={TC1:{letters:'ABCDE',ans:1},TC2:{letters:'ABCDEF',ans:2},SE:{letters:'ABCDEF',ans:2},TC3:{letters:'ABCDEFGHI',ans:3}};
+function tcGroups(type){
+  if(type==='TC1')return[{lab:'',letters:'ABCDE',pick:1}];
+  if(type==='TC2')return[{lab:'(i)',letters:'ABC',pick:1},{lab:'(ii)',letters:'DEF',pick:1}];
+  if(type==='TC3')return[{lab:'(i)',letters:'ABC',pick:1},{lab:'(ii)',letters:'DEF',pick:1},{lab:'(iii)',letters:'GHI',pick:1}];
+  if(type==='SE')return[{lab:'2개 선택',letters:'ABCDEF',pick:2}];
+  return[];
+}
+function tcGroupOf(type,letter){const gs=tcGroups(type);for(let i=0;i<gs.length;i++){if(gs[i].letters.indexOf(letter)>=0)return i;}return -1;}
+
+/* ---- 저장/조회 ---- */
+function tcLoad(){try{return JSON.parse(localStorage.getItem(TCSE_KEY))||[]}catch(e){return[]}}
+function tcSave(arr){try{localStorage.setItem(TCSE_KEY,JSON.stringify(arr));return true;}catch(e){alert('저장 공간이 부족합니다. 다른 데이터를 정리해주세요.');return false;}}
+function tcLoadProg(){try{return JSON.parse(localStorage.getItem(TCSE_PROG))||{}}catch(e){return{}}}
+function tcSaveProg(){try{localStorage.setItem(TCSE_PROG,JSON.stringify(tcProg));}catch(e){}}
+function tcLoadHist(){try{return JSON.parse(localStorage.getItem(TCSE_HIST))||[]}catch(e){return[]}}
+function tcSaveHist(h){try{localStorage.setItem(TCSE_HIST,JSON.stringify(h));}catch(e){}}
+function tcLoadLinks(){try{return JSON.parse(localStorage.getItem(TCSE_LINK))||{}}catch(e){return{}}}
+function tcSaveLinks(){try{localStorage.setItem(TCSE_LINK,JSON.stringify(tcLinks));}catch(e){}}
+function tcLoadWStat(){try{return JSON.parse(localStorage.getItem(TCSE_WSTAT))||{}}catch(e){return{}}}
+function tcSaveWStat(){try{localStorage.setItem(TCSE_WSTAT,JSON.stringify(tcWStat));}catch(e){}}
+let TCSE=tcLoad(), tcProg=tcLoadProg(), tcLinks=tcLoadLinks(), tcWStat=tcLoadWStat();
+let tcseSession=null, tcEdit=null;
+
+function tcP(id){if(!tcProg[id])tcProg[id]={attempts:0,correct:0,wrong:0,lastSelected:[],lastCorrect:false,lastAt:'',bookmarked:false};return tcProg[id];}
+
+/* ---- CSV 검증·로드 ---- */
+function tcseValidate(rows){
+  if(!rows||rows.length<2)return{ok:false,err:'빈 파일입니다.'};
+  const head=rows[0].map(h=>(h||'').trim().toLowerCase());
+  const need=['id','section','difficulty','question_no','type','question','choice_a','choice_b','choice_c','choice_d','choice_e','choice_f','choice_g','choice_h','choice_i','answer'];
+  const idx={};
+  need.forEach(n=>{idx[n]=head.indexOf(n);});
+  const miss=need.filter(n=>idx[n]<0 && !/choice_[fghi]/.test(n)); // f-i 필수(형식상 열 존재) but 값은 유형별
+  const missReq=['id','section','difficulty','question_no','type','question','answer'].filter(n=>head.indexOf(n)<0);
+  if(missReq.length)return{ok:false,err:'필수 칼럼 없음: '+missReq.join(', ')};
+  for(const L of 'ABCDEFGHI'){if(head.indexOf('choice_'+L.toLowerCase())<0)return{ok:false,err:'choice_'+L+' 칼럼 없음'};}
+  const col=n=>head.indexOf(n);
+  const iId=col('id'),iSec=col('section'),iDiff=col('difficulty'),iQno=col('question_no'),iType=col('type'),iQ=col('question'),
+    iAns=col('answer'),iSrcAns=col('source_answer'),iVn=col('validation_note'),iVs=col('validation_source'),iSf=col('source_file');
+  const chIdx={};for(const L of 'ABCDEFGHI')chIdx[L]=col('choice_'+L.toLowerCase());
+  const out=[],seen={},errs=[];
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]; if(!row||!(row[iId]||'').trim())continue;
+    const id=(row[iId]||'').trim();
+    if(seen[id]){errs.push('중복 id: '+id);continue;}
+    seen[id]=1;
+    const type=(row[iType]||'').trim();
+    if(!TC_RULES[type]){errs.push(id+': 알 수 없는 type "'+type+'"');continue;}
+    const rule=TC_RULES[type];
+    const choices={};for(const L of 'ABCDEFGHI'){const v=(row[chIdx[L]]||'').trim();if(v)choices[L]=v;}
+    // 선지 존재 검증
+    for(const L of rule.letters){if(!choices[L]){errs.push(id+' ('+type+'): '+L+' 선지 없음');}}
+    // 초과 선지 없는지(형식): 규칙 밖 문자에 값 있으면 경고만(무시)
+    const ans=(row[iAns]||'').split('|').map(x=>x.trim()).filter(Boolean);
+    if(ans.length!==rule.ans){errs.push(id+' ('+type+'): 정답 '+rule.ans+'개여야 하는데 '+ans.length+'개');}
+    for(const a of ans){if(!choices[a]){errs.push(id+': 정답 '+a+'가 선지에 없음');}}
+    out.push({id:id,section:(row[iSec]||'').trim(),difficulty:(row[iDiff]||'').trim().toLowerCase(),
+      question_no:(row[iQno]||'').trim(),type:type,question:(row[iQ]||''),choices:choices,answer:ans,
+      source_answer:(iSrcAns>=0?(row[iSrcAns]||'').trim():''),validation_note:(iVn>=0?(row[iVn]||'').trim():''),
+      validation_source:(iVs>=0?(row[iVs]||'').trim():''),source_file:(iSf>=0?(row[iSf]||'').trim():'')});
+  }
+  if(errs.length)return{ok:false,err:errs.slice(0,8).join('\n')+(errs.length>8?('\n… 외 '+(errs.length-8)+'건'):''),count:errs.length};
+  if(!out.length)return{ok:false,err:'불러올 문항이 없습니다.'};
+  return{ok:true,items:out};
+}
+function tcseImport(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(e){
+    let rows;try{rows=parseCSV(e.target.result.replace(/^﻿/,''));}catch(err){inp.value='';return alert('CSV를 읽을 수 없습니다.');}
+    const v=tcseValidate(rows);
+    inp.value='';
+    if(!v.ok)return alert('CSV 검증 실패:\n'+v.err);
+    const hadData=TCSE.length>0;
+    let resetProg=false;
+    if(hadData){
+      const a=confirm('이미 TCSE 데이터가 있습니다.\n확인 = 문제 데이터만 교체 (진행 기록 유지)\n취소 = 취소');
+      if(!a)return;
+      resetProg=confirm('진행 기록·연결·통계도 초기화할까요?\n확인 = 전부 초기화 / 취소 = 기록 유지');
+    }
+    if(!tcSave(v.items))return;
+    TCSE=v.items;
+    if(resetProg){tcProg={};tcLinks={};tcWStat={};localStorage.removeItem(TCSE_PROG);localStorage.removeItem(TCSE_LINK);localStorage.removeItem(TCSE_WSTAT);localStorage.removeItem(TCSE_HIST);}
+    tcseSession=null;renderTcse();
+    const s=tcseSummary(v.items);
+    alert('불러오기 성공\n총 '+s.total+'문항 · '+s.sections+'섹션\nTC1 '+s.TC1+' · TC2 '+s.TC2+' · TC3 '+s.TC3+' · SE '+s.SE+'\nEasy '+s.easy+' · Medium '+s.medium+' · Hard '+s.hard+'\n검증노트 '+s.vnotes+'건');
+  };
+  rd.readAsText(f,'utf-8');
+}
+function tcseSummary(arr){
+  const s={total:arr.length,sections:new Set(arr.map(q=>q.section)).size,TC1:0,TC2:0,TC3:0,SE:0,easy:0,medium:0,hard:0,vnotes:0};
+  arr.forEach(q=>{if(s[q.type]!==undefined)s[q.type]++;if(q.difficulty==='easy')s.easy++;else if(q.difficulty==='medium')s.medium++;else if(q.difficulty==='hard')s.hard++;if(q.validation_note)s.vnotes++;});
+  return s;
+}
+
+/* ================= GRE 연결 ================= */
+const TC_STOP=new Set(['a','an','the','to','of','in','on','for','and','or','be','is','are','with','as','by','that','which','not','more','less','than','such']);
+function tcNorm(s){
+  s=(s||'').normalize('NFKC').toLowerCase();
+  s=s.replace(/\([^)]*\)/g,' ');
+  s=s.replace(/[^a-z0-9\s\-]/g,' ');
+  s=s.replace(/-/g,' ');
+  s=s.replace(/\s+/g,' ').trim();
+  s=s.replace(/^(a|an|the|to)\s+/,'');
+  return s.trim();
+}
+function tcBaseForms(w){
+  const o=new Set([w]);
+  if(w.length>3){
+    if(/ies$/.test(w))o.add(w.slice(0,-3)+'y');
+    if(/ied$/.test(w))o.add(w.slice(0,-3)+'y');
+    if(/es$/.test(w))o.add(w.slice(0,-2));
+    if(/s$/.test(w)&&!/ss$/.test(w))o.add(w.slice(0,-1));
+    if(/ed$/.test(w)){o.add(w.slice(0,-2));o.add(w.slice(0,-1));}
+    if(/ing$/.test(w)){o.add(w.slice(0,-3));o.add(w.slice(0,-3)+'e');}
+  }
+  return[...o];
+}
+function tcGreWords(){try{return JSON.parse(localStorage.getItem('voca_GRE')||'[]');}catch(e){return[];}}
+function tcBuildGreIndex(){
+  const words=tcGreWords();const idx={};
+  words.forEach(w=>{const n=tcNorm(w.word);if(!n)return;(idx[n]=idx[n]||[]).push(w);});
+  return{words:words,idx:idx};
+}
+function tcAutoMatch(choiceStr,gre){
+  const norm=tcNorm(choiceStr);if(!norm)return[];
+  const uniq=k=>gre.idx[k]&&gre.idx[k].length===1?gre.idx[k][0]:null;
+  let m=uniq(norm);if(m)return[m.word];
+  const tokens=norm.split(' ').filter(t=>t.length>2&&!TC_STOP.has(t));
+  for(const t of tokens){m=uniq(t);if(m)return[m.word];}
+  for(const bf of tcBaseForms(norm)){m=uniq(bf);if(m)return[m.word];}
+  for(const t of tokens){for(const bf of tcBaseForms(t)){m=uniq(bf);if(m)return[m.word];}}
+  return[];
+}
+/* 문제·정답문자에 연결된 GRE 단어 배열 (override 우선) */
+function tcLinkFor(q,letter,gre){
+  const key=q.id+':'+letter;
+  if(Object.prototype.hasOwnProperty.call(tcLinks,key))return tcLinks[key].slice();
+  return tcAutoMatch(q.choices[letter]||'',gre);
+}
+
+/* ================= 홈/시작 화면 ================= */
+function tcSectionsList(){return[...new Set(TCSE.map(q=>+q.section))].sort((a,b)=>a-b);}
+function renderTcse(){
+  if(tcseSession){showTcseStep();return;}
+  const el=document.getElementById('tcseBody');if(!el)return;
+  if(!TCSE.length){
+    el.innerHTML='<h3>TCSE 문제풀이</h3>'+
+      '<p class="count" style="margin-top:8px">TCSE 문제 데이터가 없습니다.</p>'+
+      '<div class="row" style="margin-top:12px"><button class="primary" onclick="document.getElementById(\'tcseCsvFile\').click()">CSV 불러오기</button>'+
+      '<input type="file" id="tcseCsvFile" accept=".csv" class="hide" onchange="tcseImport(this)"></div>'+
+      '<div class="tcse-help"><b>CSV 형식</b><br>id, section, difficulty, question_no, type(TC1/TC2/TC3/SE), question, choice_A~choice_I, answer(C|E 형식), source_answer, validation_note, validation_source, source_file</div>';
+    return;
+  }
+  const s=tcseSummary(TCSE), secs=tcSectionsList();
+  let h='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">TCSE 문제풀이</h3><span class="count">'+s.total+'문항 · '+s.sections+'섹션</span></div>';
+  h+='<div class="statgrid" style="margin:12px 0"><div class="stat"><b>'+s.total+'</b><span class="count">총 문항</span></div>'+
+     '<div class="stat"><b>'+Object.keys(tcProg).filter(k=>tcProg[k].attempts>0).length+'</b><span class="count">푼 문항</span></div>'+
+     '<div class="stat"><b>'+TCSE.filter(q=>{const p=tcProg[q.id];return p&&p.attempts>0&&!p.lastCorrect;}).length+'</b><span class="count">최근 오답</span></div></div>';
+  h+='<div class="count" style="margin-top:6px">유형: TC1 '+s.TC1+' · TC2 '+s.TC2+' · TC3 '+s.TC3+' · SE '+s.SE+' &nbsp;|&nbsp; 난이도: Easy '+s.easy+' · Medium '+s.medium+' · Hard '+s.hard+(s.vnotes?' &nbsp;|&nbsp; 검증노트 '+s.vnotes:'')+'</div>';
+  const minS=secs[0]||1, maxS=secs[secs.length-1]||150;
+  h+='<div class="row" style="margin-top:14px">Section <input type="number" id="tcSecFrom" min="1" max="150" value="'+minS+'" style="width:64px"> ~ <input type="number" id="tcSecTo" min="1" max="150" value="'+maxS+'" style="width:64px"></div>';
+  h+='<div class="row" style="margin-top:8px"><select id="tcDiff"><option value="all">전체 난이도</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select>'+
+     '<select id="tcType"><option value="all">전체 유형</option><option value="TC1">TC1</option><option value="TC2">TC2</option><option value="TC3">TC3</option><option value="SE">SE</option></select>'+
+     '<select id="tcScope"><option value="all">전체</option><option value="unseen">미풀이</option><option value="wrong">오답</option></select></div>';
+  h+='<div class="row" style="margin-top:8px">문제 <input type="number" id="tcCount" value="20" min="1" style="width:70px">개 '+
+     '<select id="tcOrder"><option value="no">번호순</option><option value="random">랜덤</option></select>'+
+     '<button class="primary" onclick="startTcse()">문제풀이 시작</button></div>';
+  h+='<div class="row" style="margin-top:12px"><button class="small danger" onclick="tcResetProgress()">진행 기록 초기화</button>'+
+     '<button class="small" onclick="document.getElementById(\'tcseCsvFile\').click()">다른 CSV 불러오기</button>'+
+     '<input type="file" id="tcseCsvFile" accept=".csv" class="hide" onchange="tcseImport(this)"></div>';
+  el.innerHTML=h;
+}
+function tcResetProgress(){
+  if(!confirm('TCSE 진행 기록·연결·통계를 모두 초기화할까요? (문제 데이터는 유지)'))return;
+  tcProg={};tcLinks={};tcWStat={};
+  [TCSE_PROG,TCSE_LINK,TCSE_WSTAT,TCSE_HIST].forEach(k=>localStorage.removeItem(k));
+  renderTcse();
+}
+function startTcse(){
+  const from=Math.max(1,Math.min(150,+document.getElementById('tcSecFrom').value||1));
+  const to=Math.max(1,Math.min(150,+document.getElementById('tcSecTo').value||150));
+  const diff=document.getElementById('tcDiff').value, type=document.getElementById('tcType').value, scope=document.getElementById('tcScope').value;
+  const n=+document.getElementById('tcCount').value||20, order=document.getElementById('tcOrder').value;
+  const lo=Math.min(from,to),hi=Math.max(from,to);
+  let pool=TCSE.filter(q=>{const sec=+q.section;return sec>=lo&&sec<=hi;});
+  if(diff!=='all')pool=pool.filter(q=>q.difficulty===diff);
+  if(type!=='all')pool=pool.filter(q=>q.type===type);
+  if(scope==='unseen')pool=pool.filter(q=>{const p=tcProg[q.id];return !p||!p.attempts;});
+  else if(scope==='wrong')pool=pool.filter(q=>{const p=tcProg[q.id];return p&&p.attempts>0&&!p.lastCorrect;});
+  if(!pool.length)return alert('조건에 맞는 문제가 없습니다.');
+  if(order==='random')pool=pool.slice().sort(()=>Math.random()-.5);
+  else pool=pool.slice().sort((a,b)=>(+a.section-+b.section)||(a.question_no+'').localeCompare(b.question_no+'')||a.id.localeCompare(b.id));
+  pool=pool.slice(0,Math.max(1,Math.min(n,pool.length)));
+  tcseSession={pool:pool,i:0,score:0,total:0,wrong:[],byType:{TC1:[0,0],TC2:[0,0],TC3:[0,0],SE:[0,0]},sel:[],answered:false};
+  document.getElementById('mainTabs').classList.add('hide');
+  showTcseStep();
+}
+function endTcse(){tcseSession=null;tcEdit=null;document.getElementById('mainTabs').classList.remove('hide');renderTcse();}
+function tcNext(){tcseSession.i++;tcseSession.sel=[];tcseSession.answered=false;tcEdit=null;showTcseStep();}
+
+function tcHead(){
+  const s=tcseSession;
+  return '<div class="row" style="justify-content:space-between"><span class="count">'+(s.i+1)+'/'+s.pool.length+' · 점수 '+s.score+'</span><button class="small" onclick="endTcse()">그만</button></div>';
+}
+function showTcseStep(){
+  const el=document.getElementById('tcseBody');if(!el||!tcseSession)return;
+  const s=tcseSession;
+  if(s.i>=s.pool.length){el.innerHTML=tcDoneHTML();return;}
+  el.innerHTML=tcHead()+tcQuestionHTML(s.pool[s.i]);
+  tcUpdateSubmitState();
+}
+function tcQMarked(text){
+  // 그래픽/일반 빈칸: (i)_____ 등을 강조. 이미 _____ 존재하면 그대로.
+  return esc(text);
+}
+function tcQuestionHTML(q){
+  const s=tcseSession, p=tcProg[q.id];
+  let h='<div class="tcse-meta"><span class="e-day">S'+q.section+' Q'+q.question_no+'</span><span class="tcse-type tc-'+q.type+'">'+q.type+'</span><span class="tcse-diff d-'+q.difficulty+'">'+q.difficulty+'</span>'+
+    '<button class="small" style="margin-left:auto;color:'+((p&&p.bookmarked)?'#e0a800':'var(--sub)')+'" onclick="tcToggleBookmark(\''+q.id+'\')">'+((p&&p.bookmarked)?'★':'☆')+'</button></div>';
+  h+='<div class="tcse-q">'+tcQMarked(q.question)+'</div>';
+  const groups=tcGroups(q.type);
+  h+='<div id="tcChoices">';
+  groups.forEach((g,gi)=>{
+    if(g.lab)h+='<div class="tcse-grouplab">'+esc(g.lab)+(q.type==='SE'?'':' 빈칸')+'</div>';
+    for(const L of g.letters){
+      if(!q.choices[L])continue;
+      h+='<button class="tcse-choice" data-l="'+L+'" data-g="'+gi+'" onclick="tcPick(\''+L+'\','+gi+')"><span class="tcse-cl">'+L+'</span> '+esc(q.choices[L])+'</button>';
+    }
+  });
+  h+='</div>';
+  h+='<div class="row" style="margin-top:10px"><button class="primary" id="tcSubmit" onclick="tcCheck()" style="min-height:42px;font-weight:700">정답 확인</button>'+
+     '<button class="btn" id="tcDunno" onclick="tcDunno()" style="color:var(--sub)">모르겠어요</button></div>';
+  h+='<div id="tcMsg" class="tcse-msg"></div><div id="tcAfter"></div>';
+  const need=q.type==='SE'?2:(q.type==='TC1'?1:groups.length);
+  h+='<div class="study-tip">키보드: 1~9 선택 · Enter 정답확인/다음 · Esc 종료 &nbsp;(정확히 '+need+'개 선택)</div>';
+  return h;
+}
+function tcSelForGroup(gi){return tcseSession.sel.filter(x=>x.g===gi).map(x=>x.l);}
+function tcPick(L,gi){
+  const s=tcseSession;if(s.answered)return;
+  const q=s.pool[s.i], g=tcGroups(q.type)[gi];
+  const cur=s.sel.filter(x=>x.g===gi);
+  const has=cur.some(x=>x.l===L);
+  const msg=document.getElementById('tcMsg');if(msg)msg.textContent='';
+  if(g.pick===1){
+    s.sel=s.sel.filter(x=>x.g!==gi);
+    if(!has)s.sel.push({g:gi,l:L});
+  }else{ // SE: pick 2
+    if(has){s.sel=s.sel.filter(x=>!(x.g===gi&&x.l===L));}
+    else if(cur.length>=g.pick){ if(msg)msg.textContent='정확히 '+g.pick+'개만 선택할 수 있습니다. 다른 선지를 해제하세요.'; return; }
+    else s.sel.push({g:gi,l:L});
+  }
+  tcRenderSelection();tcUpdateSubmitState();
+}
+function tcRenderSelection(){
+  const s=tcseSession;
+  document.querySelectorAll('#tcChoices .tcse-choice').forEach(b=>{
+    const on=s.sel.some(x=>x.l===b.dataset.l);
+    b.classList.toggle('sel',on);
+  });
+}
+function tcNeeded(q){return q.type==='SE'?2:(q.type==='TC1'?1:tcGroups(q.type).length);}
+function tcUpdateSubmitState(){
+  const s=tcseSession,q=s.pool[s.i];
+  const btn=document.getElementById('tcSubmit');if(!btn)return;
+  btn.disabled=(s.sel.length!==tcNeeded(q));
+}
+function tcCheck(){
+  const s=tcseSession;if(s.answered)return;
+  const q=s.pool[s.i];
+  if(s.sel.length!==tcNeeded(q))return;
+  tcGrade(q,s.sel.map(x=>x.l),false);
+}
+function tcDunno(){
+  const s=tcseSession;if(s.answered)return;
+  tcGrade(s.pool[s.i],[],true);
+}
+function tcGrade(q,selected,viaDunno){
+  const s=tcseSession;s.answered=true;
+  const selSet=new Set(selected), ansSet=new Set(q.answer);
+  const correct=!viaDunno && selected.length===q.answer.length && q.answer.every(a=>selSet.has(a));
+  // 선지 색칠
+  document.querySelectorAll('#tcChoices .tcse-choice').forEach(b=>{
+    b.disabled=true;const L=b.dataset.l;
+    if(ansSet.has(L))b.classList.add('correct');
+    else if(selSet.has(L))b.classList.add('wrong');
+  });
+  document.getElementById('tcSubmit').classList.add('hide');
+  const dn=document.getElementById('tcDunno');if(dn){dn.disabled=true;if(viaDunno)dn.classList.add('dunno-wrong');}
+  // 진행 저장
+  const p=tcP(q.id);p.attempts++;if(correct)p.correct++;else p.wrong++;
+  p.lastSelected=selected.slice();p.lastCorrect=correct;p.lastAt=new Date().toISOString();
+  tcSaveProg();
+  // 세션 집계
+  s.total++;if(correct)s.score++;else s.wrong.push(q);
+  if(s.byType[q.type]){s.byType[q.type][0]++;if(correct)s.byType[q.type][1]++;}
+  // GRE 단어 통계
+  tcUpdateWordStats(q,selSet,viaDunno);
+  // 피드백
+  const gre=tcBuildGreIndex();
+  let af='<div class="v-verdict '+(correct?'ok':'bad')+'">'+(correct?'정답':(viaDunno?'모르겠어요 처리':'오답'))+'</div>';
+  if(q.validation_note)af+='<div class="tcse-note">⚠ '+esc(q.validation_note)+(q.source_answer&&q.source_answer!==q.answer.join('|')?' (source_answer: '+esc(q.source_answer)+')':'')+'</div>';
+  if(q.validation_source)af+='<div class="tcse-src"><a href="'+esc(q.validation_source)+'" target="_blank" rel="noopener">검증 출처 ↗</a></div>';
+  af+='<div class="tcse-linkbox"><div class="count" style="margin-bottom:4px">연결된 GRE 단어</div>'+tcLinkPanelHTML(q,gre)+'</div>';
+  af+='<button class="primary" onclick="tcNext()" style="width:100%;margin-top:10px;min-height:42px">다음 →</button>';
+  document.getElementById('tcAfter').innerHTML=af;
+}
+function tcUpdateWordStats(q,selSet,viaDunno){
+  const gre=tcBuildGreIndex();const now=new Date().toISOString();const bumped={};
+  q.answer.forEach(L=>{
+    const words=tcLinkFor(q,L,gre);
+    const missed=viaDunno||!selSet.has(L);
+    words.forEach(w=>{
+      if(!tcWStat[w])tcWStat[w]={seen:0,missed:0,lastSeenAt:''};
+      if(!bumped[w+'|seen']){tcWStat[w].seen++;bumped[w+'|seen']=1;tcWStat[w].lastSeenAt=now;}
+      if(missed&&!bumped[w+'|miss']){tcWStat[w].missed++;bumped[w+'|miss']=1;}
+    });
+  });
+  tcSaveWStat();
+  if(mainTab==='gre')render();
+}
+function tcLinkPanelHTML(q,gre){
+  let h='';
+  q.answer.forEach(L=>{
+    const words=tcLinkFor(q,L,gre);
+    h+='<div class="tcse-ansrow"><div class="tcse-ans-letter">'+L+'</div><div class="tcse-ans-body"><div class="tcse-ans-choice">'+esc(q.choices[L])+'</div>';
+    if(words.length){
+      h+='<div class="tcse-chips">'+words.map(w=>{
+        const gw=gre.words.find(x=>x.word===w);
+        return '<span class="tcse-wchip">'+esc(w)+(gw?' <span class="tcse-wmean">'+esc((gw.mean||'').split('\n')[0].slice(0,24))+'</span>':'')+'</span>';
+      }).join('')+'</div>';
+      // 상세
+      words.forEach(w=>{const gw=gre.words.find(x=>x.word===w);if(gw)h+='<div class="tcse-wdetail">'+esc(gw.word)+(gw.pron?' <span class="e-pron">'+esc(gw.pron)+'</span>':'')+' · '+esc((gw.mean||'').split('\n')[0])+' <span class="count">('+gw.day+'일차 #'+(gw.no||'')+')</span> <button class="small" onclick="openGreWord('+JSON.stringify(gw.word).replace(/"/g,'&quot;')+','+gw.day+','+(gw.no||0)+')">GRE 단어장에서 보기</button></div>';});
+    }else{
+      h+='<div class="count">GRE 단어장 연결 없음</div>';
+    }
+    h+='<button class="small" style="margin-top:4px" onclick="tcOpenEdit(\''+q.id+'\',\''+L+'\')">연결 편집</button>';
+    h+='<div class="tcse-edit hide" id="tcedit_'+L+'"></div>';
+    h+='</div></div>';
+  });
+  return h;
+}
+
+/* ---- 연결 편집 ---- */
+function tcOpenEdit(qid,L){
+  const box=document.getElementById('tcedit_'+L);if(!box)return;
+  const open=box.classList.contains('hide');
+  document.querySelectorAll('.tcse-edit').forEach(b=>b.classList.add('hide'));
+  if(!open){return;}
+  box.classList.remove('hide');
+  const key=qid+':'+L;
+  const cur=Object.prototype.hasOwnProperty.call(tcLinks,key)?tcLinks[key]:tcLinkFor(TCSE.find(x=>x.id===qid),L,tcBuildGreIndex());
+  box.innerHTML='<input type="text" placeholder="GRE 단어 검색" oninput="tcEditSearch(\''+qid+'\',\''+L+'\',this.value)" style="width:100%"><div class="tcse-editcur">현재: '+(cur.length?cur.map(esc).join(', '):'없음')+' <button class="small danger" onclick="tcSetLink(\''+qid+'\',\''+L+'\',[])">연결 해제</button></div><div id="tcEditList_'+L+'" class="tcse-editlist"></div>';
+}
+function tcEditSearch(qid,L,term){
+  const list=document.getElementById('tcEditList_'+L);if(!list)return;
+  term=(term||'').trim().toLowerCase();
+  if(!term){list.innerHTML='';return;}
+  const words=tcGreWords().filter(w=>(w.word||'').toLowerCase().includes(term)).slice(0,20);
+  list.innerHTML=words.map(w=>'<div class="tcse-edititem" onclick="tcSetLink(\''+qid+'\',\''+L+'\',['+JSON.stringify(w.word).replace(/"/g,'&quot;')+'])"><b>'+esc(w.word)+'</b> <span class="count">'+esc((w.mean||'').split('\n')[0].slice(0,30))+'</span></div>').join('')||'<div class="count">검색 결과 없음</div>';
+}
+function tcSetLink(qid,L,words){
+  tcLinks[qid+':'+L]=words.slice();tcSaveLinks();
+  // 현재 문제 다시 렌더(피드백 유지)
+  if(tcseSession&&tcseSession.answered){const q=tcseSession.pool[tcseSession.i];const gre=tcBuildGreIndex();
+    const box=document.querySelector('.tcse-linkbox');if(box)box.innerHTML='<div class="count" style="margin-bottom:4px">연결된 GRE 단어</div>'+tcLinkPanelHTML(q,gre);}
+}
+function tcToggleBookmark(qid){const p=tcP(qid);p.bookmarked=!p.bookmarked;tcSaveProg();const q=tcseSession&&tcseSession.pool[tcseSession.i];if(q&&q.id===qid)showTcseAgain();}
+function showTcseAgain(){/* 북마크만 갱신: 헤더 별표 */
+  const s=tcseSession;if(!s)return;const q=s.pool[s.i];const p=tcProg[q.id];
+  const b=document.querySelector('.tcse-meta button');if(b){b.textContent=(p&&p.bookmarked)?'★':'☆';b.style.color=(p&&p.bookmarked)?'#e0a800':'var(--sub)';}
+}
+
+function tcDoneHTML(){
+  const s=tcseSession;const pct=s.total?Math.round(s.score/s.total*100):0;
+  // 히스토리 저장
+  const hist=tcLoadHist();hist.push({at:new Date().toISOString(),total:s.total,score:s.score,pct:pct,byType:s.byType});
+  if(hist.length>200)hist.splice(0,hist.length-200);tcSaveHist(hist);
+  let h='<h3>TCSE 세션 완료</h3><div class="statgrid"><div class="stat"><b>'+s.score+'/'+s.total+'</b><span class="count">점수</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+s.wrong.length+'</b><span class="count">틀린 문제</span></div></div>';
+  h+='<div class="count" style="margin-top:4px">유형별: '+['TC1','TC2','TC3','SE'].map(t=>{const b=s.byType[t];return b[0]?t+' '+b[1]+'/'+b[0]:null;}).filter(Boolean).join(' · ')+'</div>';
+  h+='<div class="row" style="margin-top:12px"><button class="primary" onclick="tcRetry()">다시 풀기</button><button onclick="endTcse()">TCSE 홈으로</button></div>';
+  if(s.wrong.length){
+    h+='<h3 style="margin-top:16px;color:var(--red)">틀린 문제 '+s.wrong.length+'개</h3>';
+    h+=s.wrong.map(q=>'<div class="tcse-wrongitem"><span class="e-day">S'+q.section+' Q'+q.question_no+'</span> <span class="tcse-type tc-'+q.type+'">'+q.type+'</span> <span class="count">정답 '+q.answer.join(', ')+'</span></div>').join('');
+  }
+  return h;
+}
+function tcRetry(){
+  const pool=tcseSession.pool.slice();
+  tcseSession={pool:pool,i:0,score:0,total:0,wrong:[],byType:{TC1:[0,0],TC2:[0,0],TC3:[0,0],SE:[0,0]},sel:[],answered:false};
+  showTcseStep();
+}
+
+/* ---- GRE 단어장에서 보기 ---- */
+function openGreWord(word,day,no){
+  if(tcseSession){tcseSession=null;document.getElementById('mainTabs').classList.remove('hide');}
+  if(CUR!=='GRE'){ switchDeck('GRE'); }
+  else { mainTab='gre'; document.getElementById('greView').classList.remove('hide');
+    document.getElementById('calView').classList.add('hide');document.getElementById('verbsView').classList.add('hide');
+    document.getElementById('tcseView').classList.add('hide'); }
+  filterDay=+day||0; statusFilter='all'; wrongOnly=false;
+  const sb=document.getElementById('searchBox');if(sb)sb.value=word;
+  renderTabs();renderChips();renderStatusChips();render();
+  setTimeout(function(){
+    const el=[].slice.call(document.querySelectorAll('#list .e-word')).find(function(e){return e.textContent===word;});
+    if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});
+  },60);
+}
+
+/* ---- 키보드 ---- */
+document.addEventListener('keydown',function(e){
+  if(mainTab!=='tcse'||!tcseSession)return;
+  const tag=(e.target&&e.target.tagName)||'';
+  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  if(e.key==='Escape'){endTcse();return;}
+  if(tcseSession.i>=tcseSession.pool.length){if(e.key==='Enter')tcRetry();return;}
+  if(e.key==='Enter'){
+    if(tcseSession.answered){tcNext();}
+    else{const b=document.getElementById('tcSubmit');if(b&&!b.disabled)tcCheck();}
+    return;
+  }
+  if(!tcseSession.answered&&e.key>='1'&&e.key<='9'){
+    const btns=document.querySelectorAll('#tcChoices .tcse-choice');
+    const b=btns[+e.key-1];
+    if(b&&!b.disabled){tcPick(b.dataset.l,+b.dataset.g);}
+  }
+});
+
+/* TCSE 헬퍼(GRE 목록용) */
+function tcSeen(w){const st=tcWStat[w];return st?st.seen:0;}
+function tcMissed(w){const st=tcWStat[w];return st?st.missed:0;}
 /* ================= init ================= */
 const VIEWMAP=[['optMean','m'],['optSent','s'],['optSyn','y'],['optPron','p'],['optEtym','e']];
 function syncViewUI(){VIEWMAP.forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.checked=!!settings.view[k];});}
