@@ -298,7 +298,6 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
   <span class="count" style="font-weight:700;color:#0b6b5e">TCSE 빈출</span>
   일차 <input type="number" id="freqDayFrom" min="1" placeholder="1" style="width:52px"> ~ <input type="number" id="freqDayTo" min="1" placeholder="끝" style="width:52px">
   최소 <input type="number" id="freqMin" value="2" min="1" style="width:56px">회↑
-  <input type="number" id="freqCount" value="20" min="1" style="width:64px">개
   <select id="freqMode"><option value="mean">뜻 고르기</option><option value="word">단어 고르기</option></select>
   <button class="primary" onclick="startFreqQuiz()" style="background:#0b6b5e;border-color:#0b6b5e">빈출 단어 테스트</button>
   <span class="count" id="freqAvail"></span>
@@ -1190,22 +1189,22 @@ function freqPool(){
   return data.filter(x=>tcFreqOf(x.word)>=min && x.day>=b.lo && x.day<=b.hi);
 }
 function startFreqQuiz(){
-  const n=+document.getElementById('freqCount').value||20, mode=document.getElementById('freqMode').value;
+  const mode=document.getElementById('freqMode').value;
   const min=Math.max(1,+document.getElementById('freqMin').value||1);
   let pool=freqPool();
   if(!pool.length)return alert('조건에 맞는 빈출 단어가 없습니다.\nTCSE 문제 CSV를 먼저 불러오거나(TCSE 탭), 일차 범위·최소 빈도를 조정해보세요.');
-  if(pool.length<4)return alert('조건에 맞는 빈출 단어가 4개 미만입니다. 일차 범위를 넓히거나 최소 빈도를 낮춰보세요. (현재 '+pool.length+'개)');
-  pool=[...pool].sort((a,b)=>tcFreqOf(b.word)-tcFreqOf(a.word)||a.day-b.day||a.no-b.no).slice(0,Math.max(4,Math.min(n,pool.length)));
+  if(data.length<4)return alert('GRE 단어가 4개 미만이라 선지를 만들 수 없습니다.');
+  /* 조건에 맞는 빈출 단어 전부 출제(개수 제한 없음) */
   pool=[...pool].sort(()=>Math.random()-.5);
   const b=freqDayBounds();
   const dayLbl=(b.hi>=9999?(b.lo>1?b.lo+'일차↑':'전체'):(b.lo===b.hi?b.lo+'일차':b.lo+'~'+b.hi+'일차'));
-  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',label:'TCSE 빈출('+min+'회↑·'+dayLbl+') '+pool.length+'문항'};
+  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',distractSrc:data,label:'TCSE 빈출('+min+'회↑·'+dayLbl+') '+pool.length+'문항'};
   setQuizMode(true);showQ();
 }
 function updateFreqAvail(){
   const el=document.getElementById('freqAvail');if(!el)return;
   const cnt=freqPool().length;
-  el.textContent=cnt?('· 조건 '+cnt+'개'):('· 조건 0개 (TCSE 로드/범위 확인)');
+  el.textContent=cnt?('· '+cnt+'개 전부 출제'):('· 조건 0개 (TCSE 로드/범위 확인)');
 }
 function endQuiz(){clearQuizTimer();quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();}
 function clearQuizTimer(){if(quiz&&quiz._tid){clearInterval(quiz._tid);quiz._tid=null;}}
@@ -1252,7 +1251,7 @@ function showQ(){
   }
   const q=quiz.pool[quiz.i];
   const nch=Math.min(6,Math.max(3,settings.choices||4));
-  const others=pick(quiz.pool.length>=nch+2?quiz.pool:data,nch-1,q);
+  const others=pick(quiz.distractSrc?quiz.distractSrc:(quiz.pool.length>=nch+2?quiz.pool:data),nch-1,q);
   const choices=[q,...others].sort(()=>Math.random()-.5);
   const ansIdx=data.indexOf(q);
   const prompt = quiz.mode==='mean'
