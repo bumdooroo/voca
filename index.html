@@ -454,7 +454,7 @@ function todayKey(){return dateKey(new Date());}
 function ymd(){return todayKey().slice(2).replace(/-/g,'');}
 
 function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
-function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data));if(typeof tcFreqCache!=='undefined')tcFreqCache=null;}
+function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data));tcFreqCache=null;}
 function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY()))||{}}catch(e){return{}}}
 function saveCal(){localStorage.setItem(CAL_KEY(),JSON.stringify(calendar))}
 
@@ -2497,7 +2497,7 @@ document.addEventListener('keydown',function(e){
 });
 
 /* TCSE 헬퍼(GRE 목록용) */
-let tcFreqCache=null;
+var tcFreqCache=null;
 function tcBuildFreq(){
   const gre=tcBuildGreIndex();const freq={};
   TCSE.forEach(function(q){var seen={};q.answer.forEach(function(L){
