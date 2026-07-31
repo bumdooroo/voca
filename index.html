@@ -244,6 +244,9 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .tcse-freq{font-size:10.5px;color:#0b6b5e;background:#e2f6f1;border-radius:6px;padding:1px 6px;margin-left:2px;font-weight:700}
 .chip.tc-freqchip{cursor:pointer}
 .chip.tc-freqchip b{color:#0b6b5e}
+.chip.tc-selfchip{color:#4b5563;background:#f1f3f6}
+.chip.tc-selfchip b{color:#374151}
+.chip.tc-selfchip .tc-nogre{margin-left:5px;font-size:9.5px;color:#b42323;font-weight:700}
 @media(max-width:640px){
   .tcse-q{font-size:15px}
   .tcse-choice{padding:10px}
@@ -2194,7 +2197,7 @@ function tcseImport(inp){
       resetProg=confirm('진행 기록·연결·통계도 초기화할까요?\n확인 = 전부 초기화 / 취소 = 기록 유지');
     }
     if(!tcSave(v.items))return;
-    TCSE=v.items;tcFreqCache=null;
+    TCSE=v.items;tcFreqCache=null;tcSelfCache=null;
     if(resetProg){tcProg={};tcLinks={};tcWStat={};localStorage.removeItem(TCSE_PROG);localStorage.removeItem(TCSE_LINK);localStorage.removeItem(TCSE_WSTAT);localStorage.removeItem(TCSE_HIST);}
     tcseSession=null;renderTcse();
     const s=tcseSummary(v.items);
@@ -2284,8 +2287,10 @@ function renderTcse(){
   h+='<div class="row" style="margin-top:12px"><button class="small danger" onclick="tcResetProgress()">진행 기록 초기화</button>'+
      '<button class="small" onclick="document.getElementById(\'tcseCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="tcseCsvFile" accept=".csv" class="hide" onchange="tcseImport(this)"></div>';
-  const fr=tcFreq();const words=tcGreWords();const top=Object.keys(fr).sort((a,b)=>fr[b]-fr[a]);
-  h+='<div class="count" style="margin-top:18px;margin-bottom:6px;font-weight:700;color:var(--ink)">TCSE 빈출 단어 <span class="count">· 정답 선지 등장 순 (GRE 연결 기준)</span></div>';
+  const gre=tcBuildGreIndex();
+  // ① GRE 연결 빈출
+  const fr=tcFreq();const words=gre.words;const top=Object.keys(fr).sort((a,b)=>fr[b]-fr[a]);
+  h+='<div class="count" style="margin-top:18px;margin-bottom:6px;font-weight:700;color:var(--ink)">① GRE 연결 빈출 단어 <span class="count">· TCSE 정답이 내 GRE 단어와 연결된 것</span></div>';
   if(top.length){
     h+='<div class="chipwrap" id="tcFreqWrap">'+top.slice(0,40).map(function(w){
       const gw=words.find(x=>x.word===w);
@@ -2294,6 +2299,21 @@ function renderTcse(){
     if(top.length>40)h+='<p class="count" style="margin-top:4px">상위 40개 표시 (총 '+top.length+'개 연결)</p>';
   }else{
     h+='<p class="count">아직 GRE 단어장과 연결된 정답 단어가 없습니다. GRE 덱에 단어가 있어야 자동 연결됩니다.</p>';
+  }
+  // ② TCSE 자체 빈출 (GRE 연결 여부 무관)
+  const sf=tcSelfFreq();const skeys=Object.keys(sf.freq).sort((a,b)=>sf.freq[b]-sf.freq[a]);
+  const missing=skeys.filter(k=>!(gre.idx[k]&&gre.idx[k].length===1)).length;
+  h+='<div class="count" style="margin-top:20px;margin-bottom:6px;font-weight:700;color:var(--ink)">② TCSE 자체 빈출 단어 <span class="count">· 정답 선지 자체 등장 순 (GRE 없어도 집계)</span></div>';
+  if(skeys.length){
+    h+='<div class="chipwrap">'+skeys.slice(0,60).map(function(k){
+      const cnt=sf.freq[k], word=sf.disp[k];
+      const g=(gre.idx[k]&&gre.idx[k].length===1)?gre.idx[k][0]:null;
+      if(g)return '<span class="chip tc-freqchip" onclick="openGreWord('+JSON.stringify(g.word).replace(/"/g,'&quot;')+','+g.day+','+(g.no||0)+')" title="GRE '+g.day+'일차: '+esc((g.mean||'').split('\n')[0])+'">'+esc(word)+' <b>'+cnt+'</b></span>';
+      return '<span class="chip tc-selfchip" title="GRE 단어장에 없음">'+esc(word)+' <b>'+cnt+'</b><span class="tc-nogre">GRE X</span></span>';
+    }).join('')+'</div>';
+    h+='<p class="count" style="margin-top:4px">상위 60개 · 총 '+skeys.length+'종 (그중 GRE에 없는 단어 '+missing+'종) · 초록=내 GRE에 있음, 회색=GRE 없음</p>';
+  }else{
+    h+='<p class="count">집계할 정답 선지가 없습니다.</p>';
   }
   el.innerHTML=h;
 }
@@ -2554,7 +2574,22 @@ document.addEventListener('keydown',function(e){
 });
 
 /* TCSE 헬퍼(GRE 목록용) */
-var tcFreqCache=null;
+var tcFreqCache=null, tcSelfCache=null;
+function tcSelfFreqBuild(){
+  const freq={}, disp={};
+  TCSE.forEach(function(q){
+    var seen={};
+    q.answer.forEach(function(L){
+      var raw=(q.choices[L]||'').trim(); if(!raw)return;
+      var key=tcNorm(raw); if(!key)return;
+      if(seen[key])return; seen[key]=1;
+      freq[key]=(freq[key]||0)+1;
+      if(!disp[key])disp[key]=raw;
+    });
+  });
+  return {freq:freq, disp:disp};
+}
+function tcSelfFreq(){ if(!tcSelfCache)tcSelfCache=tcSelfFreqBuild(); return tcSelfCache; }
 function tcBuildFreq(){
   const gre=tcBuildGreIndex();const freq={};
   TCSE.forEach(function(q){var seen={};q.answer.forEach(function(L){
