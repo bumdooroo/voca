@@ -253,6 +253,25 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
   .tcse-choice{padding:10px}
 }
 
+/* Writing */
+.wr-type{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;background:#eef1ff;color:var(--acc)}
+.wr-dir{font-size:11px;border-radius:6px;padding:2px 7px;background:#f5f1ff;color:#6b46d0}
+.wr-st{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px}
+.wr-st-none{background:#f1f3f6;color:#6b7280}.wr-st-draft{background:#fff4d6;color:#8a5a00}
+.wr-st-submitted{background:#eef1ff;color:var(--acc)}.wr-st-feedback{background:#e6f7ee;color:#176b43}.wr-st-revised{background:#e2f6f1;color:#0b6b5e}
+.wr-topic{font-size:15px;line-height:1.6;margin-top:6px;white-space:pre-line;word-break:break-word}
+.wr-instr{font-size:12.5px;color:#4b5563;margin-top:4px;line-height:1.5;white-space:pre-line}
+.wr-topicbox{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;margin-top:10px}
+.wr-lab{font-size:12px;font-weight:700;color:var(--sub);margin:12px 0 4px;letter-spacing:.03em}
+.wr-area{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:14px;line-height:1.7;font-family:inherit;resize:vertical}
+.wr-area:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.wr-show{border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#f9fafb;white-space:pre-line;line-height:1.7;font-size:13.5px;margin-top:4px}
+.wr-pre{white-space:pre-wrap;word-break:break-word;font-size:11.5px;background:#f9fafb;border:1px solid var(--line);border-radius:8px;padding:10px;line-height:1.5;max-height:220px;overflow:auto}
+.wr-fb{margin-top:8px}
+.wr-chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.wr-chain .wr-arrow{color:var(--sub)}
+@media(max-width:640px){.statgrid[style*="repeat(5"]{grid-template-columns:repeat(3,1fr)!important}}
+
 </style>
 </head>
 <body>
@@ -393,6 +412,11 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
   <div class="card hide" id="tcseWordCard"></div>
 </div>
 
+<!-- ============ WRITING VIEW ============ -->
+<div id="writingView" class="hide">
+  <div class="card" id="writingBody"></div>
+</div>
+
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
@@ -522,10 +546,12 @@ function switchTab(t){
   document.getElementById('calView').classList.toggle('hide',t!=='cal');
   document.getElementById('verbsView').classList.toggle('hide',t!=='verbs');
   document.getElementById('tcseView').classList.toggle('hide',t!=='tcse');
+  document.getElementById('writingView').classList.toggle('hide',t!=='writing');
   renderTabs();
   if(t==='cal'){ if(!calSel)calSel=todayKey(); renderCalendar(); }
   else if(t==='verbs'){ renderVerbs(); }
   else if(t==='tcse'){ renderTcse(); }
+  else if(t==='writing'){ renderWriting(); }
   else render();
 }
 function renderTabs(){
@@ -538,6 +564,7 @@ function renderTabs(){
   h+='<button onclick="addDeck()" title="단어장 추가">＋</button>';
   h+='<button id="tabVERB" class="'+(mainTab==='verbs'?'on':'')+'" onclick="switchTab(\'verbs\')" style="margin-left:auto">Verbs</button>';
   h+='<button id="tabTCSE" class="'+(mainTab==='tcse'?'on':'')+'" onclick="switchTab(\'tcse\')">TCSE</button>';
+  h+='<button id="tabWRITING" class="'+(mainTab==='writing'?'on':'')+'" onclick="switchTab(\'writing\')">Writing</button>';
   h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')">캘린더</button>';
   el.innerHTML=h;
 }
@@ -554,6 +581,7 @@ function switchDeck(id){
   if(study)endStudy();
   if(quiz){quiz=null;document.getElementById('quizArea').innerHTML='';document.getElementById('calQuizArea').innerHTML='';}
   if(typeof tcseSession!=='undefined'&&tcseSession){tcseSession=null;document.getElementById('mainTabs').classList.remove('hide');}
+  if(typeof writingSession!=='undefined'&&writingSession){if(typeof clearWrTimer==='function')clearWrTimer();writingSession=null;document.getElementById('mainTabs').classList.remove('hide');}
   CUR=id;saveActive();
   data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;
   syncSettingsUI();syncViewUI();updatePracticeCount();
@@ -565,6 +593,7 @@ function switchDeck(id){
   document.getElementById('calView').classList.add('hide');
   document.getElementById('verbsView').classList.add('hide');
   const _tv=document.getElementById('tcseView');if(_tv)_tv.classList.add('hide');
+  const _wv=document.getElementById('writingView');if(_wv)_wv.classList.add('hide');
   renderTabs();renderAll();
 }
 function addDeck(){
@@ -2650,6 +2679,337 @@ function tcFreq(){if(!tcFreqCache)tcFreqCache=tcBuildFreq();return tcFreqCache;}
 function tcFreqOf(w){return tcFreq()[w]||0;}
 function tcSeen(w){const st=tcWStat[w];return st?st.seen:0;}
 function tcMissed(w){const st=tcWStat[w];return st?st.missed:0;}
+/* ================= Writing (GRE 작문) ================= */
+const WR_TOPICS='voca_writing_topics', WR_ATTEMPTS='voca_writing_attempts', WR_FEEDBACK='voca_writing_feedback', WR_SETTINGS='voca_writing_settings';
+function wrLoadTopics(){try{return JSON.parse(localStorage.getItem(WR_TOPICS))||[]}catch(e){return[]}}
+function wrSaveTopics(a){try{localStorage.setItem(WR_TOPICS,JSON.stringify(a));return true;}catch(e){alert('저장 공간이 부족합니다.');return false;}}
+function wrLoadAtt(){try{return JSON.parse(localStorage.getItem(WR_ATTEMPTS))||[]}catch(e){return[]}}
+function wrSaveAtt(){try{localStorage.setItem(WR_ATTEMPTS,JSON.stringify(wrAtt));}catch(e){alert('저장 공간이 부족합니다.');}}
+function wrLoadFb(){try{return JSON.parse(localStorage.getItem(WR_FEEDBACK))||[]}catch(e){return[]}}
+function wrSaveFb(){try{localStorage.setItem(WR_FEEDBACK,JSON.stringify(wrFb));}catch(e){}}
+function wrLoadSet(){try{return Object.assign({favorites:{}},JSON.parse(localStorage.getItem(WR_SETTINGS))||{})}catch(e){return{favorites:{}}}}
+function wrSaveSet(){try{localStorage.setItem(WR_SETTINGS,JSON.stringify(wrSet));}catch(e){}}
+var WR=wrLoadTopics(), wrAtt=wrLoadAtt(), wrFb=wrLoadFb(), wrSet=wrLoadSet();
+let writingSession=null, wrTimer=null, wrFilterType='all', wrFilterScope='all', wrFavOnly=false, wrSearch='';
+
+function wrNewId(){const d=new Date();const p=n=>String(n).padStart(2,'0');return 'WR-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+Math.random().toString(36).slice(2,6);}
+function fmtMMSS(s){s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function wrWordCount(t){t=(t||'').trim();return t?t.split(/\s+/).filter(Boolean).length:0;}
+function wrTopicAtts(tid){return wrAtt.filter(a=>a.topicId===tid);}
+function wrAttFb(aid){return wrFb.filter(f=>f.attemptId===aid);}
+function wrTopicStatus(tid){
+  const as=wrTopicAtts(tid);
+  if(!as.length)return 'none';
+  if(as.some(a=>a.parentAttemptId))return 'revised';
+  if(as.some(a=>wrAttFb(a.id).length>0))return 'feedback';
+  if(as.some(a=>a.status!=='draft'))return 'submitted';
+  if(as.some(a=>a.status==='draft'))return 'draft';
+  return 'none';
+}
+const WR_STLABEL={none:'미작성',draft:'작성 중',submitted:'작성 완료',feedback:'피드백 완료',revised:'재작성 완료'};
+
+/* ---- CSV 불러오기 ---- */
+function wrImport(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(e){
+    let rows;try{rows=parseCSV(e.target.result.replace(/^﻿/,''));}catch(err){inp.value='';return alert('CSV를 읽을 수 없습니다.');}
+    if(rows.length<2){inp.value='';return alert('빈 파일입니다.');}
+    const head=rows[0].map(h=>(h||'').trim().toLowerCase());
+    const ix=function(){const ns=[].slice.call(arguments);return head.findIndex(h=>ns.some(n=>h===n||h.indexOf(n)>=0));};
+    const iId=ix('id','no','번호'), iTopic=ix('topic','prompt','제목','주제','statement','issue','argument'),
+      iInstr=ix('instruction','directions','지시','task','question'),
+      iType=ix('section','type','유형'), iDir=ix('directive','지시문유형','instruction_type','prompt_type','category');
+    if(iTopic<0){inp.value='';return alert('topic/prompt/제목 칼럼을 찾을 수 없습니다.');}
+    const out=[],seen={},dups=[];
+    rows.slice(1).forEach(function(r,ri){
+      const topic=(r[iTopic]||'').trim(); if(!topic)return;
+      var id=(iId>=0&&(r[iId]||'').trim())||('T'+(ri+1));
+      if(seen[id]){dups.push(id);return;} seen[id]=1;
+      out.push({id:id,topic:topic,instruction:(iInstr>=0?(r[iInstr]||'').trim():''),
+        type:(iType>=0?(r[iType]||'').trim():''),directive:(iDir>=0?(r[iDir]||'').trim():'')});
+    });
+    inp.value='';
+    if(!out.length)return alert('불러올 문제가 없습니다.');
+    if(dups.length&&!confirm('중복 id '+dups.length+'건이 있습니다 (건너뜀). 계속할까요?'))return;
+    if(WR.length&&!confirm('이미 '+WR.length+'개 문제가 있습니다. 문제 데이터를 교체할까요?\n(작성·피드백 기록은 유지됩니다)'))return;
+    if(!wrSaveTopics(out))return;
+    WR=out; writingSession=null; renderWriting();
+    const types={};out.forEach(t=>{const k=t.type||'기타';types[k]=(types[k]||0)+1;});
+    alert(out.length+'개 문제를 불러왔습니다.\n'+Object.keys(types).map(k=>k+' '+types[k]).join(' · '));
+  };
+  rd.readAsText(f,'utf-8');
+}
+
+/* ================= 홈 ================= */
+function renderWriting(){
+  if(writingSession){return;}
+  const el=document.getElementById('writingBody');if(!el)return;
+  if(!WR.length){
+    el.innerHTML='<h3>Writing (GRE 작문)</h3>'+
+      '<p class="count" style="margin-top:8px">작문 문제 데이터가 없습니다. ETS 문제 CSV를 불러오세요.</p>'+
+      '<div class="row" style="margin-top:12px"><button class="primary" onclick="document.getElementById(\'wrCsvFile\').click()">ETS CSV 불러오기</button>'+
+      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>'+
+      '<div class="tcse-help"><b>CSV 형식</b><br>id, topic(주제/prompt), instruction(지시문), type(Issue/Argument), directive(지시문 유형)</div>';
+    return;
+  }
+  const stat={none:0,draft:0,submitted:0,feedback:0,revised:0};
+  WR.forEach(t=>{stat[wrTopicStatus(t.id)]++;});
+  const types=[...new Set(WR.map(t=>t.type).filter(Boolean))];
+  let h='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">Writing (GRE 작문)</h3><span class="count">'+WR.length+'문제</span></div>';
+  h+='<div class="statgrid" style="margin:12px 0;grid-template-columns:repeat(5,1fr)">'+
+     [['none','미작성'],['draft','작성 중'],['submitted','작성 완료'],['feedback','피드백 완료'],['revised','재작성 완료']].map(x=>
+       '<div class="stat"><b>'+stat[x[0]]+'</b><span class="count">'+x[1]+'</span></div>').join('')+'</div>';
+  h+='<div class="row" style="margin-top:6px">'+
+     '<button class="primary" onclick="wrRandomStart()">랜덤 문제</button>'+
+     '<button class="small" onclick="document.getElementById(\'wrCsvFile\').click()">다른 CSV 불러오기</button>'+
+     '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>';
+  h+='<div class="row" style="margin-top:10px">'+
+     '<select onchange="wrFilterType=this.value;wrRenderList()"><option value="all">전체 유형</option>'+types.map(t=>'<option value="'+esc(t)+'"'+(wrFilterType===t?' selected':'')+'>'+esc(t)+'</option>').join('')+'</select>'+
+     '<select onchange="wrFilterScope=this.value;wrRenderList()">'+
+       ['all:전체','none:미작성','draft:작성 중','submitted:작성 완료','feedback:피드백 완료','revised:재작성 완료'].map(o=>{const p=o.split(':');return '<option value="'+p[0]+'"'+(wrFilterScope===p[0]?' selected':'')+'>'+p[1]+'</option>';}).join('')+'</select>'+
+     '<label class="tog"><input type="checkbox" '+(wrFavOnly?'checked':'')+' onchange="wrFavOnly=this.checked;wrRenderList()">☆ 즐겨찾기</label>'+
+     '<input type="text" id="wrSearch" placeholder="문제 검색" value="'+esc(wrSearch).replace(/"/g,'&quot;')+'" oninput="wrSearch=this.value;wrRenderList()" style="flex:1;min-width:140px"></div>';
+  h+='<div class="row" style="margin-top:8px"><button class="small" onclick="wrShowHistory()">작성 기록 보기</button></div>';
+  h+='<div id="wrList" style="margin-top:6px"></div>';
+  el.innerHTML=h;
+  wrRenderList();
+  const nb=document.getElementById('wrSearch');if(nb&&wrSearch){nb.focus();nb.setSelectionRange(wrSearch.length,wrSearch.length);}
+}
+function wrRenderList(){
+  const box=document.getElementById('wrList');if(!box)return;
+  let arr=WR.slice();
+  if(wrFilterType!=='all')arr=arr.filter(t=>t.type===wrFilterType);
+  if(wrFavOnly)arr=arr.filter(t=>wrSet.favorites[t.id]);
+  if(wrFilterScope!=='all')arr=arr.filter(t=>wrTopicStatus(t.id)===wrFilterScope);
+  const q=(wrSearch||'').trim().toLowerCase();
+  if(q)arr=arr.filter(t=>(t.topic||'').toLowerCase().includes(q)||(t.instruction||'').toLowerCase().includes(q)||(t.id||'').toLowerCase().includes(q)||(t.directive||'').toLowerCase().includes(q));
+  box.innerHTML='<div class="count" style="margin:4px 0">'+arr.length+'문제</div>'+(arr.slice(0,300).map(function(t){
+    const as=wrTopicAtts(t.id), fbN=as.reduce((s,a)=>s+wrAttFb(a.id).length,0), st=wrTopicStatus(t.id);
+    return '<div class="entry"><div class="e-top">'+
+      '<span class="e-no">'+esc(t.id)+'</span>'+
+      (t.type?'<span class="wr-type">'+esc(t.type)+'</span>':'')+
+      (t.directive?'<span class="wr-dir">'+esc(t.directive)+'</span>':'')+
+      '<span class="wr-st wr-st-'+st+'">'+WR_STLABEL[st]+'</span>'+
+      '<span class="e-act"><button class="small" onclick="wrToggleFav(\''+t.id+'\')" style="color:'+(wrSet.favorites[t.id]?'#e0a800':'var(--sub)')+'">'+(wrSet.favorites[t.id]?'★':'☆')+'</button>'+
+      '<button class="small primary" onclick="wrOpenTopic(\''+t.id+'\')">'+(as.length?'이어서/보기':'작성 시작')+'</button></span>'+
+      '</div>'+
+      '<div class="wr-topic">'+esc(t.topic)+'</div>'+
+      (t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+
+      (as.length?'<div class="count" style="margin-top:4px">작성 '+as.length+'회 · 피드백 '+fbN+'회</div>':'')+
+    '</div>';
+  }).join('')||'<p class="count" style="padding:12px">조건에 맞는 문제가 없습니다.</p>');
+}
+function wrToggleFav(tid){wrSet.favorites[tid]=!wrSet.favorites[tid];if(!wrSet.favorites[tid])delete wrSet.favorites[tid];wrSaveSet();wrRenderList();}
+function wrRandomStart(){let arr=WR.filter(t=>wrTopicStatus(t.id)==='none');if(!arr.length)arr=WR;const t=arr[Math.floor(Math.random()*arr.length)];wrOpenTopic(t.id);}
+
+/* ---- 문제 열기: 새로 시작 / 이어쓰기 / 기존 시도 보기 ---- */
+function wrOpenTopic(tid){
+  const t=WR.find(x=>x.id===tid);if(!t)return;
+  const draft=wrAtt.find(a=>a.topicId===tid&&a.status==='draft');
+  const done=wrAtt.filter(a=>a.topicId===tid&&a.status!=='draft').sort((a,b)=>(b.submittedAt||'').localeCompare(a.submittedAt||''));
+  if(draft){ startWriting(tid,draft.mode,null,draft.id); return; }
+  if(done.length){ wrShowResult(done[0].id); return; }
+  wrChooseMode(tid,null);
+}
+function wrChooseMode(tid,parentId){
+  const t=WR.find(x=>x.id===tid);if(!t)return;
+  const el=document.getElementById('writingBody');
+  document.getElementById('mainTabs').classList.remove('hide');
+  el.innerHTML='<button class="small" onclick="renderWriting()">← Writing 홈</button>'+
+    '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+'</div><div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
+    '<p class="count" style="margin-top:12px">'+(parentId?'재작성 모드':'작성 모드')+'를 선택하세요.</p>'+
+    '<div class="row" style="margin-top:8px"><button class="primary" onclick="startWriting(\''+tid+'\',\'timed\','+(parentId?'\''+parentId+'\'':'null')+')">실전 30분</button>'+
+    '<button onclick="startWriting(\''+tid+'\',\'practice\','+(parentId?'\''+parentId+'\'':'null')+')">연습 모드(무제한)</button></div>';
+}
+
+/* ================= 작성 에디터 ================= */
+function startWriting(tid,mode,parentId,resumeId){
+  const t=WR.find(x=>x.id===tid);if(!t)return;
+  let att;
+  if(resumeId){att=wrAtt.find(a=>a.id===resumeId);}
+  if(!att){
+    let baseEssay='';
+    if(parentId){const p=wrAtt.find(a=>a.id===parentId);if(p)baseEssay=p.essay||'';}
+    att={id:wrNewId(),topicId:tid,mode:mode||'timed',outline:'',essay:baseEssay,
+      startedAt:new Date().toISOString(),submittedAt:'',elapsedSec:0,wordCount:wrWordCount(baseEssay),
+      parentAttemptId:parentId||null,status:'draft'};
+    wrAtt.push(att);wrSaveAtt();
+  } else if(mode){att.mode=mode;}
+  writingSession={att:att,topic:t,startTs:Date.now(),baseElapsed:att.elapsedSec||0};
+  document.getElementById('mainTabs').classList.add('hide');
+  showWritingEditor();
+  startWrTimer();
+}
+function showWritingEditor(){
+  const el=document.getElementById('writingBody');if(!el||!writingSession)return;
+  const a=writingSession.att, t=writingSession.topic;
+  el.innerHTML='<div class="row" style="justify-content:space-between"><button class="small" onclick="wrExitEditor()">← 저장하고 나가기</button>'+
+      '<span><b id="wrTimer" style="color:var(--acc);font-weight:700"></b> · <span id="wrWc" class="count"></span> · <span class="count">자동 저장됨</span></span></div>'+
+    '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+(a.parentAttemptId?' · 재작성':'')+'</div>'+
+      '<div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
+    '<div class="wr-lab">Outline (개요)</div>'+
+    '<textarea id="wrOutline" class="wr-area" style="min-height:90px" placeholder="Position / Reason 1 / Reason 2 / Counterargument …" oninput="wrEditorInput()">'+esc(a.outline||'')+'</textarea>'+
+    '<div class="wr-lab">Essay</div>'+
+    '<textarea id="wrEssay" class="wr-area" style="min-height:280px" placeholder="여기에 에세이를 작성하세요…" oninput="wrEditorInput()">'+esc(a.essay||'')+'</textarea>'+
+    '<div class="row" style="margin-top:10px"><button class="primary" onclick="wrSubmit()" style="min-height:42px;font-weight:700">작성 완료</button>'+
+    '<button onclick="wrExitEditor()">저장하고 나가기</button></div>';
+  wrUpdateWc();
+}
+function wrEditorInput(){
+  if(!writingSession)return;
+  const a=writingSession.att;
+  a.outline=(document.getElementById('wrOutline')||{}).value||'';
+  a.essay=(document.getElementById('wrEssay')||{}).value||'';
+  a.wordCount=wrWordCount(a.essay);
+  a.elapsedSec=Math.floor((Date.now()-writingSession.startTs)/1000)+writingSession.baseElapsed;
+  wrSaveAtt();
+  wrUpdateWc();
+}
+function wrUpdateWc(){const el=document.getElementById('wrWc');if(el&&writingSession)el.textContent=writingSession.att.wordCount+' words';}
+function startWrTimer(){
+  clearWrTimer();
+  wrTimer=setInterval(function(){
+    if(!writingSession){clearWrTimer();return;}
+    const el=Math.floor((Date.now()-writingSession.startTs)/1000)+writingSession.baseElapsed;
+    const disp=document.getElementById('wrTimer');
+    if(disp){
+      if(writingSession.att.mode==='timed'){
+        const rem=1800-el;
+        if(rem<=0){disp.textContent='시간 종료 (0:00)';disp.style.color='var(--red)';}
+        else{disp.textContent=fmtMMSS(rem)+' 남음';if(rem<=60)disp.style.color='var(--red)';}
+      }else{disp.textContent=fmtMMSS(el)+' 경과';}
+    }
+  },1000);
+}
+function clearWrTimer(){if(wrTimer){clearInterval(wrTimer);wrTimer=null;}}
+function wrExitEditor(){wrEditorInput();clearWrTimer();writingSession=null;document.getElementById('mainTabs').classList.remove('hide');renderWriting();}
+function wrSubmit(){
+  if(!writingSession)return;
+  wrEditorInput();
+  const a=writingSession.att;
+  if(a.wordCount<10&&!confirm('에세이가 너무 짧습니다 ('+a.wordCount+' words). 그래도 완료할까요?'))return;
+  a.submittedAt=new Date().toISOString();
+  a.elapsedSec=Math.floor((Date.now()-writingSession.startTs)/1000)+writingSession.baseElapsed;
+  a.status='submitted';
+  wrSaveAtt();
+  clearWrTimer();
+  const aid=a.id; writingSession=null;
+  document.getElementById('mainTabs').classList.remove('hide');
+  showWritingFeedback(aid);
+}
+
+/* ================= 피드백 화면 ================= */
+function wrBuildPrompt(a,t){
+  return [
+    '[GRE Writing 답안 평가 요청]',
+    '아래는 GRE '+(t.type||'Analytical Writing')+' 문제에 대한 제 답안입니다. ETS의 공식 채점 기준(0–6점 척도)에 따라 평가해 주세요.',
+    'Topic:\n'+t.topic,
+    t.instruction?('Instruction:\n'+t.instruction):'',
+    '작성 시간: '+fmtMMSS(a.elapsedSec)+'  ·  단어 수: '+a.wordCount+'  ·  모드: '+(a.mode==='timed'?'실전 30분':'연습'),
+    '제 답안:\n'+(a.essay||''),
+    'ETS 평가 기준(주장의 명료성·설득력, 논거의 전개·근거, 반론 고려, 구조·응집성, 문장·어휘·문법)에 따라 다음을 한국어로 자세히 작성해 주세요:\n1) 예상 점수대 (예: 3.5–4.0)\n2) 강점 3가지\n3) 약점 3가지\n4) 구체적 개선 제안\n5) 어색한 문장 2–3개를 골라 수정 예시'
+  ].filter(Boolean).join('\n\n');
+}
+function showWritingFeedback(aid){
+  const el=document.getElementById('writingBody');
+  const a=wrAtt.find(x=>x.id===aid);if(!a){renderWriting();return;}
+  const t=WR.find(x=>x.id===a.topicId)||{topic:'',type:''};
+  window.__wrPrompt=wrBuildPrompt(a,t);
+  el.innerHTML='<button class="small" onclick="renderWriting()">← Writing 홈</button>'+
+    '<div class="v-verdict ok" style="margin-top:8px">작성 완료 · '+fmtMMSS(a.elapsedSec)+' · '+a.wordCount+' words</div>'+
+    '<div class="wr-lab">① AI 피드백 받기</div>'+
+    '<div class="row"><button class="primary" onclick="wrCopyPrompt()">AI 피드백 프롬프트 복사</button>'+
+    '<button onclick="window.open(\'https://chatgpt.com/\',\'_blank\')">ChatGPT 열기</button>'+
+    '<button onclick="window.open(\'https://claude.ai/new\',\'_blank\')">Claude 열기</button>'+
+    '<button onclick="window.open(\'https://gemini.google.com/app\',\'_blank\')">Gemini 열기</button></div>'+
+    '<p class="study-tip">프롬프트를 복사해 AI에 붙여넣고, 받은 피드백을 아래에 붙여넣어 저장하세요. (API 키 불필요)</p>'+
+    '<details class="test-wrong" style="margin-top:6px"><summary>복사될 프롬프트 미리보기</summary><pre class="wr-pre">'+esc(window.__wrPrompt)+'</pre></details>'+
+    '<div class="wr-lab" style="margin-top:12px">② AI 피드백 붙여넣기</div>'+
+    '<div class="row"><select id="wrProvider"><option>ChatGPT</option><option>Claude</option><option>Gemini</option><option>기타</option></select>'+
+    '<input type="text" id="wrScore" placeholder="점수대 (예: 3.5-4.0)" style="width:150px"></div>'+
+    '<textarea id="wrFbText" class="wr-area" style="min-height:160px;margin-top:8px" placeholder="AI가 준 피드백을 여기에 붙여넣기"></textarea>'+
+    '<div class="row" style="margin-top:8px"><button class="primary" onclick="wrSaveFeedback(\''+aid+'\')">피드백 저장</button>'+
+    '<button onclick="wrShowResult(\''+aid+'\')">건너뛰고 결과로</button></div>';
+}
+function wrCopyPrompt(){
+  const txt=window.__wrPrompt||'';
+  const done=()=>{const b=event&&event.target;if(b){const o=b.textContent;b.textContent='복사됨!';setTimeout(()=>{b.textContent=o;},1200);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,()=>wrCopyFallback(txt));}
+  else wrCopyFallback(txt);
+}
+function wrCopyFallback(txt){const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');alert('프롬프트를 복사했습니다.');}catch(e){alert('복사 실패. 미리보기에서 직접 복사하세요.');}document.body.removeChild(ta);}
+function wrSaveFeedback(aid){
+  const txt=(document.getElementById('wrFbText')||{}).value||'';
+  if(!txt.trim())return alert('붙여넣은 피드백이 없습니다.');
+  const prov=(document.getElementById('wrProvider')||{}).value||'기타';
+  const score=(document.getElementById('wrScore')||{}).value||'';
+  wrFb.push({attemptId:aid,provider:prov,rawText:txt.trim(),scoreBand:score.trim(),createdAt:new Date().toISOString()});
+  wrSaveFb();
+  const a=wrAtt.find(x=>x.id===aid);if(a){a.status='feedback_done';wrSaveAtt();}
+  wrShowResult(aid);
+}
+
+/* ================= 결과 / 재작성 ================= */
+function wrShowResult(aid){
+  const el=document.getElementById('writingBody');
+  const a=wrAtt.find(x=>x.id===aid);if(!a){renderWriting();return;}
+  const t=WR.find(x=>x.id===a.topicId)||{topic:''};
+  const fbs=wrAttFb(aid);
+  let h='<button class="small" onclick="renderWriting()">← Writing 홈</button>';
+  h+='<div class="wr-topicbox" style="margin-top:8px"><div class="e-no">'+esc(t.id||'')+(a.parentAttemptId?' · 재작성본':'')+'</div><div class="wr-topic">'+esc(t.topic)+'</div></div>';
+  h+='<div class="count" style="margin-top:8px">'+fmtMMSS(a.elapsedSec)+' · '+a.wordCount+' words · '+(a.mode==='timed'?'실전':'연습')+(fbs.length?' · 피드백 '+fbs.length+'개':'')+'</div>';
+  h+='<div class="row" style="margin-top:10px"><button onclick="wrToggle(\'wrOrig\')">원문 보기</button>'+
+     (fbs.length?'<button onclick="wrToggle(\'wrFb\')">AI 피드백 보기</button>':'<button onclick="showWritingFeedback(\''+aid+'\')">피드백 추가</button>')+
+     '<button class="primary" onclick="wrChooseMode(\''+a.topicId+'\',\''+aid+'\')">이 답안 재작성</button></div>';
+  h+='<div id="wrOrig" class="hide"><div class="wr-lab">Outline</div><div class="wr-show">'+esc(a.outline||'(없음)')+'</div><div class="wr-lab">Essay</div><div class="wr-show">'+esc(a.essay||'')+'</div></div>';
+  h+='<div id="wrFb" class="hide">'+fbs.map(f=>'<div class="wr-fb"><div class="count">'+esc(f.provider)+(f.scoreBand?' · '+esc(f.scoreBand):'')+' · '+esc((f.createdAt||'').slice(0,10))+'</div><div class="wr-show">'+esc(f.rawText)+'</div></div>').join('')+'</div>';
+  // 연결 체인
+  const chain=wrBuildChain(a);
+  if(chain.length>1){
+    h+='<div class="wr-lab" style="margin-top:14px">답안 연결</div><div class="wr-chain">'+chain.map((c,i)=>{
+      const cf=wrAttFb(c.id).length;
+      return (i>0?'<span class="wr-arrow">→</span>':'')+'<button class="chip'+(c.id===aid?' on':'')+'" onclick="wrShowResult(\''+c.id+'\')">'+(c.parentAttemptId?'수정본':'원본')+(cf?' (피드백 '+cf+')':'')+'</button>';
+    }).join('')+'</div>';
+  }
+  el.innerHTML=h;
+}
+function wrToggle(id){const e=document.getElementById(id);if(e)e.classList.toggle('hide');}
+function wrBuildChain(a){
+  // 루트까지 올라간 뒤 자식들 따라 내려오는 단순 체인(부모→자식)
+  let root=a; const guard=new Set();
+  while(root.parentAttemptId&&!guard.has(root.id)){guard.add(root.id);const p=wrAtt.find(x=>x.id===root.parentAttemptId);if(!p)break;root=p;}
+  const chain=[root]; let cur=root, g2=new Set();
+  while(!g2.has(cur.id)){g2.add(cur.id);const child=wrAtt.find(x=>x.parentAttemptId===cur.id);if(!child)break;chain.push(child);cur=child;}
+  return chain;
+}
+
+/* ================= 작성 기록 ================= */
+function wrShowHistory(){
+  const el=document.getElementById('writingBody');
+  const done=wrAtt.filter(a=>a.status!=='draft').sort((a,b)=>(b.submittedAt||'').localeCompare(a.submittedAt||''));
+  let h='<div class="row" style="justify-content:space-between"><h3 style="margin:0">작성 기록</h3><button class="small" onclick="renderWriting()">← 홈</button></div>';
+  if(!done.length){h+='<p class="count" style="margin-top:8px">아직 제출한 답안이 없습니다.</p>';el.innerHTML=h;return;}
+  h+=done.map(function(a){
+    const t=WR.find(x=>x.id===a.topicId)||{topic:'(삭제된 문제)'};
+    const fb=wrAttFb(a.id).length;
+    return '<div class="entry"><div class="e-top"><span class="e-no">'+esc((a.submittedAt||'').slice(0,10))+'</span>'+
+      (a.parentAttemptId?'<span class="wr-type">재작성</span>':'')+
+      '<span class="wr-st wr-st-'+(fb?'feedback':'submitted')+'">'+(fb?'피드백 '+fb:'피드백 없음')+'</span>'+
+      '<span class="count">'+fmtMMSS(a.elapsedSec)+' · '+a.wordCount+'w</span>'+
+      '<span class="e-act"><button class="small" onclick="wrShowResult(\''+a.id+'\')">보기</button></span></div>'+
+      '<div class="wr-topic" style="font-size:14px">'+esc((t.topic||'').slice(0,90))+((t.topic||'').length>90?'…':'')+'</div></div>';
+  }).join('');
+  el.innerHTML=h;
+}
+
+/* ---- 키보드: Esc로 에디터 나가기 ---- */
+document.addEventListener('keydown',function(e){
+  if(mainTab!=='writing'||!writingSession)return;
+  const tag=(e.target&&e.target.tagName)||'';
+  if(e.key==='Escape'&&tag!=='TEXTAREA'&&tag!=='INPUT'){wrExitEditor();}
+});
+
 /* ================= init ================= */
 const VIEWMAP=[['optMean','m'],['optSent','s'],['optSyn','y'],['optPron','p'],['optEtym','e']];
 function syncViewUI(){VIEWMAP.forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.checked=!!settings.view[k];});}
