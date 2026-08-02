@@ -2801,7 +2801,7 @@ function wrRenderList(){
   }).join('')||'<p class="count" style="padding:12px">조건에 맞는 문제가 없습니다.</p>');
 }
 function wrToggleFav(tid){wrSet.favorites[tid]=!wrSet.favorites[tid];if(!wrSet.favorites[tid])delete wrSet.favorites[tid];wrSaveSet();wrRenderList();}
-function wrRandomStart(){let arr=WR.filter(t=>wrTopicStatus(t.id)==='none');if(!arr.length)arr=WR;const t=arr[Math.floor(Math.random()*arr.length)];wrOpenTopic(t.id);}
+function wrRandomStart(){if(!WR.length){alert('먼저 문제 CSV를 불러오세요.');return;}let arr=WR.filter(t=>wrTopicStatus(t.id)==='none');if(!arr.length)arr=WR.slice();const t=arr[Math.floor(Math.random()*arr.length)];wrOpenTopic(t.id);}
 
 /* ---- 문제 열기: 새로 시작 / 이어쓰기 / 기존 시도 보기 ---- */
 function wrOpenTopic(tid){
@@ -2853,7 +2853,8 @@ function showWritingEditor(){
     '<div class="wr-lab">Essay</div>'+
     '<textarea id="wrEssay" class="wr-area" style="min-height:280px" placeholder="여기에 에세이를 작성하세요…" oninput="wrEditorInput()">'+esc(a.essay||'')+'</textarea>'+
     '<div class="row" style="margin-top:10px"><button class="primary" onclick="wrSubmit()" style="min-height:42px;font-weight:700">작성 완료</button>'+
-    '<button onclick="wrExitEditor()">저장하고 나가기</button></div>';
+    '<button onclick="wrExitEditor()">저장하고 나가기</button>'+
+    '<button class="small" style="color:var(--red)" onclick="wrCancelEditor()">취소(삭제)</button></div>';
   wrUpdateWc();
 }
 function wrEditorInput(){
@@ -2884,6 +2885,16 @@ function startWrTimer(){
 }
 function clearWrTimer(){if(wrTimer){clearInterval(wrTimer);wrTimer=null;}}
 function wrExitEditor(){wrEditorInput();clearWrTimer();writingSession=null;document.getElementById('mainTabs').classList.remove('hide');renderWriting();}
+function wrCancelEditor(){
+  if(!writingSession)return;
+  const a=writingSession.att;
+  const has=((a.essay||'').trim().length>0)||((a.outline||'').trim().length>0);
+  if(has&&!confirm('작성 중인 내용을 저장하지 않고 삭제할까요? (되돌릴 수 없습니다)'))return;
+  const i=wrAtt.findIndex(x=>x.id===a.id);
+  if(i>=0){wrAtt.splice(i,1);wrSaveAtt();}
+  clearWrTimer();writingSession=null;
+  document.getElementById('mainTabs').classList.remove('hide');renderWriting();
+}
 function wrSubmit(){
   if(!writingSession)return;
   wrEditorInput();
