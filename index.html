@@ -272,6 +272,14 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .wr-chain .wr-arrow{color:var(--sub)}
 @media(max-width:640px){.statgrid[style*="repeat(5"]{grid-template-columns:repeat(3,1fr)!important}}
 
+.wr-tipbox{background:var(--card2,#f5f7fb);border:1px solid var(--bd,#e2e6ee);border-radius:10px;padding:10px 12px;margin:10px 0}
+.wr-tiphead{font-weight:700;font-size:13px;margin-bottom:4px}
+.wr-tiplist{margin:4px 0 0;padding-left:18px}
+.wr-tiplist li{margin:3px 0;font-size:13px;line-height:1.5}
+details.wr-guide,details.wr-help{border:1px solid var(--bd,#e2e6ee);border-radius:10px;padding:8px 12px;margin:8px 0;background:var(--card2,#f8f9fc)}
+details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;font-size:14px}
+.wr-plan{background:#fff8e1;border:1px solid #f0d98a;border-radius:10px;padding:8px 12px;margin:8px 0}
+.wr-chkin{display:block;width:100%;box-sizing:border-box;margin:4px 0;padding:8px;border:1px solid var(--bd,#e2e6ee);border-radius:8px;font-size:13px}
 </style>
 </head>
 <body>
@@ -2691,6 +2699,133 @@ function wrLoadSet(){try{return Object.assign({favorites:{}},JSON.parse(localSto
 function wrSaveSet(){try{localStorage.setItem(WR_SETTINGS,JSON.stringify(wrSet));}catch(e){}}
 var WR=wrLoadTopics(), wrAtt=wrLoadAtt(), wrFb=wrLoadFb(), wrSet=wrLoadSet();
 let writingSession=null, wrTimer=null, wrFilterType='all', wrFilterScope='all', wrFavOnly=false, wrSearch='';
+/* ================= Writing 팁 (앱 고정 데이터, PDF 기반) ================= */
+const WR_TIPS={
+  guide:[
+    {t:'ETS가 원하는 답안',items:[
+      `프롬프트에 직접 답하고, 사안의 복잡성을 인정한다`,
+      `예시를 나열하지 말고 원칙(principle)을 세운 뒤, 예시는 그 원칙을 뒷받침하는 근거로만 쓴다`,
+      `모든 분석은 반드시 프롬프트로 다시 연결한다`,
+      `약한 답안의 특징: 예시 나열, thesis 반복, 분석 없이 요약, 프롬프트 핵심어 무시`
+    ]},
+    {t:'ETS 채점 기준 (0–6, 4점이 합격선)',items:[
+      `Task Relevance — 명확한 입장 + 조건부 추론(conditional reasoning)`,
+      `Reason & Examples — 설득력 있는 이유 + 잘 고른 예시`,
+      `Development — 초점 있고 논리적으로 조직된 전개`,
+      `Conveyance — 정확한 어휘와 문장 다양성`,
+      `Convention — 어법 통제 (사소한 실수는 감점 아님)`,
+      `4점 = 평가요소를 모두 명료히 반영 / 3점 이하 = 핵심요소·언어의 결여`
+    ]},
+    {t:'30분 시간 배분',items:[
+      `1–2분 · 입장·이유·조건부 프레임 정하기`,
+      `약 5분 · Intro 작성 (4요소 확인)`,
+      `약 10분 · Body 2개 작성 (OREO)`,
+      `약 5분 · 검토 (어법 + intro–body 일치, reason–evidence 일치)`
+    ]},
+    {t:'기본 에세이 구조',items:[
+      `Intro: 배경 → Some argue... → Admittedly... → However, 입장+이유`,
+      `Body (OREO): Opinion(topic sentence) → Reason → Example → Opinion(분석·프롬프트 연결)`,
+      `Conclusion: thesis 재진술 → 일반화 → 정책적 함의 또는 더 큰 교훈`
+    ]},
+    {t:'좋은 예시와 분석법 — So what?',items:[
+      `GRE 답안이 약해지는 지점은 예시가 없어서가 아니라, 예시 뒤에 분석이 없어서다`,
+      `예시는 하나면 충분하다. 대신 "이 예시가 무엇을 증명하는가?"에 반드시 답하라`,
+      `This suggests / demonstrates / highlights why... 로 분석을 프롬프트에 연결`
+    ]},
+    {t:'반론·양보 처리',items:[
+      `양보: Admittedly / To be sure / Granted 로 상대 논거를 인정`,
+      `재반박: Nevertheless / However / That said 로 되받는다`,
+      `조건부 프레임 6종: 이상/현실 · 부분/전체 · 단기/장기 · 비용/보상 · 과거/현재 · 좁은/포괄 정의`
+    ]},
+    {t:'자주 망하는 패턴',items:[
+      `원칙 없이 예시로 바로 점프`,
+      `예시 뒤 분석 생략`,
+      `문단마다 thesis 반복`,
+      `프롬프트 핵심어(always, most, all, only, best) 무시`,
+      `범위를 성급히 축소 (success → career success)`,
+      `reason과 연관 낮은 example, 어색한 transition`
+    ]},
+    {t:'문장·어휘 체크리스트',items:[
+      `어려운 단어보다 자연스러운 연어(collocation)를 써라`,
+      `같은 명사·동사 반복 피하기`,
+      `sentence fragment · 주어–동사 일치 · 시제 · 관사 · run-on 확인`,
+      `예: focus on score → focus on achieving high scores / think creative → think creatively`
+    ]}
+  ],
+  byType:{
+    claim_challenge:{label:'반대의견 예측',tips:[
+      `내 입장을 challenge할 수 있는 가장 강력한 반론·예시를 반드시 정면으로 다뤄라`,
+      `양보 문단에서 상대 논거를 인정한 뒤, 왜 내 입장이 더 타당한지 재반박`
+    ]},
+    policy_consequences:{label:'결과 예상',tips:[
+      `정책 시행의 직접·간접 결과를 예상하고, 그 결과가 왜 내 입장을 뒷받침하는지 설명`,
+      `의도치 않은 부작용과 예외 상황까지 검토하면 설득력이 올라간다`
+    ]},
+    recommendation_circumstances:{label:'상황·조건 검토',tips:[
+      `권고가 유리한 상황과 불리한 상황을 구분해 제시`,
+      `핵심은 "언제 성립하고 언제 실패하는가"다`
+    ]},
+    statement_conditions:{label:'성립/실패 조건',tips:[
+      `statement가 참이 되는 경우와 아닌 경우를 나눠 조건부로 판단`,
+      `무조건 찬반이 아니라, 조건에 따라 입장을 정하면 conditional reasoning이 산다`
+    ]},
+    claim_reason:{label:'claim·reason 개별 판단',tips:[
+      `claim의 타당성과, 그 claim이 근거로 삼는 reason을 각각 따로 평가`,
+      `reason이 실제로 claim을 뒷받침하는지 검증하는 것이 관건`
+    ]},
+    two_views:{label:'두 견해 비교',tips:[
+      `제시된 두 견해를 모두 다룬 뒤, 자기만의 기준으로 어느 쪽이 더 타당한지 판단`,
+      `단순 절충 금지 — 명확한 입장을 세워라`
+    ]}
+  },
+  paragraph:[
+    `Position — 소재에 대한 명시적·조건부 입장 (배경만 쓰면 off-topic)`,
+    `Reason — 입장을 행동/과정/종류로 구체화 (what · why)`,
+    `Example — study·case·observation 또는 시나리오 (when · where · who)`,
+    `So what? — 이 예시가 주장을 어떻게 입증하는가 ★가장 중요`,
+    `Counterargument / Qualification — 양보한 뒤 재반박`,
+    `Back to prompt — 분석을 다시 프롬프트로 연결`
+  ]
+};
+function wrTipKey(t){return (t&&(t.itype||t.type))||'';}
+function wrTypeTipHTML(t){
+  const key=wrTipKey(t); const d=WR_TIPS.byType[key]; if(!d)return '';
+  return '<div class="wr-tipbox"><div class="wr-tiphead">💡 이 유형 공략 · '+esc(d.label)+'</div><ul class="wr-tiplist">'+
+    d.tips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';
+}
+function wrParagraphHelpHTML(){
+  return '<details class="wr-help"><summary>💡 작성 도움말 (문단 체크리스트)</summary><ul class="wr-tiplist">'+
+    WR_TIPS.paragraph.map(x=>'<li>'+esc(x)+'</li>').join('')+
+    '</ul><div class="study-tip" style="margin:6px 0 0">핵심 공식: 주장 → 이유 → 예시 → (So what?) 예시가 증명하는 것 → 예외·반론 → 결론</div></details>';
+}
+function wrShowGuide(){
+  const el=document.getElementById('writingBody');if(!el)return;
+  el.innerHTML='<div class="row" style="justify-content:space-between"><h3 style="margin:0">📖 Writing Guide</h3><button class="small" onclick="renderWriting()">← 홈</button></div>'+
+    '<p class="study-tip" style="margin:8px 0">핵심 공식: 주장 → 이유 → 구체적 예시 → 예시가 주장을 뒷받침하는 이유(So what?) → 예외·반론 → 결론. 예시를 말하고 분석을 안 하는 것이 GRE 답안이 약해지는 가장 큰 이유다.</p>'+
+    WR_TIPS.guide.map((g,i)=>'<details class="wr-guide"'+(i===0?' open':'')+'><summary>'+esc(g.t)+'</summary><ul class="wr-tiplist">'+
+      g.items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details>').join('');
+}
+function wrRevisePlanHTML(a){
+  const list=(a&&a.checklist)||[];
+  return '<div class="wr-lab" style="margin-top:14px">다음 재작성 체크리스트 (이번 답안에서 고칠 것 3개)</div>'+
+    '<p class="study-tip" style="margin:2px 0 6px">일반 팁보다, 내 답안에서 직접 고칠 점 3개를 적는 것이 실력 향상에 가장 중요합니다.</p>'+
+    [0,1,2].map(i=>'<input type="text" id="wrChk'+i+'" class="wr-chkin" placeholder="'+(i+1)+'. 고칠 점" value="'+esc(list[i]||'').replace(/"/g,'&quot;')+'">').join('')+
+    '<div class="row" style="margin-top:6px"><button class="small primary" onclick="wrSaveChecklist(\''+a.id+'\')">체크리스트 저장</button></div>';
+}
+function wrSaveChecklist(aid){
+  const a=wrAtt.find(x=>x.id===aid);if(!a)return;
+  const v=[0,1,2].map(i=>((document.getElementById('wrChk'+i)||{}).value||'').trim()).filter(Boolean);
+  a.checklist=v; wrSaveAtt();
+  const el=document.getElementById('wrChkMsg'); 
+  alert('체크리스트를 저장했습니다. 재작성 에디터 상단에 표시됩니다.');
+}
+function wrRevisePlanBanner(parentId){
+  const p=wrAtt.find(x=>x.id===parentId); const list=(p&&p.checklist)||[];
+  if(!list.length)return '';
+  return '<div class="wr-plan"><div class="wr-tiphead">📌 이번에 고칠 것</div><ul class="wr-tiplist">'+
+    list.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';
+}
+
 
 function wrNewId(){const d=new Date();const p=n=>String(n).padStart(2,'0');return 'WR-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+Math.random().toString(36).slice(2,6);}
 function fmtMMSS(s){s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
@@ -2731,8 +2866,9 @@ function wrImport(inp){
       var id=(iId>=0&&(r[iId]||'').trim())||('T'+(ri+1));
       if(seen[id]){dups.push(id);return;} seen[id]=1;
       const typ=(iType>=0?(r[iType]||'').trim():'')||'Issue';
-      const dir=(iDirKo>=0?(r[iDirKo]||'').trim():'')||(iDir>=0?(r[iDir]||'').trim():'');
-      out.push({id:id,topic:topic,instruction:(iInstr>=0?(r[iInstr]||'').trim():''),type:typ,directive:dir});
+      const itype=(iDir>=0?(r[iDir]||'').trim():'');
+      const dir=(iDirKo>=0?(r[iDirKo]||'').trim():'')||itype;
+      out.push({id:id,topic:topic,instruction:(iInstr>=0?(r[iInstr]||'').trim():''),type:typ,itype:itype,directive:dir});
     });
     inp.value='';
     if(!out.length)return alert('불러올 문제가 없습니다.');
@@ -2760,17 +2896,19 @@ function renderWriting(){
   }
   const stat={none:0,draft:0,submitted:0,feedback:0,revised:0};
   WR.forEach(t=>{stat[wrTopicStatus(t.id)]++;});
-  const types=[...new Set(WR.map(t=>t.type).filter(Boolean))];
+  const typeKeys=[...new Set(WR.map(t=>wrTipKey(t)).filter(Boolean))];
+  const typeLbl=k=>{const r=WR.find(t=>wrTipKey(t)===k);return (r&&r.directive)||k;};
   let h='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">Writing (GRE 작문)</h3><span class="count">'+WR.length+'문제</span></div>';
   h+='<div class="statgrid" style="margin:12px 0;grid-template-columns:repeat(5,1fr)">'+
      [['none','미작성'],['draft','작성 중'],['submitted','작성 완료'],['feedback','피드백 완료'],['revised','재작성 완료']].map(x=>
        '<div class="stat"><b>'+stat[x[0]]+'</b><span class="count">'+x[1]+'</span></div>').join('')+'</div>';
   h+='<div class="row" style="margin-top:6px">'+
      '<button class="primary" onclick="wrRandomStart()">🎲 랜덤 1문제 뽑기</button>'+
+     '<button class="small" onclick="wrShowGuide()">📖 Writing Guide</button>'+
      '<button class="small" onclick="document.getElementById(\'wrCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>';
   h+='<div class="row" style="margin-top:10px">'+
-     '<select onchange="wrFilterType=this.value;wrRenderList()"><option value="all">전체 유형</option>'+types.map(t=>'<option value="'+esc(t)+'"'+(wrFilterType===t?' selected':'')+'>'+esc(t)+'</option>').join('')+'</select>'+
+     '<select onchange="wrFilterType=this.value;wrRenderList()"><option value="all">전체 유형</option>'+typeKeys.map(k=>'<option value="'+esc(k)+'"'+(wrFilterType===k?' selected':'')+'>'+esc(typeLbl(k))+'</option>').join('')+'</select>'+
      '<select onchange="wrFilterScope=this.value;wrRenderList()">'+
        ['all:전체','none:미작성','draft:작성 중','submitted:작성 완료','feedback:피드백 완료','revised:재작성 완료'].map(o=>{const p=o.split(':');return '<option value="'+p[0]+'"'+(wrFilterScope===p[0]?' selected':'')+'>'+p[1]+'</option>';}).join('')+'</select>'+
      '<label class="tog"><input type="checkbox" '+(wrFavOnly?'checked':'')+' onchange="wrFavOnly=this.checked;wrRenderList()">☆ 즐겨찾기</label>'+
@@ -2784,7 +2922,7 @@ function renderWriting(){
 function wrRenderList(){
   const box=document.getElementById('wrList');if(!box)return;
   let arr=WR.slice();
-  if(wrFilterType!=='all')arr=arr.filter(t=>t.type===wrFilterType);
+  if(wrFilterType!=='all')arr=arr.filter(t=>wrTipKey(t)===wrFilterType);
   if(wrFavOnly)arr=arr.filter(t=>wrSet.favorites[t.id]);
   if(wrFilterScope!=='all')arr=arr.filter(t=>wrTopicStatus(t.id)===wrFilterScope);
   const q=(wrSearch||'').trim().toLowerCase();
@@ -2793,7 +2931,7 @@ function wrRenderList(){
     const as=wrTopicAtts(t.id), fbN=as.reduce((s,a)=>s+wrAttFb(a.id).length,0), st=wrTopicStatus(t.id);
     return '<div class="entry"><div class="e-top">'+
       '<span class="e-no">'+esc(t.id)+'</span>'+
-      (t.type?'<span class="wr-type">'+esc(t.type)+'</span>':'')+
+      (t.type&&t.type!=='Issue'?'<span class="wr-type">'+esc(t.type)+'</span>':'')+
       (t.directive?'<span class="wr-dir">'+esc(t.directive)+'</span>':'')+
       '<span class="wr-st wr-st-'+st+'">'+WR_STLABEL[st]+'</span>'+
       '<span class="e-act"><button class="small" onclick="wrToggleFav(\''+t.id+'\')" style="color:'+(wrSet.favorites[t.id]?'#e0a800':'var(--sub)')+'">'+(wrSet.favorites[t.id]?'★':'☆')+'</button>'+
@@ -2823,6 +2961,7 @@ function wrChooseMode(tid,parentId){
   document.getElementById('mainTabs').classList.remove('hide');
   el.innerHTML='<button class="small" onclick="renderWriting()">← Writing 홈</button>'+
     '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+'</div><div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
+    wrTypeTipHTML(t)+
     '<p class="count" style="margin-top:12px">'+(parentId?'재작성 모드':'작성 모드')+'를 선택하세요.</p>'+
     '<div class="row" style="margin-top:8px"><button class="primary" onclick="startWriting(\''+tid+'\',\'timed\','+(parentId?'\''+parentId+'\'':'null')+')">실전 30분</button>'+
     '<button onclick="startWriting(\''+tid+'\',\'practice\','+(parentId?'\''+parentId+'\'':'null')+')">연습 모드(무제한)</button></div>';
@@ -2853,6 +2992,8 @@ function showWritingEditor(){
       '<span><b id="wrTimer" style="color:var(--acc);font-weight:700"></b> · <span id="wrWc" class="count"></span> · <span class="count">자동 저장됨</span></span></div>'+
     '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+(a.parentAttemptId?' · 재작성':'')+'</div>'+
       '<div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
+    (a.parentAttemptId?wrRevisePlanBanner(a.parentAttemptId):'')+
+    (a.mode==='timed'?'':wrParagraphHelpHTML())+
     (a.mode==='timed'?'':'<div class="wr-lab">Outline (개요)</div>'+
       '<textarea id="wrOutline" class="wr-area" style="min-height:90px" placeholder="Position / Reason 1 / Reason 2 / Counterargument …" oninput="wrEditorInput()">'+esc(a.outline||'')+'</textarea>')+
     '<div class="wr-lab">Essay</div>'+
@@ -2933,6 +3074,7 @@ function wrBuildPrompt(a,t){
       head,
       '── 원본 답안 ──\n'+((p&&p.essay)||'(원본 없음)'),
       '── 이전 AI 피드백 ──\n'+pfb,
+      (p&&p.checklist&&p.checklist.length?'── 내가 고치기로 한 것 ──\n'+p.checklist.map((x,i)=>(i+1)+'. '+x).join('\n'):''),
       '── 수정본 ('+meta+') ──\n'+(a.essay||''),
       '다음을 한국어로 작성해 주세요:\n1) 이전 지적사항별 개선 여부: 각 항목을 [개선 / 일부 개선 / 미개선]으로 표시\n2) 수정하면서 새로 생긴 문제\n3) 점수대 변화 (원본 예상 → 수정본 예상)\n4) 다음 수정 우선순위 3가지'
     ].filter(Boolean).join('\n\n');
@@ -2999,6 +3141,7 @@ function wrShowResult(aid){
      '<button class="small" style="color:var(--red)" onclick="wrDeleteAttempt(\''+aid+'\')">답안 삭제</button></div>';
   h+='<div id="wrOrig" class="hide"><div class="wr-lab">Outline</div><div class="wr-show">'+esc(a.outline||'(없음)')+'</div><div class="wr-lab">Essay</div><div class="wr-show">'+esc(a.essay||'')+'</div></div>';
   h+='<div id="wrFb" class="hide">'+fbs.map(f=>'<div class="wr-fb"><div class="count">'+esc(f.provider)+(f.scoreBand?' · '+esc(f.scoreBand):'')+' · '+esc((f.createdAt||'').slice(0,10))+' <button class="small" style="color:var(--red)" onclick="wrDeleteFb(\''+aid+'\',\''+esc(f.createdAt||'')+'\')">삭제</button></div><div class="wr-show">'+esc(f.rawText)+'</div></div>').join('')+'</div>';
+  h+=wrRevisePlanHTML(a);
   // 연결 체인
   const chain=wrBuildChain(a);
   if(chain.length>1){
