@@ -2766,7 +2766,7 @@ function renderWriting(){
      [['none','미작성'],['draft','작성 중'],['submitted','작성 완료'],['feedback','피드백 완료'],['revised','재작성 완료']].map(x=>
        '<div class="stat"><b>'+stat[x[0]]+'</b><span class="count">'+x[1]+'</span></div>').join('')+'</div>';
   h+='<div class="row" style="margin-top:6px">'+
-     '<button class="primary" onclick="wrRandomStart()">랜덤 문제</button>'+
+     '<button class="primary" onclick="wrRandomStart()">🎲 랜덤 1문제 뽑기</button>'+
      '<button class="small" onclick="document.getElementById(\'wrCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>';
   h+='<div class="row" style="margin-top:10px">'+
@@ -2995,7 +2995,8 @@ function wrShowResult(aid){
   h+='<div class="count" style="margin-top:8px">'+fmtMMSS(a.elapsedSec)+' · '+a.wordCount+' words · '+(a.mode==='timed'?'실전':'연습')+(fbs.length?' · 피드백 '+fbs.length+'개':'')+'</div>';
   h+='<div class="row" style="margin-top:10px"><button onclick="wrToggle(\'wrOrig\')">원문 보기</button>'+
      (fbs.length?'<button onclick="wrToggle(\'wrFb\')">AI 피드백 보기</button>':'<button onclick="showWritingFeedback(\''+aid+'\')">피드백 추가</button>')+
-     '<button class="primary" onclick="wrChooseMode(\''+a.topicId+'\',\''+aid+'\')">이 답안 재작성</button></div>';
+     '<button class="primary" onclick="wrChooseMode(\''+a.topicId+'\',\''+aid+'\')">이 답안 재작성</button>'+
+     '<button class="small" style="color:var(--red)" onclick="wrDeleteAttempt(\''+aid+'\')">답안 삭제</button></div>';
   h+='<div id="wrOrig" class="hide"><div class="wr-lab">Outline</div><div class="wr-show">'+esc(a.outline||'(없음)')+'</div><div class="wr-lab">Essay</div><div class="wr-show">'+esc(a.essay||'')+'</div></div>';
   h+='<div id="wrFb" class="hide">'+fbs.map(f=>'<div class="wr-fb"><div class="count">'+esc(f.provider)+(f.scoreBand?' · '+esc(f.scoreBand):'')+' · '+esc((f.createdAt||'').slice(0,10))+' <button class="small" style="color:var(--red)" onclick="wrDeleteFb(\''+aid+'\',\''+esc(f.createdAt||'')+'\')">삭제</button></div><div class="wr-show">'+esc(f.rawText)+'</div></div>').join('')+'</div>';
   // 연결 체인
@@ -3015,6 +3016,20 @@ function wrDeleteFb(aid,createdAt){
   if(i>=0){const removed=wrFb.splice(i,1)[0];if(!wrSaveFb()){wrFb.splice(i,0,removed);return;}}
   const a=wrAtt.find(x=>x.id===aid);if(a){a.status=wrAttFb(aid).length?'feedback_done':'submitted';wrSaveAtt();}
   wrShowResult(aid);
+}
+function wrDeleteAttempt(aid,fromHistory){
+  const a=wrAtt.find(x=>x.id===aid);if(!a)return;
+  const nfb=wrAttFb(aid).length, nkid=wrAtt.filter(x=>x.parentAttemptId===aid).length;
+  let msg='이 답안을 삭제할까요? (되돌릴 수 없습니다)';
+  if(nfb)msg='이 답안과 연결된 피드백 '+nfb+'개도 함께 삭제됩니다. 계속할까요?';
+  if(nkid)msg='이 답안에 연결된 재작성본 '+nkid+'개는 유지되고 상위 답안으로 재연결됩니다.\n'+msg;
+  if(!confirm(msg))return;
+  // 자식 재작성본은 삭제되는 답안의 상위로 승계(체인 보존)
+  wrAtt.forEach(x=>{if(x.parentAttemptId===aid)x.parentAttemptId=a.parentAttemptId||null;});
+  wrFb=wrFb.filter(f=>f.attemptId!==aid);
+  const i=wrAtt.findIndex(x=>x.id===aid);if(i>=0)wrAtt.splice(i,1);
+  wrSaveAtt();wrSaveFb();
+  if(fromHistory)wrShowHistory();else renderWriting();
 }
 function wrBuildChain(a){
   // 루트까지 올라간 뒤 자식들 따라 내려오는 단순 체인(부모→자식)
@@ -3038,7 +3053,7 @@ function wrShowHistory(){
       (a.parentAttemptId?'<span class="wr-type">재작성</span>':'')+
       '<span class="wr-st wr-st-'+(fb?'feedback':'submitted')+'">'+(fb?'피드백 '+fb:'피드백 없음')+'</span>'+
       '<span class="count">'+fmtMMSS(a.elapsedSec)+' · '+a.wordCount+'w</span>'+
-      '<span class="e-act"><button class="small" onclick="wrShowResult(\''+a.id+'\')">보기</button></span></div>'+
+      '<span class="e-act"><button class="small" onclick="wrShowResult(\''+a.id+'\')">보기</button> <button class="small" style="color:var(--red)" onclick="wrDeleteAttempt(\''+a.id+'\',1)">삭제</button></span></div>'+
       '<div class="wr-topic" style="font-size:14px">'+esc((t.topic||'').slice(0,90))+((t.topic||'').length>90?'…':'')+'</div></div>';
   }).join('');
   el.innerHTML=h;
