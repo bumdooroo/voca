@@ -2848,8 +2848,8 @@ function showWritingEditor(){
       '<span><b id="wrTimer" style="color:var(--acc);font-weight:700"></b> · <span id="wrWc" class="count"></span> · <span class="count">자동 저장됨</span></span></div>'+
     '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+(a.parentAttemptId?' · 재작성':'')+'</div>'+
       '<div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
-    '<div class="wr-lab">Outline (개요)</div>'+
-    '<textarea id="wrOutline" class="wr-area" style="min-height:90px" placeholder="Position / Reason 1 / Reason 2 / Counterargument …" oninput="wrEditorInput()">'+esc(a.outline||'')+'</textarea>'+
+    (a.mode==='timed'?'':'<div class="wr-lab">Outline (개요)</div>'+
+      '<textarea id="wrOutline" class="wr-area" style="min-height:90px" placeholder="Position / Reason 1 / Reason 2 / Counterargument …" oninput="wrEditorInput()">'+esc(a.outline||'')+'</textarea>')+
     '<div class="wr-lab">Essay</div>'+
     '<textarea id="wrEssay" class="wr-area" style="min-height:280px" placeholder="여기에 에세이를 작성하세요…" oninput="wrEditorInput()">'+esc(a.essay||'')+'</textarea>'+
     '<div class="row" style="margin-top:10px"><button class="primary" onclick="wrSubmit()" style="min-height:42px;font-weight:700">작성 완료</button>'+
