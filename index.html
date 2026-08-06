@@ -1098,6 +1098,7 @@ function studyAnswer(level){
   saveWords();renderStatusChips();study.i++;showStudy();
 }
 function toggleFlagStudy(){const q=study.pool[study.i];if(!q)return;q.flag=!q.flag;saveWords();const b=document.getElementById('stFlag');if(b){b.textContent=q.flag?'★ 체크됨':'☆ 체크';b.style.color=q.flag?'#e0a800':'var(--sub)';}}
+function studyNav(dir){if(!study||study.i>=study.pool.length)return;const n=study.i+dir;if(n<0||n>=study.pool.length)return;study.i=n;showStudy();}
 function fitStudyWord(){
   const el=document.querySelector('.dict-word');if(!el)return;
   let size=28;el.style.fontSize=size+'px';let guard=0;
@@ -1148,7 +1149,7 @@ function showStudy(){
     '</div>'+
     '</div>'+
     '<div class="study-actions"><button class="grow unknown" onclick="studyAnswer(\'unknown\')">몰라요</button><button class="grow ambiguous" onclick="studyAnswer(\'ambiguous\')">애매해요</button><button class="grow known" onclick="studyAnswer(\'known\')">알아요</button></div>'+
-    '<div class="study-tip">키보드: 1 = 몰라요 · 2 = 애매해요 · 3 = 알아요</div>'+
+    '<div class="study-tip">키보드: 1 = 몰라요 · 2 = 애매해요 · 3 = 알아요 · ← / → 이전·다음</div>'+
   '</div>';
   fitStudyWord();
 }
@@ -1159,6 +1160,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='1')studyAnswer('unknown');
   else if(e.key==='2')studyAnswer('ambiguous');
   else if(e.key==='3')studyAnswer('known');
+  else if(e.key==='ArrowRight'){e.preventDefault();studyNav(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();studyNav(-1);}
   else if(e.key==='Escape')endStudy();
 });
 document.addEventListener('keydown',e=>{
