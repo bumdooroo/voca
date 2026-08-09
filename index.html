@@ -647,6 +647,7 @@ if(data.length)saveWords();
 
 /* ================= 탭 전환 ================= */
 function switchTab(t){
+  if(t==='verbs')t='gre';
   mainTab=t;
   document.getElementById('greView').classList.toggle('hide',t!=='gre');
   document.getElementById('calView').classList.toggle('hide',t!=='cal');
@@ -670,8 +671,7 @@ function renderTabs(){
     h+='<button class="'+(on?'on':'')+'" onclick="switchDeck(\''+d.id+'\')" ondblclick="renameDeck(\''+d.id+'\')" title="더블클릭: 이름 변경/삭제">'+esc(d.name)+'</button>';
   });
   h+='<button onclick="addDeck()" title="단어장 추가">＋</button>';
-  h+='<button id="tabVERB" class="'+(mainTab==='verbs'?'on':'')+'" onclick="switchTab(\'verbs\')" style="margin-left:auto">Verbs</button>';
-  h+='<button id="tabTCSE" class="'+(mainTab==='tcse'?'on':'')+'" onclick="switchTab(\'tcse\')">TCSE</button>';
+  h+='<button id="tabTCSE" class="'+(mainTab==='tcse'?'on':'')+'" onclick="switchTab(\'tcse\')" style="margin-left:auto">TCSE</button>';
   h+='<button id="tabRC" class="'+(mainTab==='rc'?'on':'')+'" onclick="switchTab(\'rc\')">RC</button>';
   h+='<button id="tabWRITING" class="'+(mainTab==='writing'?'on':'')+'" onclick="switchTab(\'writing\')">Writing</button>';
   h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')">캘린더</button>';
