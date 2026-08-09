@@ -2794,8 +2794,9 @@ function tcFreqOf(w){return tcFreq()[w]||0;}
 function tcSeen(w){const st=tcWStat[w];return st?st.seen:0;}
 function tcMissed(w){const st=tcWStat[w];return st?st.missed:0;}
 /* ================= RC (Reading Comprehension) — 실전형 ================= */
-const RC_SESSION_KEY='voca_rc_session', RC_PROG_KEY='voca_rc_prog';
-var RC_DATA=[], RC_LOADED=false, RC_LOADERR='', rcLoading=false, rcTried=false;
+const RC_SESSION_KEY='voca_rc_session', RC_PROG_KEY='voca_rc_prog', RC_DATA_KEY='voca_rc_data';
+function rcLoadStored(){try{return JSON.parse(localStorage.getItem(RC_DATA_KEY))||[]}catch(e){return[]}}
+var RC_DATA=rcLoadStored(), RC_LOADED=RC_DATA.length>0;
 var rcS=null, rcTimer=null, rcRenderedSec=null, rcRenderedInteractive=null;
 
 /* ---- 정규화 & 문장 분리 ---- */
@@ -2902,12 +2903,7 @@ function rcBuildFromRows(rows){
   if(!out.length)return{ok:false,err:'불러올 문항이 없습니다.'};
   return{ok:true,items:out};
 }
-function rcApply(items){RC_DATA=items;RC_LOADED=true;RC_LOADERR='';}
-function rcLoadCsv(){
-  return fetch('gre_rc_350.csv',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status+' — gre_rc_350.csv를 찾을 수 없습니다.');return r.text();})
-    .then(function(txt){const rows=parseCSV(txt.replace(/^﻿/,''));const b=rcBuildFromRows(rows);if(!b.ok)throw new Error(b.err);rcApply(b.items);return true;})
-    .catch(function(e){RC_LOADERR=String(e&&e.message||e);return false;});
-}
+function rcApply(items){RC_DATA=items;RC_LOADED=items.length>0;try{localStorage.setItem(RC_DATA_KEY,JSON.stringify(items));}catch(e){alert('문항 데이터가 커서 브라우저 저장에 실패했습니다. 저장소를 확보한 뒤 다시 시도해 주세요.');}}
 function rcManualLoad(inp){
   const f=inp.files[0];if(!f)return;
   const rd=new FileReader();
@@ -2938,27 +2934,15 @@ function renderRc(){
   const el=document.getElementById('rcBody');if(!el)return;
   if(rcS){rcRenderExam();return;}
   document.getElementById('mainTabs').classList.remove('hide');
-  if(!RC_LOADED){
-    if(rcLoading)return;
-    if(rcTried&&RC_LOADERR){el.innerHTML=rcErrorHTML();return;}
-    rcLoading=true;
-    el.innerHTML='<div class="card"><h3>RC 독해</h3><p class="count" style="margin-top:8px">문제 데이터(gre_rc_350.csv)를 불러오는 중…</p></div>';
-    rcLoadCsv().then(function(){rcLoading=false;rcTried=true;if(mainTab==='rc'&&!rcS)renderRc();});
-    return;
-  }
+  if(!RC_LOADED){el.innerHTML=rcNoDataHTML();return;}
   rcStartScreen();
 }
-function rcErrorHTML(){
-  return '<div class="card"><h3>RC 데이터를 불러오지 못했습니다</h3>'+
-    '<p class="count" style="margin-top:8px;color:#b42323">원인: '+esc(RC_LOADERR)+'</p>'+
-    '<div class="tcse-help" style="margin-top:10px"><b>해결 방법</b><br>'+
-    '1) <code>gre_rc_350.csv</code> 파일을 index.html과 <b>같은 폴더</b>에 두세요 (GitHub Pages 루트).<br>'+
-    '2) 파일명이 정확히 <code>gre_rc_350.csv</code>인지 확인하세요.<br>'+
-    '3) 로컬에서 file:// 로 직접 열면 보안상 불러올 수 없습니다 — 아래에서 직접 선택하거나 로컬 서버로 여세요.</div>'+
-    '<div class="row" style="margin-top:12px"><button class="primary" onclick="rcRetryLoad()">다시 시도</button>'+
-    '<label class="btn" style="cursor:pointer">파일 직접 선택<input type="file" accept=".csv" class="hide" onchange="rcManualLoad(this)"></label></div></div>';
+function rcNoDataHTML(){
+  return '<div class="card"><h3>Reading Comprehension</h3>'+
+    '<p class="count" style="margin-top:8px">RC 문제 데이터가 없습니다. CSV를 직접 불러오세요.<br>한 번 불러오면 브라우저에 저장되어 <b>새로고침·재접속해도 유지</b>됩니다.</p>'+
+    '<div class="row" style="margin-top:12px"><label class="btn primary" style="cursor:pointer">CSV 불러오기<input type="file" accept=".csv" class="hide" onchange="rcManualLoad(this)"></label></div>'+
+    '<div class="tcse-help" style="margin-top:10px"><b>CSV 형식</b><br>id, section, question_no, response_type(single/multiple/sentence), passage, highlighted_text, question, choice_A~choice_I, answer(A|B 형식), answer_text(문장선택 정답), validation_note</div></div>';
 }
-function rcRetryLoad(){RC_LOADERR='';rcTried=false;RC_LOADED=false;renderRc();}
 
 /* ---- 시작 화면 ---- */
 function rcStartScreen(){
@@ -2988,6 +2972,7 @@ function rcStartScreen(){
   h+='</div>';
   h+='<div class="row" style="margin-top:14px"><button class="primary" onclick="rcStartNew()" style="min-height:44px;font-weight:700">시작</button>'+
      '<button class="small" onclick="rcGuideScreen()">📖 문제 유형 가이드</button>'+
+     '<label class="btn small" style="cursor:pointer">CSV 교체<input type="file" accept=".csv" class="hide" onchange="rcManualLoad(this)"></label>'+
      '<button class="small" onclick="rcResetProg()">복습용 정오 기록 초기화</button></div>';
   h+='<p class="study-tip" style="margin-top:10px">키보드: 숫자 1–9 선택 · ← / → 이전·다음 · Enter 확인/다음 · Esc 나가기</p>';
   el.innerHTML=h;
