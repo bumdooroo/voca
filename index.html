@@ -376,6 +376,20 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .rc-guide>summary{cursor:pointer;font-weight:700;font-size:13.5px}
 .rc-guidebody{margin-top:6px;font-size:13px;line-height:1.6}
 .rc-sig code{background:#eef2f7;border-radius:3px;padding:1px 5px;font-size:11.5px;margin:0 1px}
+.mv-collect{margin:10px 0;border:1px solid #e2e6ee;border-radius:8px;padding:8px 12px;background:#f9fbfd}
+.mv-collect>summary{cursor:pointer;font-weight:700;font-size:13px}
+.mv-cbody{margin-top:8px}
+.mv-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.mv-chip{font-size:12.5px;padding:4px 9px;border:1px solid #cdd6e4;border-radius:999px;background:#fff;cursor:pointer}
+.mv-chip:hover{background:#eef4ff;border-color:#9db4d4}
+.mv-chip.added{background:#e6f7ee;border-color:#9fd8ba;color:#176b43;cursor:default}
+.mv-ai{border:1px solid #e2e6ee;border-radius:8px;padding:10px 12px;margin-top:8px;background:#fafbfc}
+.mv-list{margin-top:8px}
+.mv-item{border:1px solid #e6e9f0;border-radius:8px;padding:9px 12px;margin:7px 0;background:#fff}
+.mv-w{font-size:15px}
+.mv-mean{margin-top:3px;font-size:13.5px;line-height:1.5}
+.mv-syn{margin-top:2px;font-size:12.5px;color:#4a6a8a}
+.mv-ex{margin-top:2px;font-size:12.5px;color:#5a6b82;font-style:italic}
 </style>
 </head>
 <body>
@@ -2972,6 +2986,7 @@ function rcStartScreen(){
   h+='</div>';
   h+='<div class="row" style="margin-top:14px"><button class="primary" onclick="rcStartNew()" style="min-height:44px;font-weight:700">시작</button>'+
      '<button class="small" onclick="rcGuideScreen()">📖 문제 유형 가이드</button>'+
+     '<button class="small" onclick="mvOpen(\'rcBody\',renderRc)">📒 내 단어장 ('+MYVOCAB.length+')</button>'+
      '<label class="btn small" style="cursor:pointer">CSV 교체<input type="file" accept=".csv" class="hide" onchange="rcManualLoad(this)"></label>'+
      '<button class="small" onclick="rcResetProg()">복습용 정오 기록 초기화</button></div>';
   h+='<p class="study-tip" style="margin-top:10px">키보드: 숫자 1–9 선택 · ← / → 이전·다음 · Enter 확인/다음 · Esc 나가기</p>';
@@ -3144,6 +3159,7 @@ function rcQuestionHTML(q){
     if(checked)h+=rcVerdict(rcGradeOne(q,ans),!(ans.sel&&ans.sel.length));
   }
   if(checked&&q.note)h+='<div class="rc-note"><b>Source note</b> · '+esc(q.note)+'</div>';
+  h+=mvCollectorHTML((q.passage||'')+' '+(q.question||'')+' '+q.choices.map(function(c){return c.text;}).join(' '),'RC P'+q.section);
   return h;
 }
 function rcVerdict(ok,blank){
@@ -3347,6 +3363,135 @@ document.addEventListener('keydown',function(e){
     }}
   }
 });
+
+/* ================= 내 단어장 (My Vocab) — RC/Writing 공용 ================= */
+const MV_KEY='voca_myvocab';
+function mvLoadStore(){try{return JSON.parse(localStorage.getItem(MV_KEY))||[]}catch(e){return[]}}
+var MYVOCAB=mvLoadStore(), mvReturn=null, mvBodyId='rcBody';
+function mvSave(){try{localStorage.setItem(MV_KEY,JSON.stringify(MYVOCAB));return true;}catch(e){alert('내 단어장 저장 공간이 부족합니다.');return false;}}
+function mvNorm(w){return String(w||'').toLowerCase().replace(/[^a-z'-]/g,'').replace(/^[-']+|[-']+$/g,'');}
+function mvHas(w){w=mvNorm(w);return MYVOCAB.some(x=>x.wkey===w);}
+function mvAdd(word,src){const wkey=mvNorm(word);if(!wkey||wkey.length<2)return false;if(MYVOCAB.some(x=>x.wkey===wkey))return false;
+  MYVOCAB.push({word:String(word).trim().replace(/[^A-Za-z'-]/g,'')||wkey,wkey:wkey,pron:'',mean:'',syn:'',ex:'',src:src||'',at:Date.now()});mvSave();return true;}
+function mvRemove(wkey){const i=MYVOCAB.findIndex(x=>x.wkey===wkey);if(i>=0){MYVOCAB.splice(i,1);mvSave();}}
+const MV_COMMON=new Set(("about,above,across,after,against,almost,already,although,always,among,anLINEother,"+
+ "another,answer,anyone,anything,around,because,become,before,began,begin,behind,being,believe,better,between,beyond,"+
+ "bring,brought,called,cannot,center,certain,change,children,common,community,company,consider,continue,could,country,"+
+ "course,create,current,decide,develop,difference,different,discuss,doing,during,either,enough,especially,every,everyone,"+
+ "everything,example,experience,follow,following,friend,general,great,group,happen,having,history,however,human,important,"+
+ "include,including,increase,indeed,information,inside,instead,interest,itself,knowledge,known,large,later,learn,least,"+
+ "leave,letter,level,likely,little,living,making,manner,matter,maybe,meaning,measure,might,million,moment,money,months,"+
+ "moreover,morning,mother,nature,nearly,necessary,neither,never,nothing,number,object,often,online,order,other,others,"+
+ "ought,outside,particular,people,perhaps,period,person,place,point,possible,present,probably,problem,process,provide,"+
+ "public,purpose,question,rather,reason,recent,report,result,return,school,science,second,seems,sense,several,should,"+
+ "similar,simply,since,social,society,something,sometimes,special,specific,still,structure,student,students,subject,"+
+ "success,suggest,support,system,taken,their,themselves,there,therefore,these,thing,things,think,those,though,thought,"+
+ "through,together,toward,understand,until,using,usually,value,various,water,whether,which,while,whole,whose,within,"+
+ "without,women,world,would,write,writing,written,years,young,government,research,development,environment,environmental,president,national,economic,economy,political,politics,individual,particular,available,experience,community,education,educational,activity,activities,university,universities,technology,technological,generally,traditional,throughout,significant,significantly,established,population,practice,practices,production,relationship,relationships,approach,approaches,argument,arguments,evidence,culture,cultural,natural,potential,positive,negative,require,required,requires,attention,situation,condition,conditions,material,materials,resource,resources,response,various,widely,greatly,largely,recently,currently,previously,related,including,concern,concerns,concerned,influence,influenced,industry,industrial,property,properties,standard,standards,physical,mental,medical,central,federal,private,modern,ancient,region,regional,section,method,methods,typical,typically,unique,useful,valuable,article,author,authors,century,described,despite,detail,details,earlier,economic,element,elements,factor,factors,figure,formation,further,greater,ground,higher,himself,herself,increased,involved,largely,located,located,longer,majority,measure,members,notion,observed,obtain,obtained,occur,occurred,original,parents,pattern,patterns,physical,popular,position,positions,possibly,practice,previous,primary,produce,produced,production,professional,proposed,provided,provides,quality,quantity,readily,received,reflect,region,relate,related,relation,relative,released,remained,remains,removed,required,researchers,response,revealed,scholars,section,seemingly,separate,serious,shorter,showing,significance,similarly,simple,simply,slightly,smaller,somewhat,speaking,species,specific,started,statement,stronger,studies,studied,suggested,suggests,supported,surface,theory,theories,thereby,typical,ultimately,understanding,unlikely,version,virtually,whereas,whether,widespread").replace(/anLINEother,/,'').split(','));
+function mvCandidates(text,limit){
+  const seen={},out=[];
+  (String(text).match(/[A-Za-z][A-Za-z'-]{5,}/g)||[]).forEach(function(raw){
+    const k=mvNorm(raw); if(k.length<6)return; if(MV_COMMON.has(k))return; if(seen[k])return; if(mvHas(k))return; seen[k]=1; out.push(k);
+  });
+  out.sort((a,b)=>b.length-a.length);
+  return out.slice(0,limit||18);
+}
+/* ---- 수집 패널(접이식) : RC/Writing 어디서든 재사용 ---- */
+function mvCollectorHTML(text,src){
+  const cands=mvCandidates(text,18);
+  let h='<details class="mv-collect"><summary>🔖 어려운 단어 담기 <span class="mv-cnt count">(내 단어장 '+MYVOCAB.length+'개)</span></summary><div class="mv-cbody">';
+  h+='<div class="count" style="margin:4px 0">자동 추출된 후보에서 <b>모르는 단어</b>를 눌러 담으세요.</div>';
+  h+='<div class="mv-chips">'+(cands.length?cands.map(function(w){return '<button type="button" class="mv-chip" onclick="mvChip(this,\''+w+'\',\''+esc(src)+'\')">'+esc(w)+'</button>';}).join(''):'<span class="count">추출된 후보가 없습니다</span>')+'</div>';
+  h+='<div class="row" style="margin-top:6px"><input type="text" id="mvManual" placeholder="직접 입력 (스페이스·쉼표로 여러 개)" style="flex:1;min-width:150px"><button type="button" class="small" onclick="mvManualAdd(\''+esc(src)+'\')">담기</button></div>';
+  h+='<div class="row" style="margin-top:6px"><button type="button" class="small primary" onclick="mvOpenHere()">📒 내 단어장 열기 · AI 정리</button></div>';
+  h+='</div></details>';
+  return h;
+}
+function mvChip(btn,w,src){ if(mvAdd(w,src)){btn.classList.add('added');btn.disabled=true;btn.textContent='✓ '+w;} mvBump(); }
+function mvManualAdd(src){const el=document.getElementById('mvManual');if(!el)return;const parts=(el.value||'').split(/[\s,]+/).filter(Boolean);let n=0;parts.forEach(function(w){if(mvAdd(w,src))n++;});el.value='';mvBump();if(n)alert(n+'개 담았습니다. (내 단어장 '+MYVOCAB.length+'개)');else if(parts.length)alert('이미 있는 단어이거나 담을 수 없습니다.');}
+function mvBump(){document.querySelectorAll('.mv-cnt').forEach(function(e){e.textContent='(내 단어장 '+MYVOCAB.length+'개)';});}
+function mvOpenHere(){
+  if(mainTab==='rc')mvOpen('rcBody',function(){ if(typeof rcS!=='undefined'&&rcS)rcRenderExam(); else renderRc(); });
+  else if(mainTab==='writing')mvOpen('writingBody',renderWriting);
+  else mvOpen('rcBody',renderRc);
+}
+/* ---- 뷰어 + AI 정리 ---- */
+function mvOpen(bodyId,backFn){ mvBodyId=bodyId||'rcBody'; mvReturn=backFn||function(){renderRc();}; document.getElementById('mainTabs').classList.remove('hide'); mvRenderViewer(); }
+function mvBack(){ const f=mvReturn; mvReturn=null; if(f)f(); }
+function mvBuildPrompt(){
+  const pend=MYVOCAB.filter(x=>!x.mean);
+  const words=(pend.length?pend:MYVOCAB).map(x=>x.word);
+  return [
+    '[GRE 어휘 정리 요청]',
+    '아래 단어들을 GRE 학습용으로 정리해 주세요.',
+    '각 단어를 정확히 아래 형식의 "한 줄"로만 출력하세요. 구분자는 " | " (공백-파이프-공백). 헤더·번호·추가 설명 없이 단어 줄만 출력하세요.',
+    '형식:  word | 발음 | 한국어 뜻 | 동의어 | 예문',
+    '예시:  abate | əˈbeɪt | 약해지다, 완화되다 | diminish, subside, wane | The storm gradually abated.',
+    '단어 목록:\n'+words.join('\n')
+  ].join('\n\n');
+}
+function mvRenderViewer(){
+  const el=document.getElementById(mvBodyId);if(!el)return;
+  const pend=MYVOCAB.filter(x=>!x.mean).length;
+  let h='<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">📒 내 단어장 <span class="count">'+MYVOCAB.length+'개</span></h3><button class="small" onclick="mvBack()">← 돌아가기</button></div>';
+  h+='<div class="mv-ai"><div class="wr-lab">① AI로 뜻 정리</div>';
+  var aiNote = !MYVOCAB.length ? '담은 단어가 없습니다.' : (pend? ('뜻이 없는 '+pend+'개 단어를 정리합니다.') : '모든 단어에 뜻이 있습니다. (전체 재정리는 프롬프트 그대로 사용)');
+  h+='<p class="study-tip" style="margin:2px 0 6px">'+aiNote+'</p>';
+  h+='<div class="row"><button class="primary" onclick="mvCopyPrompt(this)" '+(MYVOCAB.length?'':'disabled')+'>AI 프롬프트 복사</button>'+
+     '<button onclick="window.open(\'https://chatgpt.com/\',\'_blank\')">ChatGPT</button>'+
+     '<button onclick="window.open(\'https://claude.ai/new\',\'_blank\')">Claude</button>'+
+     '<button onclick="window.open(\'https://gemini.google.com/app\',\'_blank\')">Gemini</button></div>';
+  if(MYVOCAB.length)h+='<details class="wr-help" style="margin-top:6px"><summary>복사될 프롬프트 미리보기</summary><pre class="wr-pre">'+esc(mvBuildPrompt())+'</pre></details>';
+  h+='<div class="wr-lab" style="margin-top:10px">② AI 결과 붙여넣기</div>';
+  h+='<textarea id="mvPaste" class="wr-area" style="min-height:120px" placeholder="AI 결과(word | 발음 | 뜻 | 동의어 | 예문)를 그대로 붙여넣으세요"></textarea>';
+  h+='<div class="row" style="margin-top:6px"><button class="primary" onclick="mvParseSave()">단어장에 저장</button></div></div>';
+  h+='<div class="row" style="justify-content:space-between;margin-top:14px"><b>단어 목록</b><span><button class="small" onclick="mvExport()">CSV 내보내기</button> <button class="small danger" onclick="mvClear()">전체 삭제</button></span></div>';
+  if(!MYVOCAB.length)h+='<p class="count" style="margin-top:8px">RC 지문·문제나 Writing 주제에서 🔖 로 어려운 단어를 담아보세요.</p>';
+  else h+='<div class="mv-list">'+MYVOCAB.slice().sort((a,b)=>a.word.toLowerCase().localeCompare(b.word.toLowerCase())).map(mvItemHTML).join('')+'</div>';
+  h+='</div>';
+  el.innerHTML=h;
+}
+function mvItemHTML(x){
+  return '<div class="mv-item"><div class="mv-w"><b>'+esc(x.word)+'</b>'+(x.pron?' <span class="dict-pron">['+esc(x.pron)+']</span>':'')+(x.src?' <span class="count">· '+esc(x.src)+'</span>':'')+
+    '<button class="small danger" style="float:right" onclick="mvDel(\''+esc(x.wkey)+'\')">삭제</button></div>'+
+    (x.mean?'<div class="mv-mean">'+esc(x.mean)+'</div>':'<div class="mv-mean count">— 뜻 미정리 (AI 정리 필요)</div>')+
+    (x.syn?'<div class="mv-syn">≈ '+esc(x.syn)+'</div>':'')+
+    (x.ex?'<div class="mv-ex">'+esc(x.ex)+'</div>':'')+'</div>';
+}
+function mvDel(wkey){mvRemove(wkey);mvRenderViewer();}
+function mvClear(){if(!confirm('내 단어장을 전부 삭제할까요? (되돌릴 수 없음)'))return;MYVOCAB=[];mvSave();mvRenderViewer();}
+function mvParseSave(){
+  const txt=(document.getElementById('mvPaste')||{}).value||'';
+  if(!txt.trim())return alert('붙여넣은 내용이 없습니다.');
+  let n=0;
+  txt.split(/\r?\n/).forEach(function(line){
+    line=line.trim(); if(!line)return; if(/^(형식|예시|단어 목록|\[)/.test(line))return;
+    if(line.indexOf('|')<0)return;
+    const parts=line.split('|').map(s=>s.trim());
+    const wkey=mvNorm(parts[0]); if(!wkey)return;
+    let item=MYVOCAB.find(x=>x.wkey===wkey);
+    if(!item){item={word:parts[0].trim(),wkey:wkey,pron:'',mean:'',syn:'',ex:'',src:'AI',at:Date.now()};MYVOCAB.push(item);}
+    if(parts.length>=5){item.pron=parts[1];item.mean=parts[2];item.syn=parts[3];item.ex=parts.slice(4).join(' | ');}
+    else if(parts.length===4){item.pron=parts[1];item.mean=parts[2];item.syn=parts[3];}
+    else if(parts.length===3){item.mean=parts[1];item.syn=parts[2];}
+    else {item.mean=parts[1];}
+    n++;
+  });
+  if(!mvSave())return;
+  alert(n+'개 단어를 정리해 저장했습니다.'); mvRenderViewer();
+}
+function mvExport(){
+  if(!MYVOCAB.length)return alert('내보낼 단어가 없습니다.');
+  const rows=[['word','pron','mean','syn','example','source']].concat(MYVOCAB.map(x=>[x.word,x.pron,x.mean,x.syn,x.ex,x.src]));
+  const csv=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  const d=new Date();const p=n=>String(n).padStart(2,'0');a.download='my_vocab_'+(''+d.getFullYear()).slice(2)+p(d.getMonth()+1)+p(d.getDate())+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function mvCopyPrompt(btn){const t=mvBuildPrompt();const done=function(){if(btn){const o=btn.textContent;btn.textContent='복사됨!';setTimeout(function(){btn.textContent=o;},1200);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){mvCopyFb(t);}); else mvCopyFb(t);}
+function mvCopyFb(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');alert('프롬프트를 복사했습니다.');}catch(e){alert('복사 실패 — 미리보기에서 직접 복사하세요.');}document.body.removeChild(ta);}
 
 /* ================= Writing (GRE 작문) ================= */
 const WR_TOPICS='voca_writing_topics', WR_ATTEMPTS='voca_writing_attempts', WR_FEEDBACK='voca_writing_feedback', WR_SETTINGS='voca_writing_settings';
@@ -3565,6 +3710,7 @@ function renderWriting(){
        '<div class="stat"><b>'+stat[x[0]]+'</b><span class="count">'+x[1]+'</span></div>').join('')+'</div>';
   h+='<div class="row" style="margin-top:6px">'+
      '<button class="primary" onclick="wrRandomStart()">🎲 랜덤 1문제 뽑기</button>'+
+     '<button class="small" onclick="mvOpen(\'writingBody\',renderWriting)">📒 내 단어장 ('+MYVOCAB.length+')</button>'+
      '<button class="small" onclick="wrShowGuide()">📖 Writing Guide</button>'+
      '<button class="small" onclick="document.getElementById(\'wrCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>';
@@ -3623,6 +3769,7 @@ function wrChooseMode(tid,parentId){
   el.innerHTML='<button class="small" onclick="renderWriting()">← Writing 홈</button>'+
     '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+'</div><div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
     wrTypeTipHTML(t)+
+    mvCollectorHTML((t.topic||'')+' '+(t.instruction||''),'Writing '+t.id)+
     '<p class="count" style="margin-top:12px">'+(parentId?'재작성 모드':'작성 모드')+'를 선택하세요.</p>'+
     '<div class="row" style="margin-top:8px"><button class="primary" onclick="startWriting(\''+tid+'\',\'timed\','+(parentId?'\''+parentId+'\'':'null')+')">실전 30분</button>'+
     '<button onclick="startWriting(\''+tid+'\',\'practice\','+(parentId?'\''+parentId+'\'':'null')+')">연습 모드(무제한)</button></div>';
