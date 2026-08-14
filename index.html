@@ -3169,7 +3169,7 @@ function rcStartScreen(){
      '<option value="all">전체 지문</option><option value="range">지문 번호 범위</option><option value="random" selected>무작위 지문</option>'+
      '<option value="wrong"'+(wrongCnt?'':' disabled')+'>이전에 틀린 문제만 ('+wrongCnt+')</option></select>'+
      '<span id="rcRangeWrap" class="hide" style="margin-left:8px">'+secs[0]+' ~ <input type="number" id="rcFrom" value="'+secs[0]+'" min="'+secs[0]+'" max="'+secs[secs.length-1]+'" style="width:70px"> ~ <input type="number" id="rcTo" value="'+secs[secs.length-1]+'" min="'+secs[0]+'" max="'+secs[secs.length-1]+'" style="width:70px"></span>'+
-     '<span id="rcRandWrap" style="margin-left:8px">지문 <input type="number" id="rcRandN" value="3" min="1" style="width:64px">개</span></div>';
+     '<span id="rcRandWrap" style="margin-left:8px">지문 <input type="number" id="rcRandN" value="1" min="1" style="width:64px">개</span></div>';
   h+='<div class="rc-frow"><label class="rc-flab">학습량</label><select id="rcAmount"><option value="all">전체</option><option value="count">지문 개수 지정</option></select>'+
      '<span id="rcAmtWrap" class="hide" style="margin-left:8px">지문 <input type="number" id="rcAmtN" value="5" min="1" style="width:64px">개</span></div>';
   h+='<div class="rc-frow"><label class="rc-flab">모드</label>'+
