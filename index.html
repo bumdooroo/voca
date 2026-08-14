@@ -390,6 +390,15 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .mv-mean{margin-top:3px;font-size:13.5px;line-height:1.5}
 .mv-syn{margin-top:2px;font-size:12.5px;color:#4a6a8a}
 .mv-ex{margin-top:2px;font-size:12.5px;color:#5a6b82;font-style:italic}
+.rb-round,.rb-mode{font-size:12.5px;padding:5px 10px;border:1px solid var(--bd,#dfe3ea);border-radius:8px;background:#fff;cursor:pointer}
+.rb-round.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.rb-mode.on{background:#1f3a5f;color:#fff;border-color:#1f3a5f}
+.rb-lab{font-size:12.5px;color:var(--sub);font-weight:700;align-self:center}
+.round-prog{margin-top:10px;border:1px solid var(--bd,#e2e6ee);border-radius:8px;padding:8px 12px;background:#fafbfc;font-size:13px}
+.round-prog .rp-title{font-weight:700;margin-bottom:4px}
+.round-prog .rp-row{margin:2px 0}
+.sc-reveal{text-align:center;padding:26px 0}
+.rstep{display:inline-flex;align-items:center;gap:8px}.rstep b{min-width:48px;text-align:center}
 </style>
 </head>
 <body>
@@ -404,21 +413,11 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 <div id="greView">
 
 <div class="card" id="studyCard">
-<h3 id="studyHead">학습</h3>
-<div class="row" id="studyConfig">
-일차 <input type="number" id="sDayFrom" min="1" value="1" style="width:70px"> ~
-<input type="number" id="sDayTo" min="1" value="1" style="width:70px">
-<input type="number" id="sCount" value="100" min="1" style="width:70px"> 개
-<select id="sOrder">
-<option value="no" selected>번호순</option>
-<option value="abc">ABC순</option>
-<option value="random">랜덤 순서</option>
-<option value="wrong">모름·애매 우선</option>
-</select>
-<button class="primary" onclick="startStudy()">전체 학습</button>
-</div>
+<div class="row" id="studyTopRow" style="justify-content:space-between;align-items:baseline"><h3 id="studyHead" style="margin:0">학습 · <span id="studyRoundLbl">1회독</span></h3><button class="small" onclick="toggleSettings(true)">⚙ 설정</button></div>
+<div class="study-tip" id="presetInfo" style="margin:4px 0 8px"></div>
+<div class="row" id="autoRow">시작 일차 <input type="number" id="rDayFrom" min="1" value="1" style="width:70px" oninput="onStartDayInput()"> <span class="count" id="rSpanLbl"></span> <button class="primary" onclick="startAuto()">학습 시작</button></div>
 <div class="row" id="chunkRow" style="margin-top:8px"></div>
-<p class="study-tip" id="studyNote">한 일차(1~100번)를 순서대로 학습하고 숙지 정도를 기록합니다. 끝까지 완료하면 오늘 날짜 캘린더에 자동 기록됩니다.</p>
+<div class="study-tip" id="roundProgress" style="margin-top:8px"></div>
 <div id="studyArea"></div>
 </div>
 
@@ -563,7 +562,20 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
     </div>
     <div style="margin-top:18px">
       <div class="count" style="margin-bottom:8px">학습</div>
-      <div class="row"><span style="font-size:13px">구간 크기</span> <input type="number" id="setChunkSize" min="1" style="width:64px"> 개</div>
+      <div class="row" style="align-items:center"><span style="font-size:13px">현재 회독</span> <span class="rstep"><button class="small" onclick="roundStep(-1)" aria-label="회독 감소">−</button><b id="setRoundLbl">1회독</b><button class="small" onclick="roundStep(1)" aria-label="회독 증가">＋</button></span></div>
+      <div class="study-tip" id="setPresetSummary" style="margin:6px 0"></div>
+      <label class="tog" style="margin-top:6px"><input type="checkbox" id="setCustomToggle" onchange="onCustomToggle()">세부 설정 직접 변경</label>
+      <div id="setCustomBox" class="hide" style="margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:10px 12px">
+        <div class="row"><span style="font-size:13px">한 번에 묶을 일차</span> <input type="number" id="cfgSpan" min="1" style="width:60px" onchange="onCfgChange()"> 일차</div>
+        <div class="row" style="margin-top:8px"><span style="font-size:13px">세션당 최대 단어</span> <input type="number" id="cfgMax" min="0" style="width:70px" onchange="onCfgChange()"> <span class="count">(0=전체)</span></div>
+        <div class="row" style="margin-top:8px"><span style="font-size:13px">출제 순서</span> <select id="cfgOrder" onchange="onCfgChange()"><option value="no">번호순</option><option value="random">랜덤</option><option value="weak">취약 우선</option></select></div>
+        <div class="row" style="margin-top:8px"><span style="font-size:13px">첫 화면</span> <select id="cfgView" onchange="onCfgChange()"><option value="both">단어+뜻 함께</option><option value="wordonly">단어만(뜻 가리기)</option></select></div>
+        <label class="tog" style="margin-top:8px"><input type="checkbox" id="cfgReview" onchange="onCfgChange()">학습 종료 후 약한 단어 다시 보기</label>
+        <div class="row" style="margin-top:8px"><span style="font-size:13px">취약 중심 안정 단어 비율</span> <input type="number" id="cfgStable" min="0" max="100" style="width:60px" onchange="onCfgChange()"> %</div>
+        <div class="row" style="margin-top:8px"><span style="font-size:13px">1회독 구간 크기</span> <input type="number" id="setChunkSize" min="1" style="width:64px" onchange="onCfgChange()"> 개</div>
+        <button class="small" style="margin-top:8px" onclick="resetRoundCfg()">이 회독 추천값으로 되돌리기</button>
+      </div>
+      <div class="study-tip" id="setRoundProg" style="margin-top:8px"></div>
     </div>
     <p class="study-tip" style="margin-top:16px">정답 넘김 0 = 즉시. ‘틀린 후 자동 넘김’은 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
     <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
@@ -625,7 +637,7 @@ function loadSettings(){const D={correctDelay:2,wrongDelay:2,chunkSize:25,choice
   try{const o=Object.assign({},D,JSON.parse(localStorage.getItem(SET_KEY()))||{});o.view=Object.assign({},D.view,o.view||{});return o;}catch(e){return D}}
 function toggleSettings(open){
   document.getElementById('settingsModal').classList.toggle('hide',!open);
-  if(open){updatePracticeCount();const b=document.getElementById('practiceLog');
+  if(open){updatePracticeCount();syncStudySettings();const b=document.getElementById('practiceLog');
     if(b&&!b.classList.contains('hide'))renderPracticeLog();}
 }
 function saveSettings(){localStorage.setItem(SET_KEY(),JSON.stringify(settings))}
@@ -708,7 +720,7 @@ function switchDeck(id){
   if(typeof rcS!=='undefined'&&rcS){if(typeof rcStopTimer==='function')rcStopTimer();rcSaveSession();rcS=null;document.getElementById('mainTabs').classList.remove('hide');}
   {const rv=document.getElementById('rcView');if(rv)rv.classList.add('hide');}
   CUR=id;saveActive();
-  data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;
+  data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;roundState=roundLoad();
   syncSettingsUI();syncViewUI();updatePracticeCount();
   {const b=document.getElementById('practiceLog');if(b&&!b.classList.contains('hide'))renderPracticeLog();}
   normalizeNumbers();if(data.length)saveWords();
@@ -719,7 +731,7 @@ function switchDeck(id){
   document.getElementById('verbsView').classList.add('hide');
   const _tv=document.getElementById('tcseView');if(_tv)_tv.classList.add('hide');
   const _wv=document.getElementById('writingView');if(_wv)_wv.classList.add('hide');
-  renderTabs();renderAll();
+  renderTabs();renderAll();syncStudySettings();
 }
 function addDeck(){
   const name=(prompt('새 단어장 이름 (예: 토익, 토플)','')||'').trim();
@@ -761,9 +773,8 @@ function renderChips(){
     const q1=document.getElementById('qDayFrom'),q2=document.getElementById('qDayTo');
     if(!q1.value||+q1.value<1)q1.value=dd[0];
     if(!q2.value||+q2.value<1)q2.value=dd[dd.length-1];
-    const s1=document.getElementById('sDayFrom'),s2=document.getElementById('sDayTo');
-    if(!s1.value||+s1.value<1)s1.value=dd[0];
-    if(!s2.value||+s2.value<1)s2.value=dd[0];
+    const s1=document.getElementById('rDayFrom');
+    if(s1&&(!s1.value||+s1.value<1))s1.value=dd[0];
   }
 }
 
@@ -846,7 +857,7 @@ function render(){
   if(typeof updateFreqAvail==='function')updateFreqAvail();
 }
 
-function renderAll(){renderChips();renderStatusChips();renderChunkRow();renderTestChunkRow();render()}
+function renderAll(){renderChips();renderStatusChips();renderTestChunkRow();renderStudyMain();render()}
 
 function toggleSel(i,on){const x=data[i];if(!x)return;if(on)selected.add(x);else selected.delete(x);document.getElementById('selCnt').textContent=selected.size}
 function toggleFlag(i){const x=data[i];if(!x)return;x.flag=!x.flag;saveWords();renderStatusChips();render();}
@@ -1151,7 +1162,7 @@ function renderPracticeLog(){
 let study=null;
 function setStudyMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','testCard','listCard','addCard','studyConfig','chunkRow','studyNote','studyHead'].forEach(id=>{
+  ['mainTabs','testCard','listCard','addCard','studyTopRow','presetInfo','autoRow','chunkRow','roundProgress'].forEach(id=>{
     document.getElementById(id).classList.toggle('hide',on);
   });
 }
@@ -1162,7 +1173,157 @@ function orderPool(pool,order){
   if(order==='wrong') return [...pool].sort((a,b)=>studyPriority(b)-studyPriority(a)||a.day-b.day||a.no-b.no);
   return [...pool].sort((a,b)=>a.day-b.day||a.no-b.no);
 }
-function beginStudy(pool){study={pool,i:0,unknown:0,ambiguous:0,known:0,reviewList:[]};setStudyMode(true);showStudy();}
+/* ================= 회독(Round) 시스템 ================= */
+var roundState=null;
+function roundKey(){return 'voca_round_'+CUR;}
+function roundLoad(){try{return JSON.parse(localStorage.getItem(roundKey()))||{cur:1,max:1,prog:{}}}catch(e){return{cur:1,max:1,prog:{}}}}
+function roundEnsure(){if(!roundState)roundState=roundLoad();return roundState;}
+function roundSave(){try{localStorage.setItem(roundKey(),JSON.stringify(roundState));}catch(e){}}
+function rPreset(r){
+  if(r<=1)return{span:1,recall:false,order:'no',count:0,weakFocus:false,name:'1회독 · 처음 익히기',short:'처음 익히기'};
+  if(r<=4)return{span:2,recall:true,order:(r===2?'random':'weak'),count:0,weakFocus:false,name:r+'회독 · 뜻 회상',short:'뜻 회상'};
+  return{span:5,recall:true,order:'weak',count:100,weakFocus:true,name:r+'회독 · 취약 중심 점검',short:'취약 중심 점검'};
+}
+function wRecent(w){return Array.isArray(w.recent)?w.recent:[];}
+function wConsecKnown(w){var r=wRecent(w),c=0;for(var i=r.length-1;i>=0;i--){if(r[i]==='k')c++;else break;}return c;}
+function weakScore(w){
+  var keep=0;
+  if(w.tLast==='wrong')keep+=4;
+  if(w.flag)keep+=2;
+  try{ if(typeof tcFreqOf==='function'){var f=tcFreqOf((w.word||'').toLowerCase());if(f)keep+=Math.min(2,f*0.5);} }catch(e){}
+  if(wConsecKnown(w)>=3)return keep; /* 최근 3연속 known: 과거 학습판정 무시, 테스트오답/★/TCSE만 유지 */
+  var sc=0;
+  if(w.lastLevel==='unknown')sc+=6; else if(w.lastLevel==='ambiguous')sc+=4;
+  var r=wRecent(w).slice(-5); var bad=r.filter(function(x){return x==='u'||x==='a'}).length;
+  sc+=bad*1.5;
+  return sc+keep;
+}
+function dayChunkCount(day){var dws=data.filter(function(w){return +w.day===+day});if(!dws.length)return 0;var mx=Math.max.apply(null,dws.map(function(w){return +w.no||0}));return Math.ceil(mx/QSIZE);}
+function isDayDone(day){var n=dayChunkCount(day);return n>0&&(chunkProg[day]||[]).length>=n;}
+function maxDay(){return data.length?Math.max.apply(null,data.map(function(w){return +w.day||0})):0;}
+function roundDoneDays(r){var md=maxDay(),out=[];roundEnsure();for(var d=1;d<=md;d++){if(r===1){if(isDayDone(d))out.push(d);}else{if((roundState.prog[r]||[]).indexOf(d)>=0)out.push(d);}}return out;}
+function studyAutoMode(){return (settings.studyAuto==='manual')?'manual':'auto';}
+function roundCfgGet(r){ if(!settings.roundCfg)settings.roundCfg={}; return settings.roundCfg[r]||null; }
+function effCfg(r){
+  var p=rPreset(r), rc=roundCfgGet(r), custom=!!(rc&&rc.custom);
+  return {custom:custom,
+    span:(custom&&rc.span)?Math.max(1,+rc.span):p.span,
+    count:custom?((rc.maxWords===0)?0:(+rc.maxWords||p.count)):p.count,
+    order:(custom&&rc.order)?rc.order:p.order,
+    recall:custom?(rc.firstView==='wordonly'):p.recall,
+    weakFocus:p.weakFocus,
+    reviewWeak:custom?(rc.reviewWeak!==false):true,
+    stableRatio:(custom&&rc.stableRatio!=null)?Math.max(0,Math.min(100,+rc.stableRatio)):25,
+    preset:p};
+}
+function effLine(r){var c=effCfg(r);
+  return (c.span===1?'1일차씩':(c.span+'일차씩'))+' · '+(c.count?('세션당 '+c.count+'개'):'전체 단어')+' · '+
+    (c.order==='random'?'랜덤':(c.order==='weak'?'취약 우선':'번호순'))+' · '+(c.recall?'뜻을 가리고 시작':'뜻 함께');}
+function onStartDayInput(){ renderChunkRow(); updateSpanLbl(); }
+function updateSpanLbl(){
+  roundEnsure(); var r=roundState.cur, c=effCfg(r), md=maxDay();
+  var from=Math.max(1,+((document.getElementById('rDayFrom')||{}).value)||1);
+  var hi=Math.min(from+c.span-1, md||from);
+  var el=document.getElementById('rSpanLbl');
+  if(el)el.textContent=(c.span===1?(from+'일차'):(from+'~'+hi+'일차'))+' · '+(c.count?('약 '+c.count+'개'):'전체');
+}
+function renderStudyMain(){
+  roundEnsure(); var r=roundState.cur, c=effCfg(r);
+  var lbl=document.getElementById('studyRoundLbl'); if(lbl)lbl.textContent=r+'회독';
+  var info=document.getElementById('presetInfo'); if(info)info.innerHTML='<b>'+esc(c.preset.short)+(c.custom?' · 직접 설정':'')+'</b> · '+esc(effLine(r));
+  var cr=document.getElementById('chunkRow'); if(cr)cr.classList.toggle('hide', r!==1);
+  if(r===1)renderChunkRow();
+  updateSpanLbl(); renderRoundProgress();
+}
+function roundStep(d){ roundEnsure(); roundState.cur=Math.max(1,(roundState.cur||1)+d); roundState.max=Math.max(roundState.max||1,roundState.cur); roundSave(); syncStudySettings(); renderStudyMain(); }
+function onCustomToggle(){
+  roundEnsure(); var r=roundState.cur; if(!settings.roundCfg)settings.roundCfg={};
+  var on=document.getElementById('setCustomToggle').checked;
+  var g=settings.roundCfg[r]||(settings.roundCfg[r]={});
+  if(on&&g.span==null){var p=rPreset(r);g.span=p.span;g.maxWords=p.count;g.order=p.order;g.firstView=p.recall?'wordonly':'both';g.reviewWeak=true;g.stableRatio=25;}
+  g.custom=on; saveSettings(); syncStudySettings(); renderStudyMain();
+}
+function onCfgChange(){
+  roundEnsure(); var r=roundState.cur; if(!settings.roundCfg)settings.roundCfg={};
+  var g=settings.roundCfg[r]||(settings.roundCfg[r]={}); g.custom=true;
+  var el=function(id){return document.getElementById(id);};
+  g.span=Math.max(1,+el('cfgSpan').value||effCfg(r).span);
+  g.maxWords=Math.max(0,+el('cfgMax').value||0);
+  g.order=el('cfgOrder').value; g.firstView=el('cfgView').value;
+  g.reviewWeak=el('cfgReview').checked;
+  g.stableRatio=Math.max(0,Math.min(100,+el('cfgStable').value||25));
+  settings.chunkSize=Math.max(1,+el('setChunkSize').value||settings.chunkSize); QSIZE=settings.chunkSize;
+  saveSettings();
+  var ps=el('setPresetSummary'); if(ps)ps.innerHTML='<b>'+esc(rPreset(r).name)+'</b><br>'+esc(effLine(r));
+  renderStudyMain(); renderTestChunkRow();
+}
+function resetRoundCfg(){ roundEnsure(); var r=roundState.cur; if(settings.roundCfg&&settings.roundCfg[r])settings.roundCfg[r].custom=false; saveSettings(); syncStudySettings(); renderStudyMain(); }
+function syncStudySettings(){
+  roundEnsure(); var r=roundState.cur, p=rPreset(r), rc=roundCfgGet(r), custom=!!(rc&&rc.custom), c=effCfg(r);
+  var el=function(id){return document.getElementById(id);};
+  if(el('setRoundLbl'))el('setRoundLbl').textContent=r+'회독';
+  if(el('setPresetSummary'))el('setPresetSummary').innerHTML='<b>'+esc(p.name)+'</b><br>'+esc(effLine(r));
+  if(el('setCustomToggle'))el('setCustomToggle').checked=custom;
+  if(el('setCustomBox'))el('setCustomBox').classList.toggle('hide',!custom);
+  if(el('cfgSpan'))el('cfgSpan').value=c.span;
+  if(el('cfgMax'))el('cfgMax').value=c.count;
+  if(el('cfgOrder'))el('cfgOrder').value=c.order;
+  if(el('cfgView'))el('cfgView').value=c.recall?'wordonly':'both';
+  if(el('cfgReview'))el('cfgReview').checked=c.reviewWeak;
+  if(el('cfgStable'))el('cfgStable').value=c.stableRatio;
+  if(el('setChunkSize'))el('setChunkSize').value=settings.chunkSize;
+  var md=maxDay(), mx=Math.max(roundState.max||1,r), h='';
+  for(var rr=1;rr<=mx;rr++){h+=(rr===r?'▶ ':'')+rr+'회독 '+roundDoneDays(rr).length+'/'+md+'일차<br>';}
+  if(el('setRoundProg'))el('setRoundProg').innerHTML=h;
+}
+function renderRoundProgress(){
+  var el=document.getElementById('roundProgress');if(!el)return;roundEnsure();
+  var r=roundState.cur, md=maxDay(), done=roundDoneDays(r).length;
+  el.innerHTML=(r>=5?(r+'회독 점검 범위 '):(r+'회독 진도 '))+'<b>'+done+'/'+md+'</b>일차';
+}
+function shuffleSameScore(scored){return scored.map(function(o){return{o:o,r:Math.random()}}).sort(function(A,B){return (B.o.s-A.o.s)||(A.r-B.r)}).map(function(x){return x.o.w});}
+function orderRoundPool(pool,order){
+  if(order==='random')return pool.slice().sort(function(){return Math.random()-.5});
+  if(order==='weak')return shuffleSameScore(pool.map(function(w){return{w:w,s:weakScore(w)}}));
+  return pool.slice().sort(function(a,b){return a.day-b.day||a.no-b.no});
+}
+function weakFocusSelect(pool,target,stablePct){
+  var scored=pool.map(function(w){return{w:w,s:weakScore(w)}});
+  var weak=shuffleSameScore(scored.filter(function(o){return o.s>0}));
+  var stable=scored.filter(function(o){return o.s===0}).map(function(o){return o.w}).sort(function(){return Math.random()-.5});
+  target=Math.min(target,pool.length);
+  var stableN=Math.round(target*(stablePct/100));
+  var weakN=target-stableN;
+  if(weakN>weak.length){weakN=weak.length;stableN=Math.min(stable.length,target-weakN);}
+  if(stableN>stable.length){stableN=stable.length;weakN=Math.min(weak.length,target-stableN);}
+  return weak.slice(0,weakN).concat(stable.slice(0,stableN));
+}
+function buildRoundPool(r,fromDay){
+  var c=effCfg(r), md=maxDay();
+  var lo=fromDay, hi=Math.min(fromDay+c.span-1, md||fromDay);
+  var inRange=data.filter(function(x){return x.day>=lo&&x.day<=hi});
+  if(!inRange.length)return{pool:[],cover:[lo,hi],cfg:c,coverDays:[]};
+  var coverDays=Array.from(new Set(inRange.map(function(x){return +x.day}))).sort(function(a,b){return a-b});
+  var pool;
+  if(c.weakFocus){
+    var target=c.count>0?c.count:inRange.length;
+    pool=weakFocusSelect(inRange,target,c.stableRatio);
+  }else{
+    pool=orderRoundPool(inRange,c.order);
+    if(c.count>0&&pool.length>c.count)pool=pool.slice(0,c.count);
+  }
+  return{pool:pool,cover:[lo,hi],cfg:c,coverDays:coverDays};
+}
+function startAuto(){
+  roundEnsure();var r=roundState.cur;
+  var from=Math.max(1,+((document.getElementById('rDayFrom')||{}).value)||1);
+  var res=buildRoundPool(r,from);
+  if(!res.pool.length)return alert('해당 범위에 단어가 없습니다.');
+  beginStudy(res.pool,{recall:res.cfg.recall,round:r,coverDays:res.cover,coverList:res.coverDays,weakFocus:res.cfg.weakFocus,reviewWeak:res.cfg.reviewWeak,label:rPreset(r).name});
+}
+function studyReveal(){if(study){study.revealed=true;showStudy();}}
+function studyReviewWeak(){if(!study||!study.reviewList.length)return;var seen={},items=[];study.reviewList.forEach(function(r){var k=r.item.day+'_'+r.item.no;if(!seen[k]){seen[k]=1;items.push(r.item);}});var recall=!!study.recall,round=study.round;beginStudy(orderRoundPool(items,'weak'),{recall:recall,round:null,label:(round?round+'회독 ':'')+'약한 단어 복습'});}
+function beginStudy(pool,opts){opts=opts||{};study={pool:pool,i:0,unknown:0,ambiguous:0,known:0,reviewList:[],recall:!!opts.recall,revealed:false,round:opts.round||null,coverDays:opts.coverDays||null,coverList:opts.coverList||null,weakFocus:!!opts.weakFocus,reviewWeak:opts.reviewWeak!==false,label:opts.label||''};setStudyMode(true);showStudy();}
 function startStudy(){
   const f=+sDayFrom.value||1,t=+sDayTo.value||f,n=+sCount.value||100,order=sOrder.value;
   let pool=data.filter(x=>x.day>=Math.min(f,t)&&x.day<=Math.max(f,t));
@@ -1175,7 +1336,7 @@ function startChunk(day,q){
   const a=q*QSIZE+1,b=q*QSIZE+QSIZE;
   let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
   if(!pool.length)return alert(day+'일차 '+a+'–'+b+' 구간에 단어가 없습니다.');
-  beginStudy(orderPool(pool,document.getElementById('sOrder').value));
+  beginStudy(orderPool(pool,'no'));
 }
 function startNextChunk(day){
   day=+day;
@@ -1190,7 +1351,7 @@ function startNextChunk(day){
 }
 function renderChunkRow(){
   const el=document.getElementById('chunkRow');if(!el)return;
-  const day=+document.getElementById('sDayFrom').value||1;
+  const day=+((document.getElementById('rDayFrom')||{}).value)||1;
   const dayWords=data.filter(w=>+w.day===day);
   if(!dayWords.length){el.innerHTML='<span class="count">'+day+'일차 단어 없음</span>';return;}
   const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
@@ -1204,18 +1365,19 @@ function renderChunkRow(){
   h+='<button class="chip" style="border-color:var(--acc);color:var(--acc);font-weight:700" onclick="startNextChunk('+day+')">이어서 ▶</button>';
   el.innerHTML=h;
 }
-function endStudy(){study=null;document.getElementById('studyArea').innerHTML='';setStudyMode(false);renderChunkRow();render()}
+function endStudy(){study=null;document.getElementById('studyArea').innerHTML='';setStudyMode(false);renderStudyMain();render()}
 function studyAnswer(level){
   if(!study||study.i>=study.pool.length)return;
   const q=study.pool[study.i];
   q.studied=(q.studied||0)+1;q.lastLevel=level;
+  q.recent=(Array.isArray(q.recent)?q.recent:[]).concat(level==='known'?'k':(level==='ambiguous'?'a':'u')).slice(-5);
   if(level==='unknown'){q.unknown=(q.unknown||0)+1;study.unknown++;study.reviewList.push({item:q,status:'몰라요',cls:'unknown'});}
   else if(level==='ambiguous'){q.ambiguous=(q.ambiguous||0)+1;study.ambiguous++;study.reviewList.push({item:q,status:'애매해요',cls:'ambiguous'});}
   else{q.known=(q.known||0)+1;study.known++;}
-  saveWords();renderStatusChips();study.i++;showStudy();
+  saveWords();renderStatusChips();study.i++;study.revealed=false;showStudy();
 }
 function toggleFlagStudy(){const q=study.pool[study.i];if(!q)return;q.flag=!q.flag;saveWords();const b=document.getElementById('stFlag');if(b){b.textContent=q.flag?'★ 체크됨':'☆ 체크';b.style.color=q.flag?'#e0a800':'var(--sub)';}}
-function studyNav(dir){if(!study||study.i>=study.pool.length)return;const n=study.i+dir;if(n<0||n>=study.pool.length)return;study.i=n;showStudy();}
+function studyNav(dir){if(!study||study.i>=study.pool.length)return;const n=study.i+dir;if(n<0||n>=study.pool.length)return;study.i=n;study.revealed=false;showStudy();}
 function fitStudyWord(){
   const el=document.querySelector('.dict-word');if(!el)return;
   let size=28;el.style.fontSize=size+'px';let guard=0;
@@ -1225,8 +1387,9 @@ function showStudy(){
   const a=document.getElementById('studyArea');if(!study)return;
   if(study.i>=study.pool.length){
     // 완료: 완전히 학습한 일차를 오늘 날짜에 자동 기록
-    const bynos={};study.pool.forEach(w=>{(bynos[w.day]=bynos[w.day]||new Set()).add(+w.no)});
     const recordedDays=[];
+    if(!(study.round>=2)){
+    const bynos={};study.pool.forEach(w=>{(bynos[w.day]=bynos[w.day]||new Set()).add(+w.no)});
     Object.keys(bynos).forEach(dk=>{
       const day=+dk;
       const dayWords=data.filter(w=>+w.day===day);
@@ -1239,41 +1402,70 @@ function showStudy(){
       if(done.size>=nq&&before<nq){addStudiedDay(todayKey(),day);recordedDays.push(day);}
     });
     saveChunk();
+    }
+    if(study.round&&study.round>=2){
+      roundEnsure();
+      var _cov=[];
+      if(study.weakFocus){ _cov=(study.coverList||[]).slice(); }
+      else if(study.coverDays){
+        for(var _d=study.coverDays[0];_d<=study.coverDays[1];_d++){
+          var _dws=data.filter(function(w){return +w.day===_d}); if(!_dws.length)continue;
+          var _inp={}; study.pool.forEach(function(w){if(+w.day===_d)_inp[+w.no]=1;});
+          if(_dws.every(function(w){return _inp[+w.no]}))_cov.push(_d);
+        }
+      }
+      if(_cov.length){var _set={};(roundState.prog[study.round]||[]).forEach(function(d){_set[d]=1});_cov.forEach(function(d){_set[d]=1});roundState.prog[study.round]=Object.keys(_set).map(Number).sort(function(a,b){return a-b});roundSave();}
+    }
     const reviewSorted=[...study.reviewList].sort((a,b)=>(a.item.day-b.item.day)||(a.item.no-b.item.no));
     const reviewHtml=study.reviewList.length
       ? '<h3 style="margin-top:18px">복습할 단어 '+study.reviewList.length+'개</h3>'+
         reviewSorted.map(r=>{const x=r.item;return '<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'<span class="study-status '+r.cls+'">'+r.status+'</span></div>'+(x.etym?'<div class="etym"><b>어근·어원</b> · '+esc(x.etym)+'</div>':'')+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>';}).join('')
       : '<p class="count">모든 단어를 ‘알아요’로 분류했습니다.</p>';
     const recNote=recordedDays.length?'<p class="count" style="color:#176b43;margin-top:6px">캘린더('+todayKey()+')에 '+recordedDays.sort((a,b)=>a-b).join(', ')+'일차 학습 완료가 기록되었습니다.</p>':'';
-    a.innerHTML='<div class="study-summary"><h3>학습 완료</h3>'+recNote+
-      '<div class="statgrid"><div class="stat"><b>'+study.unknown+'</b><span class="count">몰라요</span></div><div class="stat"><b>'+study.ambiguous+'</b><span class="count">애매해요</span></div><div class="stat"><b>'+study.known+'</b><span class="count">알아요</span></div></div>'+
-      '<button class="primary" onclick="endStudy()">학습 종료</button>'+reviewHtml+'</div>';
+    const _rl=study.round?(study.round+'회독 · '):'';
+    const _kl=study.recall?'맞혔어요':'알아요';
+    a.innerHTML='<div class="study-summary"><h3>학습 완료'+(study.round?' · '+study.round+'회독':'')+'</h3>'+recNote+
+      '<div class="statgrid"><div class="stat"><b>'+study.unknown+'</b><span class="count">몰라요</span></div><div class="stat"><b>'+study.ambiguous+'</b><span class="count">애매해요</span></div><div class="stat"><b>'+study.known+'</b><span class="count">'+_kl+'</span></div></div>'+
+      ((study.reviewList.length&&study.reviewWeak!==false)?'<button class="primary" onclick="studyReviewWeak()">약한 단어 '+study.reviewList.length+'개 다시 보기</button> ':'')+
+      '<button class="'+(study.reviewList.length?'':'primary')+'" onclick="endStudy()">학습 종료</button>'+reviewHtml+'</div>';
     return;
   }
   const q=study.pool[study.i];
   const pct=Math.round((study.i/study.pool.length)*100);
   const meaningText=breakNumbered(q.mean)||'등록된 뜻이 없습니다.';
-  a.innerHTML='<div class="study-shell">'+
+  const recall=!!study.recall, shown=(!recall||study.revealed), knownLabel=recall?'맞혔어요':'알아요';
+  let sc='<div class="study-shell">'+
     '<div class="sc-prog"><div style="width:'+pct+'%"></div></div>'+
-    '<div class="study-head"><span class="count">'+(study.i+1)+'/'+study.pool.length+' · '+q.day+'일차 #'+q.no+'</span><span><button class="small" id="stFlag" onclick="toggleFlagStudy()" style="color:'+(q.flag?'#e0a800':'var(--sub)')+'">'+(q.flag?'★ 체크됨':'☆ 체크')+'</button> <button class="small" onclick="endStudy()">그만</button></span></div>'+
-    '<div style="text-align:center;margin-top:2px"><div class="dict-word" style="font-size:34px">'+esc(q.word)+'</div>'+(q.pron?'<div class="dict-pron">'+esc(q.pron)+'</div>':'')+'</div>'+
-    '<div class="sc-scroll">'+
+    '<div class="study-head"><span class="count">'+(study.i+1)+'/'+study.pool.length+' · '+q.day+'일차 #'+q.no+(study.label?' · '+esc(study.label):'')+'</span><span><button class="small" id="stFlag" onclick="toggleFlagStudy()" style="color:'+(q.flag?'#e0a800':'var(--sub)')+'">'+(q.flag?'★ 체크됨':'☆ 체크')+'</button> <button class="small" onclick="endStudy()">그만</button></span></div>'+
+    '<div style="text-align:center;margin-top:2px"><div class="dict-word" style="font-size:34px">'+esc(q.word)+'</div>'+((q.pron&&shown)?'<div class="dict-pron">'+esc(q.pron)+'</div>':'')+'</div>';
+  if(!shown){
+    sc+='<div class="sc-reveal"><button class="primary" onclick="studyReveal()" style="min-height:44px;font-weight:700;min-width:180px">뜻 보기 (Space)</button><div class="study-tip" style="margin-top:10px">단어를 보고 뜻을 떠올린 뒤 눌러 확인하세요.<br>← / → 이전·다음 · Esc 종료</div></div>';
+  }else{
+    sc+='<div class="sc-scroll">'+
       '<div class="sc-band"><div class="sc-mean">'+esc(meaningText)+'</div></div>'+
       '<div class="sc-rows">'+
       (q.sent?'<div class="sc-row"><div class="sc-lab">예문</div><div class="sc-val">'+esc(breakNumbered(q.sent))+'</div></div>':'')+
       (q.syn?'<div class="sc-row"><div class="sc-lab">유사어</div><div class="sc-val syn">≈ '+esc(q.syn)+'</div></div>':'')+
       (q.etym?'<div class="sc-row"><div class="sc-lab">어근·어원</div><div class="sc-val etym">'+esc(q.etym)+'</div></div>':'')+
-    '</div>'+
-    '</div>'+
-    '<div class="study-actions"><button class="grow unknown" onclick="studyAnswer(\'unknown\')">몰라요</button><button class="grow ambiguous" onclick="studyAnswer(\'ambiguous\')">애매해요</button><button class="grow known" onclick="studyAnswer(\'known\')">알아요</button></div>'+
-    '<div class="study-tip">키보드: 1 = 몰라요 · 2 = 애매해요 · 3 = 알아요 · ← / → 이전·다음</div>'+
-  '</div>';
+      '</div></div>'+
+      '<div class="study-actions"><button class="grow unknown" onclick="studyAnswer(\'unknown\')">몰라요</button><button class="grow ambiguous" onclick="studyAnswer(\'ambiguous\')">애매해요</button><button class="grow known" onclick="studyAnswer(\'known\')">'+knownLabel+'</button></div>'+
+      '<div class="study-tip">키보드: 1 = 몰라요 · 2 = 애매해요 · 3 = '+knownLabel+' · ← / → 이전·다음</div>';
+  }
+  sc+='</div>';
+  a.innerHTML=sc;
   fitStudyWord();
 }
 document.addEventListener('keydown',e=>{
   if(!study||study.i>=study.pool.length)return;
   const tag=(e.target&&e.target.tagName)||'';
   if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  if(study.recall&&!study.revealed){
+    if(e.key===' '||e.key==='Spacebar'){e.preventDefault();studyReveal();return;}
+    if(e.key==='ArrowRight'){e.preventDefault();studyNav(1);return;}
+    if(e.key==='ArrowLeft'){e.preventDefault();studyNav(-1);return;}
+    if(e.key==='Escape'){endStudy();return;}
+    return;
+  }
   if(e.key==='1')studyAnswer('unknown');
   else if(e.key==='2')studyAnswer('ambiguous');
   else if(e.key==='3')studyAnswer('known');
@@ -1461,9 +1653,9 @@ function answer(ci,qi,btn){
   document.querySelectorAll('#'+quiz.target+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   btn.classList.add(correct?'correct':'wrong');
   document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
-  if(correct){quiz.score++;setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.correctDelay*1000));}
+  if(correct){const cq=data[qi];cq.tLast='correct';cq.tStreak=(cq.tStreak||0)+1;saveWords();quiz.score++;setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.correctDelay*1000));}
   else{
-    const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
+    const q=data[qi];q.wrong=(q.wrong||0)+1;q.tLast='wrong';q.tStreak=0;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
     const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
     if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
     else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
@@ -1476,7 +1668,7 @@ function dontKnow(qi){
   document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
   const dn=document.getElementById('qDunno');if(dn){dn.disabled=true;dn.classList.add('dunno-wrong');}
-  const q=data[qi];q.wrong=(q.wrong||0)+1;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
+  const q=data[qi];q.wrong=(q.wrong||0)+1;q.tLast='wrong';q.tStreak=0;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
   const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
   if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
   else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
@@ -3159,6 +3351,7 @@ function rcQuestionHTML(q){
     if(checked)h+=rcVerdict(rcGradeOne(q,ans),!(ans.sel&&ans.sel.length));
   }
   if(checked&&q.note)h+='<div class="rc-note"><b>Source note</b> · '+esc(q.note)+'</div>';
+  if(checked&&!rcGradeOne(q,ans))h+='<div class="row" style="margin-top:8px"><button class="small" onclick="rcCopyAnalyze(\''+q.id+'\',this)">🤖 AI 분석 프롬프트 복사</button></div>';
   h+=mvCollectorHTML((q.passage||'')+' '+(q.question||'')+' '+q.choices.map(function(c){return c.text;}).join(' '),'RC P'+q.section);
   return h;
 }
@@ -3300,7 +3493,7 @@ function rcResultsScreen(){
      '<button class="small" onclick="rcToStart()">시작 화면으로</button></div>';
   // 오답 목록
   if(wrong.length){
-    h+='<h3 style="margin-top:18px">틀린 문제 '+wrong.length+'개</h3>'+wrong.map(rcWrongCardHTML).join('');
+    h+='<div class="row" style="justify-content:space-between;align-items:baseline;margin-top:18px"><h3 style="margin:0">틀린 문제 '+wrong.length+'개</h3><button class="small primary" onclick="rcCopyAllWrong(this)">🤖 전체 오답 프롬프트 복사</button></div>'+wrong.map(rcWrongCardHTML).join('');
   }
   if(un.length){
     h+='<h3 style="margin-top:14px">미응답 '+un.length+'개</h3><div class="rc-plist">'+un.map(q=>'<span class="rc-secchip">P'+q.section+' Q'+q.qno+'</span>').join('')+'</div>';
@@ -3308,6 +3501,40 @@ function rcResultsScreen(){
   h+='</div>';
   document.getElementById('mainTabs').classList.remove('hide');
   el.innerHTML=h;
+}
+function rcAnalyzePrompt(q){
+  const a=(typeof rcS!=='undefined'&&rcS)?(rcS.answers[q.id]||{}):{};
+  let mine,correct,block;
+  if(q.rtype==='sentence'){
+    const sents=(rcS&&rcS._sentCache&&rcS._sentCache[q.id])||rcSplitSentences(q.passage);
+    mine=(a.sidx!=null?sents[a.sidx]:'(미응답)'); correct=q.answerText;
+    block='[문제 형식] 지문에서 정답 "문장"을 선택하는 문제';
+  }else{
+    mine=(a.sel&&a.sel.length?a.sel.join(', '):'(미응답)'); correct=q.answer.join(', ');
+    block='[Choices]\n'+q.choices.map(function(c){return c.l+'. '+c.text;}).join('\n');
+  }
+  return [
+    '[GRE RC 오답 분석 요청]',
+    '아래 GRE 독해 문제를 틀렸습니다. 지문을 근거로 한국어로 분석해 주세요.\n1) 정답의 근거가 되는 지문 문장(그대로 인용)\n2) 제가 고른 답이 틀린 이유\n3) 이 제시문 유형에서 다음에 조심할 점',
+    '[Passage]\n'+(q.passage||''),
+    '[Question]\n'+(q.question||''),
+    block,
+    '[내 답] '+mine+'\n[정답] '+correct
+  ].filter(Boolean).join('\n\n');
+}
+function rcCopyText(text,btn,label){
+  const done=function(){if(btn){const o=btn.textContent;btn.textContent=label||'복사됨!';setTimeout(function(){btn.textContent=o;},1300);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,function(){rcCopyFb(text);}); else rcCopyFb(text);
+}
+function rcCopyFb(text){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');alert('프롬프트를 복사했습니다.');}catch(e){alert('복사 실패 — 직접 복사하세요.');}document.body.removeChild(ta);}
+function rcCopyAnalyze(qid,btn){const q=rcById(qid);if(!q)return;rcCopyText(rcAnalyzePrompt(q),btn,'복사됨!');}
+function rcCopyAllWrong(btn){
+  if(!rcS)return;
+  const wrong=rcS.pool.map(rcById).filter(function(q){return rcIsAnswered(q)&&!rcGradeOne(q);});
+  if(!wrong.length)return alert('틀린 문제가 없습니다.');
+  const txt='[GRE RC 오답 '+wrong.length+'개 일괄 분석 요청] 각 문제를 지문 근거로 한국어 분석해 주세요.\n\n'+
+    wrong.map(function(q,i){return '===== 오답 '+(i+1)+' =====\n'+rcAnalyzePrompt(q);}).join('\n\n');
+  rcCopyText(txt,btn,'전체 복사됨!');
 }
 function rcWrongCardHTML(q){
   const ans=rcS.answers[q.id]||{};
@@ -3324,6 +3551,7 @@ function rcWrongCardHTML(q){
   h+='<details class="rc-details"><summary>지문 보기</summary><div class="rc-ptext" style="max-height:none">'+
      (q.highlighted&&q.rtype!=='sentence'?esc(q.passage).replace(esc(q.highlighted),'<mark class="rc-hl">'+esc(q.highlighted)+'</mark>'):esc(q.passage))+'</div></details>';
   if(q.rtype==='sentence')h+='<div class="rc-wans" style="margin-top:6px"><span class="ok">정답 문장: '+esc(q.answerText)+'</span></div>';
+  h+='<div class="row" style="margin-top:8px"><button class="small" onclick="rcCopyAnalyze(\''+q.id+'\',this)">🤖 이 문제 AI 분석 프롬프트 복사</button></div>';
   h+='</div>';return h;
 }
 function rcRetryWrong(){
@@ -4028,11 +4256,10 @@ document.getElementById('setQuizTime').onchange=e=>{settings.quizTime=Math.max(0
 document.getElementById('setCorrectDelay').onchange=e=>{settings.correctDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
 document.getElementById('setWrongDelay').onchange=e=>{settings.wrongDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
 document.getElementById('setChunkSize').onchange=e=>{settings.chunkSize=Math.max(1,parseInt(e.target.value)||25);QSIZE=settings.chunkSize;e.target.value=settings.chunkSize;saveSettings();renderChunkRow();renderTestChunkRow();};
-document.getElementById('sDayFrom').addEventListener('input',renderChunkRow);
 document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow);
 ['freqMin','freqDayFrom','freqDayTo'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',updateFreqAvail);});
 updateFreqAvail();
-renderTabs();renderAll();updatePracticeCount();
+roundState=roundLoad();renderTabs();renderAll();syncStudySettings();updatePracticeCount();
 </script>
 </body>
 </html>
