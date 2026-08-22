@@ -107,6 +107,8 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .cal-brief{font-size:10.5px;line-height:1.35;border-radius:5px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cal-brief.study{background:#eef7ff;color:#1d4ed8}
 .cal-brief.test{background:#e6f7ee;color:#176b43}
+.cal-brief.studyR{background:#f0eaff;color:#6d28d9}
+.chip.rchip{background:#f3eefe;border-color:#c9b8f0;color:#5b21b6}
 .today-badge{font-size:11px;background:var(--acc);color:#fff;border-radius:999px;padding:2px 8px;font-weight:700}
 .official-box{margin-top:12px;padding:12px;border:1px dashed #c7cede;border-radius:10px;background:#fbfcff}
 .test-rec{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:8px 2px;font-size:13px}
@@ -1451,7 +1453,7 @@ function showStudy(){
           if(_dws.every(function(w){return _inp[+w.no]}))_cov.push(_d);
         }
       }
-      if(_cov.length){var _set={};(roundState.prog[study.round]||[]).forEach(function(d){_set[d]=1});_cov.forEach(function(d){_set[d]=1});roundState.prog[study.round]=Object.keys(_set).map(Number).sort(function(a,b){return a-b});roundSave();}
+      if(_cov.length){var _set={};(roundState.prog[study.round]||[]).forEach(function(d){_set[d]=1});_cov.forEach(function(d){_set[d]=1});roundState.prog[study.round]=Object.keys(_set).map(Number).sort(function(a,b){return a-b});roundSave();_cov.forEach(function(d){addStudiedDayR(todayKey(),study.round,d);});}
     }
     const reviewSorted=[...study.reviewList].sort((a,b)=>(a.item.day-b.item.day)||(a.item.no-b.item.no));
     const reviewHtml=study.reviewList.length
@@ -1801,10 +1803,13 @@ function dontKnow(qi){
 }
 
 /* ================= 캘린더 ================= */
-function ensureDate(key){calendar[key]=calendar[key]||{studiedDays:[],tests:[]};if(!calendar[key].studiedDays)calendar[key].studiedDays=[];if(!calendar[key].tests)calendar[key].tests=[];return calendar[key];}
-function cleanupDate(key){const r=calendar[key];if(r&&(!r.studiedDays||!r.studiedDays.length)&&(!r.tests||!r.tests.length))delete calendar[key];}
+function ensureDate(key){calendar[key]=calendar[key]||{studiedDays:[],tests:[]};if(!calendar[key].studiedDays)calendar[key].studiedDays=[];if(!calendar[key].tests)calendar[key].tests=[];if(!calendar[key].roundDays)calendar[key].roundDays={};return calendar[key];}
+function cleanupDate(key){const r=calendar[key];if(r&&(!r.studiedDays||!r.studiedDays.length)&&(!r.tests||!r.tests.length)&&(!r.roundDays||!Object.keys(r.roundDays).length))delete calendar[key];}
 function addStudiedDay(key,day){day=parseInt(day);if(!day)return;const r=ensureDate(key);if(!r.studiedDays.includes(day)){r.studiedDays.push(day);r.studiedDays.sort((a,b)=>a-b);saveCal();}}
 function addStudiedManual(key){const v=document.getElementById('addDayInput').value;const d=parseInt(v);if(!d)return alert('일차 숫자를 입력하세요.');addStudiedDay(key,d);renderCalendar();}
+function addStudiedDayR(key,round,day){day=parseInt(day);round=parseInt(round)||1;if(!day)return;if(round<=1){addStudiedDay(key,day);return;}const r=ensureDate(key);r.roundDays=r.roundDays||{};r.roundDays[round]=r.roundDays[round]||[];if(r.roundDays[round].indexOf(day)<0){r.roundDays[round].push(day);r.roundDays[round].sort((a,b)=>a-b);saveCal();}}
+function removeStudiedR(key,round,day){const r=calendar[key];if(r&&r.roundDays&&r.roundDays[round]){r.roundDays[round]=r.roundDays[round].filter(d=>d!==day);if(!r.roundDays[round].length)delete r.roundDays[round];if(!Object.keys(r.roundDays).length)delete r.roundDays;cleanupDate(key);saveCal();renderCalendar();}}
+function addStudiedManualR(key){const rr=+((document.getElementById('addRoundSel')||{}).value)||1;const d=parseInt((document.getElementById('addDayInput')||{}).value);if(!d)return alert('일차 숫자를 입력하세요.');addStudiedDayR(key,rr,d);renderCalendar();}
 function removeStudied(key,day){const r=calendar[key];if(r){r.studiedDays=(r.studiedDays||[]).filter(d=>d!==day);cleanupDate(key);saveCal();renderCalendar();}}
 function deleteTest(key,idx){const r=calendar[key];if(r&&r.tests){r.tests.splice(idx,1);cleanupDate(key);saveCal();renderCalendar();}}
 
@@ -1827,7 +1832,8 @@ function renderCalendar(){
     const rec=calendar[key];
     let brief='';
     if(rec){
-      if(rec.studiedDays&&rec.studiedDays.length)brief+='<div class="cal-brief study">학습: '+rec.studiedDays.slice().sort((a,b)=>a-b).join(',')+'일차</div>';
+      if(rec.studiedDays&&rec.studiedDays.length)brief+='<div class="cal-brief study">1회독 '+rec.studiedDays.slice().sort((a,b)=>a-b).join(',')+'일차</div>';
+      if(rec.roundDays)Object.keys(rec.roundDays).sort((a,b)=>a-b).forEach(function(rr){var ds=rec.roundDays[rr];if(ds&&ds.length)brief+='<div class="cal-brief studyR">'+rr+'회독 '+ds.slice().sort((a,b)=>a-b).join(',')+'일차</div>';});
       if(rec.tests&&rec.tests.length){const tt=rec.tests;const last=tt[tt.length-1];const tdays=[...new Set(tt.map(x=>x.greDay))].sort((a,b)=>a-b);brief+='<div class="cal-brief test">'+tdays.join(',')+'일차 '+last.score+'/'+last.total+(tt.length>1?' ('+tt.length+')':'')+'</div>';}
     }
     cells+='<div class="cal-cell'+(key===tk?' today':'')+(key===calSel?' sel':'')+'" onclick="selectDate(\''+key+'\')"><div class="cal-date">'+d+'</div>'+brief+'</div>';
@@ -1842,12 +1848,18 @@ function renderDayDetail(){
   if(!key){el.innerHTML='<p class="count">날짜를 선택하세요.</p>';return;}
   const rec=calendar[key]||{studiedDays:[],tests:[]};
   const studied=(rec.studiedDays||[]).slice().sort((a,b)=>a-b);
+  const rdays=rec.roundDays||{};
   const isToday=key===todayKey();
   let h='<h3>'+fmtDateK(key)+(isToday?' <span class="today-badge">오늘</span>':'')+'</h3>';
-  h+='<div class="count" style="margin-top:8px">학습한 일차</div><div class="chipwrap">';
-  h+= studied.length? studied.map(d=>'<span class="chip on">'+d+'일차 <span onclick="event.stopPropagation();removeStudied(\''+key+'\','+d+')" style="cursor:pointer">×</span></span>').join('') : '<span class="count">기록 없음</span>';
+  h+='<div class="count" style="margin-top:8px">학습한 일차 (회독별)</div><div class="chipwrap">';
+  let anyDay=false;
+  if(studied.length){anyDay=true;h+=studied.map(d=>'<span class="chip on">1회독 '+d+'일차 <span onclick="event.stopPropagation();removeStudied(\''+key+'\','+d+')" style="cursor:pointer">×</span></span>').join('');}
+  Object.keys(rdays).sort((a,b)=>a-b).forEach(function(rr){(rdays[rr]||[]).slice().sort((a,b)=>a-b).forEach(function(d){anyDay=true;h+='<span class="chip on rchip">'+rr+'회독 '+d+'일차 <span onclick="event.stopPropagation();removeStudiedR(\''+key+'\','+rr+','+d+')" style="cursor:pointer">×</span></span>';});});
+  if(!anyDay)h+='<span class="count">기록 없음</span>';
   h+='</div>';
-  h+='<div class="row"><input type="number" id="addDayInput" placeholder="일차" style="width:80px" min="1"><button class="small" onclick="addStudiedManual(\''+key+'\')">일차 추가</button></div>';
+  var _maxR=Math.max((typeof roundState!=='undefined'&&roundState&&roundState.max)||1,4);
+  var _ropts=''; for(var _r=1;_r<=_maxR;_r++)_ropts+='<option value="'+_r+'">'+_r+'회독</option>';
+  h+='<div class="row"><select id="addRoundSel">'+_ropts+'</select><input type="number" id="addDayInput" placeholder="일차" style="width:70px" min="1"><button class="small" onclick="addStudiedManualR(\''+key+'\')">추가</button></div>';
   // 공식 TEST
   h+='<div class="official-box"><div class="count" style="margin-bottom:6px;font-weight:700;color:var(--ink)">공식 TEST · 50문제</div><div class="row">일차 <input type="number" id="offDay" min="1" value="'+(studied[0]||1)+'" style="width:70px"><select id="offMode"><option value="mean">뜻 고르기</option><option value="word">단어 고르기</option></select><button class="primary" onclick="startOfficialTest(document.getElementById(\'offDay\').value,document.getElementById(\'offMode\').value)">50문제 TEST 시작</button></div>'+(!isToday?'<div class="count" style="margin-top:6px;color:#8a5a00">※ 테스트 결과는 실제 수행한 오늘('+todayKey()+') 날짜에 기록됩니다.</div>':'')+'</div>';
   // TEST 기록
