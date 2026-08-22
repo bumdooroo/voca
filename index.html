@@ -423,6 +423,11 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 
 <div class="card" id="testCard">
 <h3 id="testHead">테스트 (연습)</h3>
+<div id="roundTestBox" style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0 10px;background:#f7fbfa">
+  <div id="rtHead" class="study-tip" style="margin:0 0 6px"></div>
+  <div class="row hide" id="rtCtl">시작 일차 <input type="number" id="rtDayFrom" min="1" value="1" style="width:64px" oninput="renderRoundTest()"> <button class="primary" onclick="startRoundTest()">연습 TEST 시작</button></div>
+</div>
+<div class="count" style="margin:8px 0 4px">자유 테스트 (원하는 범위)</div>
 <div class="row" id="testConfig">
 일차 <input type="number" id="qDayFrom" min="1" value="1" style="width:70px"> ~
 <input type="number" id="qDayTo" min="1" value="1" style="width:70px">
@@ -561,6 +566,14 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
       <div class="row" style="margin-top:10px"><span style="font-size:13px">틀린 후 자동 넘김</span> <input type="number" id="setWrongDelay" min="0" step="0.5" style="width:64px"> 초</div>
     </div>
     <div style="margin-top:18px">
+      <div class="count" style="margin-bottom:8px">회독별 연습 테스트</div>
+      <div class="row"><span style="font-size:13px">추천 테스트 문제 수</span> <input type="number" id="setRQCount" min="1" style="width:64px" onchange="onRoundQuizCfg()"> 개</div>
+      <div class="row" style="margin-top:8px"><span style="font-size:13px">단어→뜻 비율</span> <input type="number" id="setRQMean" min="0" max="100" style="width:64px" onchange="onRoundQuizCfg()"> % <span class="count" id="rqDirLbl"></span></div>
+      <div class="row" style="margin-top:8px"><span style="font-size:13px">TCSE 빈출 기준</span> <input type="number" id="setRQTcse" min="1" style="width:64px" onchange="onRoundQuizCfg()"> 회↑</div>
+      <div class="row" style="margin-top:8px"><span style="font-size:13px">취약 단어 비율(3–4회독)</span> <input type="number" id="setRQWeak" min="0" max="100" style="width:64px" onchange="onRoundQuizCfg()"> %</div>
+      <p class="study-tip" style="margin-top:6px">2–4회독 추천 테스트에 적용됩니다. 현재 범위의 TCSE 빈출 단어는 목표 수와 무관하게 전부 출제됩니다.</p>
+    </div>
+    <div style="margin-top:18px">
       <div class="count" style="margin-bottom:8px">학습</div>
       <div class="row" style="align-items:center"><span style="font-size:13px">현재 회독</span> <span class="rstep"><button class="small" onclick="roundStep(-1)" aria-label="회독 감소">−</button><b id="setRoundLbl">1회독</b><button class="small" onclick="roundStep(1)" aria-label="회독 증가">＋</button></span></div>
       <div class="study-tip" id="setPresetSummary" style="margin:6px 0"></div>
@@ -633,7 +646,7 @@ let calendar=loadCal();
 function loadChunk(){try{return JSON.parse(localStorage.getItem(CHUNK_KEY()))||{}}catch(e){return{}}}
 function saveChunk(){localStorage.setItem(CHUNK_KEY(),JSON.stringify(chunkProg))}
 let chunkProg=loadChunk();
-function loadSettings(){const D={correctDelay:2,wrongDelay:2,chunkSize:25,choices:4,quizTime:10,view:{m:1,s:1,y:1,p:1,e:1}};
+function loadSettings(){const D={correctDelay:2,wrongDelay:2,chunkSize:25,choices:4,quizTime:10,roundQuizCount:50,roundQuizMeanPct:75,roundQuizTcseMin:2,roundQuizWeakPct:70,view:{m:1,s:1,y:1,p:1,e:1}};
   try{const o=Object.assign({},D,JSON.parse(localStorage.getItem(SET_KEY()))||{});o.view=Object.assign({},D.view,o.view||{});return o;}catch(e){return D}}
 function toggleSettings(open){
   document.getElementById('settingsModal').classList.toggle('hide',!open);
@@ -709,6 +722,12 @@ function syncSettingsUI(){
   document.getElementById('setChunkSize').value=settings.chunkSize;
   document.getElementById('setChoices').value=settings.choices;
   const qt=document.getElementById('setQuizTime');if(qt)qt.value=settings.quizTime;
+  var _g=function(id,v){var e=document.getElementById(id);if(e)e.value=v;};
+  _g('setRQCount',settings.roundQuizCount!=null?settings.roundQuizCount:50);
+  _g('setRQMean',settings.roundQuizMeanPct!=null?settings.roundQuizMeanPct:75);
+  _g('setRQTcse',settings.roundQuizTcseMin!=null?settings.roundQuizTcseMin:2);
+  _g('setRQWeak',settings.roundQuizWeakPct!=null?settings.roundQuizWeakPct:70);
+  var dl=document.getElementById('rqDirLbl');if(dl)dl.textContent='(뜻→단어 '+(100-(settings.roundQuizMeanPct!=null?settings.roundQuizMeanPct:75))+'%)';
 }
 function switchDeck(id){
   if(!decks.some(d=>d.id===id))return;
@@ -857,7 +876,7 @@ function render(){
   if(typeof updateFreqAvail==='function')updateFreqAvail();
 }
 
-function renderAll(){renderChips();renderStatusChips();renderTestChunkRow();renderStudyMain();render()}
+function renderAll(){renderChips();renderStatusChips();renderTestChunkRow();renderStudyMain();renderRoundTest();render()}
 
 function toggleSel(i,on){const x=data[i];if(!x)return;if(on)selected.add(x);else selected.delete(x);document.getElementById('selCnt').textContent=selected.size}
 function toggleFlag(i){const x=data[i];if(!x)return;x.flag=!x.flag;saveWords();renderStatusChips();render();}
@@ -1000,6 +1019,7 @@ function recordPractice(){
   arr.push({key:todayKey(),time:pad(now.getHours())+':'+pad(now.getMinutes()),
     label:quiz.label||'',mode:quiz.mode,score:quiz.score,total:quiz.pool.length,
     pct:Math.round(quiz.score/quiz.pool.length*100),
+    round:(quiz.round||1),roundTest:!!quiz.roundTest,cover:(quiz.coverDays||null),
     chunk:quiz.chunk||null,
     freqDay:(quiz.freqDay!=null?quiz.freqDay:null),
     wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no}))});
@@ -1228,7 +1248,7 @@ function updateSpanLbl(){
   if(el)el.textContent=(c.span===1?(from+'일차'):(from+'~'+hi+'일차'))+' · '+(c.count?('약 '+c.count+'개'):'전체');
 }
 function renderStudyMain(){
-  roundEnsure(); var r=roundState.cur, c=effCfg(r);
+  roundEnsure(); var r=roundState.cur, c=effCfg(r); if(typeof renderRoundTest==='function')renderRoundTest();
   var lbl=document.getElementById('studyRoundLbl'); if(lbl)lbl.textContent=r+'회독';
   var info=document.getElementById('presetInfo'); if(info)info.innerHTML='<b>'+esc(c.preset.short)+(c.custom?' · 직접 설정':'')+'</b> · '+esc(effLine(r));
   var cr=document.getElementById('chunkRow'); if(cr)cr.classList.toggle('hide', r!==1);
@@ -1496,7 +1516,7 @@ document.addEventListener('keydown',e=>{
 let quiz=null;
 function setQuizMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','studyCard','listCard','addCard','testConfig','testChunkRow','freqTestRow','testNote','testHead'].forEach(id=>{
+  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','freqTestRow','testNote','testHead'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('hide',on);
   });
 }
@@ -1511,7 +1531,7 @@ function renderTestChunkRow(){
   for(let q=0;q<nq;q++){
     const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
     const p=testChunkProgress(day,q);
-    const cls=p.sup?' tc-super':(p.done?' tc-done':(p.prog>=3?' on':''));
+    const cls=p.sup?' tc-super':(p.done?' tc-done':(p.total>=3?' on':''));
     h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (총 '+p.total+'회 · 3↑ 파랑 · 뜻3+단어1 빨강 · 6회↑ 무지개)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.total+'/3</b></button>';
   }
   el.innerHTML=h;
@@ -1547,6 +1567,95 @@ function freqPool(){
   const b=freqDayBounds();
   return data.filter(x=>tcFreqOf(x.word)>=min && x.day>=b.lo && x.day<=b.hi);
 }
+/* ================= 회독별 추천 연습 테스트 ================= */
+function rqGet(k,d){var v=settings[k];return (v==null||isNaN(+v))?d:+v;}
+function buildRoundQuizPool(r,fromDay){
+  var md=maxDay(), lo=fromDay, hi=Math.min(fromDay+1, md||fromDay);
+  var range=data.filter(function(x){return x.day>=lo&&x.day<=hi;});
+  if(range.length<4)return {err:'해당 범위 단어가 4개 미만입니다.'};
+  var min=rqGet('roundQuizTcseMin',2), target=Math.max(1,rqGet('roundQuizCount',50));
+  var selected={}, pool=[];
+  function key(w){return w.day+'_'+w.no;}
+  function add(w){var k=key(w);if(!selected[k]){selected[k]=1;pool.push(w);}}
+  /* 1. TCSE mandatory (전부 강제 포함) */
+  range.filter(function(w){return tcFreqOf(w.word)>=min;}).forEach(add);
+  var mandatoryCount=pool.length;
+  /* 2. 남은 슬롯 */
+  var remaining=Math.max(0, target-pool.length);
+  if(remaining>0){
+    var rest=range.filter(function(w){return !selected[key(w)];});
+    if(r>=3){
+      var weakPct=rqGet('roundQuizWeakPct',70)/100;
+      var weakN=Math.round(remaining*weakPct);
+      var scored=rest.map(function(w){return {w:w,s:weakScore(w)};}).filter(function(o){return o.s>0;});
+      scored.sort(function(a,b){return b.s-a.s;});
+      var candN=Math.min(scored.length, Math.max(weakN, Math.ceil(weakN*1.7)));
+      var cands=scored.slice(0,candN).map(function(o){return o.w;}).sort(function(){return Math.random()-.5;});
+      cands.slice(0,Math.min(weakN,cands.length)).forEach(add);
+      var rem2=Math.max(0, target-pool.length);
+      range.filter(function(w){return !selected[key(w)];}).sort(function(){return Math.random()-.5;}).slice(0,rem2).forEach(add);
+    }else{
+      rest.sort(function(){return Math.random()-.5;}).slice(0,remaining).forEach(add);
+    }
+  }
+  /* 3. 최종 셔플 */
+  var finalPool=pool.slice().sort(function(){return Math.random()-.5;});
+  /* 방향 배정: 단어→뜻(mean) 비율 */
+  var meanPct=rqGet('roundQuizMeanPct',75)/100;
+  var nMean=Math.round(finalPool.length*meanPct);
+  var idxs=finalPool.map(function(_,i){return i;}).sort(function(){return Math.random()-.5;});
+  var meanSet={}; idxs.slice(0,nMean).forEach(function(i){meanSet[i]=1;});
+  var itemMode=finalPool.map(function(_,i){return meanSet[i]?'mean':'word';});
+  return {pool:finalPool, itemMode:itemMode, cover:[lo,hi], mandatoryCount:mandatoryCount, target:target, actual:finalPool.length};
+}
+function startRoundTest(){
+  roundEnsure(); var r=roundState.cur;
+  if(r<2)return;
+  var from=Math.max(1,+((document.getElementById('rtDayFrom')||{}).value)||1);
+  var res=buildRoundQuizPool(r,from);
+  if(res.err)return alert(res.err);
+  if(res.pool.length<4)return alert('선지를 만들 단어가 부족합니다(4개 미만).');
+  if(data.length<4)return alert('GRE 단어가 4개 미만이라 선지를 만들 수 없습니다.');
+  quiz={pool:res.pool,i:0,mode:'mean',itemMode:res.itemMode,roundMixed:true,round:r,score:0,wrongList:[],official:false,target:'quizArea',distractSrc:data,roundTest:true,coverDays:res.cover,
+    label:r+'회독 · Day '+res.cover[0]+'–'+res.cover[1]+' 추천 TEST ('+res.pool.length+'문항)'};
+  setQuizMode(true); showQ();
+}
+function roundTestCount(r,from){
+  try{return loadPractice().filter(function(x){return x.roundTest&&x.round===r&&x.cover&&+x.cover[0]===+from;}).length;}catch(e){return 0;}
+}
+function renderRoundTest(){
+  var box=document.getElementById('roundTestBox'); if(!box)return; roundEnsure();
+  var r=roundState.cur, head=document.getElementById('rtHead'), ctl=document.getElementById('rtCtl'), chunkRow=document.getElementById('testChunkRow');
+  if(r===1){
+    if(head)head.innerHTML='<b>1회독 · 처음 익히기</b> · 아래 25개 구간별 테스트 (뜻 '+TEST_MEAN_GOAL+'회 + 단어 '+TEST_WORD_GOAL+'회 완료 시 구간 완료)';
+    if(ctl)ctl.classList.add('hide');
+    if(chunkRow)chunkRow.classList.remove('hide');
+    return;
+  }
+  if(ctl)ctl.classList.remove('hide');
+  if(chunkRow)chunkRow.classList.add('hide');
+  var from=Math.max(1,+((document.getElementById('rtDayFrom')||{}).value)||1);
+  var md=maxDay(), hi=Math.min(from+1, md||from);
+  var min=rqGet('roundQuizTcseMin',2), target=rqGet('roundQuizCount',50);
+  var range=data.filter(function(x){return x.day>=from&&x.day<=hi;});
+  var mand=range.filter(function(w){return tcFreqOf(w.word)>=min;}).length;
+  var actual=Math.min(range.length, Math.max(target,mand));
+  var kind=(r>=3?'취약 우선':'뜻 회상');
+  var line='<b>'+r+'회독 · '+kind+' 테스트</b><br>Day '+from+'–'+hi+' · 목표 '+target+'문제'+(r>=3?(' · 취약 '+rqGet('roundQuizWeakPct',70)+'%'):'')+' · TCSE '+min+'회↑ 전부 포함';
+  line+='<br><span class="count">'+((actual!==target)?('목표 '+target+' · 실제 '+actual+'문제 · '):'')+'TCSE 강제 '+mand+'개 포함</span>';
+  var _dn=roundTestCount(r,from); if(_dn>0)line+=' <span style="color:#176b43;font-weight:700">✓ '+_dn+'회 완료</span>';
+  if(head)head.innerHTML=line;
+}
+function onRoundQuizCfg(){
+  var g=function(id,d){var v=+((document.getElementById(id)||{}).value);return isNaN(v)?d:v;};
+  settings.roundQuizCount=Math.max(1,g('setRQCount',50));
+  settings.roundQuizMeanPct=Math.max(0,Math.min(100,g('setRQMean',75)));
+  settings.roundQuizTcseMin=Math.max(1,g('setRQTcse',2));
+  settings.roundQuizWeakPct=Math.max(0,Math.min(100,g('setRQWeak',70)));
+  saveSettings();
+  var dl=document.getElementById('rqDirLbl'); if(dl)dl.textContent='(뜻→단어 '+(100-settings.roundQuizMeanPct)+'%)';
+  renderRoundTest();
+}
 function startFreqQuiz(){
   const mode=document.getElementById('freqMode').value;
   const min=Math.max(1,+document.getElementById('freqMin').value||1);
@@ -1579,7 +1688,7 @@ function updateFreqAvail(){
     }else{bd.style.display='none';}
   }
 }
-function endQuiz(){clearQuizTimer();quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();}
+function endQuiz(){clearQuizTimer();quiz=null;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
 function clearQuizTimer(){if(quiz&&quiz._tid){clearInterval(quiz._tid);quiz._tid=null;}}
 function startQuizTimer(){
   clearQuizTimer();
@@ -1623,18 +1732,19 @@ function showQ(){
     return;
   }
   const q=quiz.pool[quiz.i];
+  const qmode=(quiz.roundMixed&&quiz.itemMode)?(quiz.itemMode[quiz.i]||quiz.mode):quiz.mode;
   const nch=Math.min(6,Math.max(3,settings.choices||4));
   const others=pick(quiz.distractSrc?quiz.distractSrc:(quiz.pool.length>=nch+2?quiz.pool:data),nch-1,q);
   const choices=[q,...others].sort(()=>Math.random()-.5);
   const ansIdx=data.indexOf(q);
-  const prompt = quiz.mode==='mean'
+  const prompt = qmode==='mean'
     ? '<div class="quiz-word">'+esc(q.word)+'</div>'+(q.pron?'<span class="e-pron">'+esc(q.pron)+'</span>':'')
     : '<div class="e-mean" style="font-size:16px">'+esc(q.mean)+'</div>';
   a.innerHTML='<div class="row" style="justify-content:space-between"><span class="count">'+(quiz.i+1)+'/'+quiz.pool.length+' · 점수 '+quiz.score+(quiz.official?' · 공식':'')+' <b id="qTimer" style="color:var(--acc);font-weight:700"></b></span><button class="small" onclick="'+(quiz.official?'backToCalendar()':'endQuiz()')+'">그만</button></div>'+prompt+
     choices.map(function(c,ci){
       const di=data.indexOf(c);
-      const main=quiz.mode==='mean'?esc(c.mean):esc(c.word);
-      const sub=quiz.mode==='mean'?esc(c.word):esc(c.mean);
+      const main=qmode==='mean'?esc(c.mean):esc(c.word);
+      const sub=qmode==='mean'?esc(c.word):esc(c.mean);
       return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
     }).join('')+'<button class="btn" id="qDunno" onclick="dontKnow('+ansIdx+')" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요</button>'+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.etym?'<div class="etym"><b>어근·어원</b> · '+esc(q.etym)+'</div>':'')+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료</div>';
   startQuizTimer();
