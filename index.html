@@ -425,7 +425,7 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 <h3 id="testHead">테스트 (연습)</h3>
 <div id="roundTestBox" style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0 10px;background:#f7fbfa">
   <div id="rtHead" class="study-tip" style="margin:0 0 6px"></div>
-  <div class="row hide" id="rtCtl">시작 일차 <input type="number" id="rtDayFrom" min="1" value="1" style="width:64px" oninput="renderRoundTest()"> <button class="primary" onclick="startRoundTest()">연습 TEST 시작</button></div>
+  <div class="row hide" id="rtCtl">시작 일차 <input type="number" id="rtDayFrom" min="1" step="2" value="1" style="width:64px" oninput="renderRoundTest()" onchange="this.value=roundBlockStart(this.value,2);renderRoundTest()"> <button class="primary" onclick="startRoundTest()">연습 TEST 시작</button></div>
 </div>
 <div class="count" style="margin:8px 0 4px">자유 테스트 (원하는 범위)</div>
 <div class="row" id="testConfig">
@@ -1221,6 +1221,7 @@ function weakScore(w){
 function dayChunkCount(day){var dws=data.filter(function(w){return +w.day===+day});if(!dws.length)return 0;var mx=Math.max.apply(null,dws.map(function(w){return +w.no||0}));return Math.ceil(mx/QSIZE);}
 function isDayDone(day){var n=dayChunkCount(day);return n>0&&(chunkProg[day]||[]).length>=n;}
 function maxDay(){return data.length?Math.max.apply(null,data.map(function(w){return +w.day||0})):0;}
+function roundBlockStart(from,span){from=Math.max(1,+from||1);span=Math.max(1,+span||1);return Math.floor((from-1)/span)*span+1;}
 function roundDoneDays(r){var md=maxDay(),out=[];roundEnsure();for(var d=1;d<=md;d++){if(r===1){if(isDayDone(d))out.push(d);}else{if((roundState.prog[r]||[]).indexOf(d)>=0)out.push(d);}}return out;}
 function studyAutoMode(){return (settings.studyAuto==='manual')?'manual':'auto';}
 function roundCfgGet(r){ if(!settings.roundCfg)settings.roundCfg={}; return settings.roundCfg[r]||null; }
@@ -1242,7 +1243,7 @@ function effLine(r){var c=effCfg(r);
 function onStartDayInput(){ renderChunkRow(); updateSpanLbl(); }
 function updateSpanLbl(){
   roundEnsure(); var r=roundState.cur, c=effCfg(r), md=maxDay();
-  var from=Math.max(1,+((document.getElementById('rDayFrom')||{}).value)||1);
+  var from=roundBlockStart(+((document.getElementById('rDayFrom')||{}).value)||1, c.span);
   var hi=Math.min(from+c.span-1, md||from);
   var el=document.getElementById('rSpanLbl');
   if(el)el.textContent=(c.span===1?(from+'일차'):(from+'~'+hi+'일차'))+' · '+(c.count?('약 '+c.count+'개'):'전체');
@@ -1252,6 +1253,7 @@ function renderStudyMain(){
   var lbl=document.getElementById('studyRoundLbl'); if(lbl)lbl.textContent=r+'회독';
   var info=document.getElementById('presetInfo'); if(info)info.innerHTML='<b>'+esc(c.preset.short)+(c.custom?' · 직접 설정':'')+'</b> · '+esc(effLine(r));
   var cr=document.getElementById('chunkRow'); if(cr)cr.classList.toggle('hide', r!==1);
+  var rdf=document.getElementById('rDayFrom'); if(rdf)rdf.step=c.span;
   if(r===1)renderChunkRow();
   updateSpanLbl(); renderRoundProgress();
 }
@@ -1320,7 +1322,7 @@ function weakFocusSelect(pool,target,stablePct){
 }
 function buildRoundPool(r,fromDay){
   var c=effCfg(r), md=maxDay();
-  var lo=fromDay, hi=Math.min(fromDay+c.span-1, md||fromDay);
+  var lo=roundBlockStart(fromDay,c.span), hi=Math.min(lo+c.span-1, md||lo);
   var inRange=data.filter(function(x){return x.day>=lo&&x.day<=hi});
   if(!inRange.length)return{pool:[],cover:[lo,hi],cfg:c,coverDays:[]};
   var coverDays=Array.from(new Set(inRange.map(function(x){return +x.day}))).sort(function(a,b){return a-b});
@@ -1547,10 +1549,10 @@ function startTestChunk(day,q){
 }
 function startQuiz(){
   const f=+qDayFrom.value||1,t=+qDayTo.value||f,n=+qCount.value||20,mode=qMode.value;
-  let pool=data.filter(x=>x.day>=Math.min(f,t)&&x.day<=Math.max(f,t));
-  if(pool.length<4)return alert('해당 범위 단어가 4개 미만입니다.');
-  pool=[...pool].sort(()=>Math.random()-.5).slice(0,n);
-  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',label:(Math.min(f,t)===Math.max(f,t)?Math.min(f,t)+'일차':Math.min(f,t)+'~'+Math.max(f,t)+'일차')+' '+pool.length+'문항'};
+  const rangeWords=data.filter(x=>x.day>=Math.min(f,t)&&x.day<=Math.max(f,t));
+  if(rangeWords.length<4)return alert('해당 범위 단어가 4개 미만입니다.');
+  let pool=[...rangeWords].sort(()=>Math.random()-.5).slice(0,n);
+  quiz={pool,i:0,mode,score:0,wrongList:[],official:false,target:'quizArea',distractSrc:rangeWords,label:(Math.min(f,t)===Math.max(f,t)?Math.min(f,t)+'일차':Math.min(f,t)+'~'+Math.max(f,t)+'일차')+' '+pool.length+'문항'};
   setQuizMode(true);showQ();
 }
 function freqDayBounds(){
@@ -1570,7 +1572,7 @@ function freqPool(){
 /* ================= 회독별 추천 연습 테스트 ================= */
 function rqGet(k,d){var v=settings[k];return (v==null||isNaN(+v))?d:+v;}
 function buildRoundQuizPool(r,fromDay){
-  var md=maxDay(), lo=fromDay, hi=Math.min(fromDay+1, md||fromDay);
+  var md=maxDay(), lo=roundBlockStart(fromDay,2), hi=Math.min(lo+1, md||lo);
   var range=data.filter(function(x){return x.day>=lo&&x.day<=hi;});
   if(range.length<4)return {err:'해당 범위 단어가 4개 미만입니다.'};
   var min=rqGet('roundQuizTcseMin',2), target=Math.max(1,rqGet('roundQuizCount',50));
@@ -1606,7 +1608,7 @@ function buildRoundQuizPool(r,fromDay){
   var idxs=finalPool.map(function(_,i){return i;}).sort(function(){return Math.random()-.5;});
   var meanSet={}; idxs.slice(0,nMean).forEach(function(i){meanSet[i]=1;});
   var itemMode=finalPool.map(function(_,i){return meanSet[i]?'mean':'word';});
-  return {pool:finalPool, itemMode:itemMode, cover:[lo,hi], mandatoryCount:mandatoryCount, target:target, actual:finalPool.length};
+  return {pool:finalPool, itemMode:itemMode, cover:[lo,hi], mandatoryCount:mandatoryCount, target:target, actual:finalPool.length, range:range};
 }
 function startRoundTest(){
   roundEnsure(); var r=roundState.cur;
@@ -1616,7 +1618,7 @@ function startRoundTest(){
   if(res.err)return alert(res.err);
   if(res.pool.length<4)return alert('선지를 만들 단어가 부족합니다(4개 미만).');
   if(data.length<4)return alert('GRE 단어가 4개 미만이라 선지를 만들 수 없습니다.');
-  quiz={pool:res.pool,i:0,mode:'mean',itemMode:res.itemMode,roundMixed:true,round:r,score:0,wrongList:[],official:false,target:'quizArea',distractSrc:data,roundTest:true,coverDays:res.cover,
+  quiz={pool:res.pool,i:0,mode:'mean',itemMode:res.itemMode,roundMixed:true,round:r,score:0,wrongList:[],official:false,target:'quizArea',distractSrc:res.range,roundTest:true,coverDays:res.cover,
     label:r+'회독 · Day '+res.cover[0]+'–'+res.cover[1]+' 추천 TEST ('+res.pool.length+'문항)'};
   setQuizMode(true); showQ();
 }
@@ -1634,7 +1636,7 @@ function renderRoundTest(){
   }
   if(ctl)ctl.classList.remove('hide');
   if(chunkRow)chunkRow.classList.add('hide');
-  var from=Math.max(1,+((document.getElementById('rtDayFrom')||{}).value)||1);
+  var from=roundBlockStart(+((document.getElementById('rtDayFrom')||{}).value)||1, 2);
   var md=maxDay(), hi=Math.min(from+1, md||from);
   var min=rqGet('roundQuizTcseMin',2), target=rqGet('roundQuizCount',50);
   var range=data.filter(function(x){return x.day>=from&&x.day<=hi;});
