@@ -399,6 +399,7 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .round-prog .rp-row{margin:2px 0}
 .sc-reveal{text-align:center;padding:26px 0}
 .rstep{display:inline-flex;align-items:center;gap:8px}.rstep b{min-width:48px;text-align:center}
+.set-sec{border:1px solid var(--line);border-radius:8px;margin-top:10px;overflow:hidden}.set-sec>summary{cursor:pointer;font-weight:700;padding:10px 12px;background:var(--card2,#f7f8fb);list-style:none}.set-sec>summary::-webkit-details-marker{display:none}.set-sec>summary::after{content:'▾';float:right;color:var(--sub)}.set-sec[open]>summary::after{content:'▴'}.set-body{padding:10px 12px}.set-sub{font-weight:700;font-size:12px;color:var(--sub);margin:4px 0 6px;letter-spacing:.02em}
 </style>
 </head>
 <body>
@@ -547,34 +548,9 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
       <h3 style="margin:0">설정</h3>
       <button class="small" onclick="toggleSettings(false)">✕ 닫기</button>
     </div>
-    <div style="margin-top:14px">
-      <div class="count" style="margin-bottom:8px">보기</div>
-      <div class="row">
-        <label class="tog"><input type="checkbox" id="optMean" checked>뜻</label>
-        <label class="tog"><input type="checkbox" id="optSent" checked>예문</label>
-        <label class="tog"><input type="checkbox" id="optSyn" checked>유사어</label>
-        <label class="tog"><input type="checkbox" id="optPron" checked>발음기호</label>
-        <label class="tog"><input type="checkbox" id="optEtym" checked>어근·어원</label>
-      </div>
-    </div>
-    <div style="margin-top:18px">
-      <div class="count" style="margin-bottom:8px">테스트</div>
-      <div class="row"><span style="font-size:13px">선택지(보기) 개수</span> <input type="number" id="setChoices" min="3" max="6" style="width:64px"> 개 <span class="count">(3~6)</span></div>
-      <div class="row" style="margin-top:10px"><span style="font-size:13px">문제당 제한시간</span> <input type="number" id="setQuizTime" min="0" step="1" style="width:64px"> 초 <span class="count">(0 = 없음)</span></div>
-      <label class="tog" style="margin-top:10px"><input type="checkbox" id="optAutoWrong">틀려도 자동 넘김</label>
-      <div class="row" style="margin-top:10px"><span style="font-size:13px">정답 후 자동 넘김</span> <input type="number" id="setCorrectDelay" min="0" step="0.5" style="width:64px"> 초</div>
-      <div class="row" style="margin-top:10px"><span style="font-size:13px">틀린 후 자동 넘김</span> <input type="number" id="setWrongDelay" min="0" step="0.5" style="width:64px"> 초</div>
-    </div>
-    <div style="margin-top:18px">
-      <div class="count" style="margin-bottom:8px">회독별 연습 테스트</div>
-      <div class="row"><span style="font-size:13px">추천 테스트 문제 수</span> <input type="number" id="setRQCount" min="1" style="width:64px" onchange="onRoundQuizCfg()"> 개</div>
-      <div class="row" style="margin-top:8px"><span style="font-size:13px">단어→뜻 비율</span> <input type="number" id="setRQMean" min="0" max="100" style="width:64px" onchange="onRoundQuizCfg()"> % <span class="count" id="rqDirLbl"></span></div>
-      <div class="row" style="margin-top:8px"><span style="font-size:13px">TCSE 빈출 기준</span> <input type="number" id="setRQTcse" min="1" style="width:64px" onchange="onRoundQuizCfg()"> 회↑</div>
-      <div class="row" style="margin-top:8px"><span style="font-size:13px">취약 단어 비율(3–4회독)</span> <input type="number" id="setRQWeak" min="0" max="100" style="width:64px" onchange="onRoundQuizCfg()"> %</div>
-      <p class="study-tip" style="margin-top:6px">2–4회독 추천 테스트에 적용됩니다. 현재 범위의 TCSE 빈출 단어는 목표 수와 무관하게 전부 출제됩니다.</p>
-    </div>
-    <div style="margin-top:18px">
-      <div class="count" style="margin-bottom:8px">학습</div>
+    <details class="set-sec" open>
+      <summary>📚 학습 (회독)</summary>
+      <div class="set-body">
       <div class="row" style="align-items:center"><span style="font-size:13px">현재 회독</span> <span class="rstep"><button class="small" onclick="roundStep(-1)" aria-label="회독 감소">−</button><b id="setRoundLbl">1회독</b><button class="small" onclick="roundStep(1)" aria-label="회독 증가">＋</button></span></div>
       <div class="study-tip" id="setPresetSummary" style="margin:6px 0"></div>
       <label class="tog" style="margin-top:6px"><input type="checkbox" id="setCustomToggle" onchange="onCustomToggle()">세부 설정 직접 변경</label>
@@ -589,32 +565,71 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
         <button class="small" style="margin-top:8px" onclick="resetRoundCfg()">이 회독 추천값으로 되돌리기</button>
       </div>
       <div class="study-tip" id="setRoundProg" style="margin-top:8px"></div>
-    </div>
-    <p class="study-tip" style="margin-top:16px">정답 넘김 0 = 즉시. ‘틀린 후 자동 넘김’은 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
-    <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
+      </div>
+    </details>
+
+    <details class="set-sec" open>
+      <summary>📝 테스트</summary>
+      <div class="set-body">
+      <div class="set-sub">회독별 추천 테스트 (2–4회독)</div>
+      <div class="row"><span style="font-size:13px">추천 테스트 문제 수</span> <input type="number" id="setRQCount" min="1" style="width:64px" onchange="onRoundQuizCfg()"> 개</div>
+      <div class="row" style="margin-top:8px"><span style="font-size:13px">단어→뜻 비율</span> <input type="number" id="setRQMean" min="0" max="100" style="width:64px" onchange="onRoundQuizCfg()"> % <span class="count" id="rqDirLbl"></span></div>
+      <div class="row" style="margin-top:8px"><span style="font-size:13px">TCSE 빈출 기준</span> <input type="number" id="setRQTcse" min="1" style="width:64px" onchange="onRoundQuizCfg()"> 회↑</div>
+      <div class="row" style="margin-top:8px"><span style="font-size:13px">취약 단어 비율(3–4회독)</span> <input type="number" id="setRQWeak" min="0" max="100" style="width:64px" onchange="onRoundQuizCfg()"> %</div>
+      <p class="study-tip" style="margin-top:6px">현재 범위의 TCSE 빈출 단어는 목표 수와 무관하게 전부 출제됩니다.</p>
+      <div class="set-sub" style="margin-top:12px">공통 (모든 테스트)</div>
+      <div class="row"><span style="font-size:13px">선택지(보기) 개수</span> <input type="number" id="setChoices" min="3" max="6" style="width:64px"> 개 <span class="count">(3~6)</span></div>
+      <div class="row" style="margin-top:10px"><span style="font-size:13px">문제당 제한시간</span> <input type="number" id="setQuizTime" min="0" step="1" style="width:64px"> 초 <span class="count">(0 = 없음)</span></div>
+      <label class="tog" style="margin-top:10px"><input type="checkbox" id="optAutoWrong">틀려도 자동 넘김</label>
+      <div class="row" style="margin-top:10px"><span style="font-size:13px">정답 후 자동 넘김</span> <input type="number" id="setCorrectDelay" min="0" step="0.5" style="width:64px"> 초</div>
+      <div class="row" style="margin-top:10px"><span style="font-size:13px">틀린 후 자동 넘김</span> <input type="number" id="setWrongDelay" min="0" step="0.5" style="width:64px"> 초</div>
+      <p class="study-tip" style="margin-top:8px">정답 넘김 0 = 즉시. ‘틀린 후 자동 넘김’은 ‘틀려도 자동 넘김’을 켰을 때만 적용됩니다.</p>
+      </div>
+    </details>
+
+    <details class="set-sec">
+      <summary>👁 표시 항목</summary>
+      <div class="set-body">
+      <div class="row">
+        <label class="tog"><input type="checkbox" id="optMean" checked>뜻</label>
+        <label class="tog"><input type="checkbox" id="optSent" checked>예문</label>
+        <label class="tog"><input type="checkbox" id="optSyn" checked>유사어</label>
+        <label class="tog"><input type="checkbox" id="optPron" checked>발음기호</label>
+        <label class="tog"><input type="checkbox" id="optEtym" checked>어근·어원</label>
+      </div>
+      </div>
+    </details>
+
+    <details class="set-sec">
+      <summary>🗂 기록 · 백업</summary>
+      <div class="set-body">
       <div class="row" style="justify-content:space-between;align-items:center">
         <div class="count" style="font-weight:700;color:var(--ink)">연습 테스트 기록 <span id="prCount" class="count"></span></div>
         <button class="small" id="prToggle" onclick="togglePracticeLog()">보기</button>
       </div>
       <p class="study-tip" style="margin-top:4px">연습 테스트는 캘린더에 남지 않고 여기에만 따로 쌓입니다.</p>
       <div id="practiceLog" class="hide" style="margin-top:8px"></div>
-    </div>
-    <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
-      <div class="count" style="font-weight:700;color:var(--ink)">전체 백업</div>
-      <p class="study-tip" style="margin-top:4px">모든 단어장 · 캘린더 · 진도 · 설정 · 기록을 파일 하나로 저장하고 통째로 되돌립니다.</p>
-      <div class="row" style="margin-top:8px">
-        <button class="small" onclick="exportBackup()">전체 저장</button>
-        <button class="small" onclick="document.getElementById('backupFile').click()">전체 불러오기</button>
-        <input type="file" id="backupFile" accept=".json,.vocabak" class="hide" onchange="importBackup(this)">
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+        <div class="count" style="font-weight:700;color:var(--ink)">전체 백업</div>
+        <p class="study-tip" style="margin-top:4px">모든 단어장 · 캘린더 · 진도 · 설정 · 기록을 파일 하나로 저장하고 통째로 되돌립니다.</p>
+        <div class="row" style="margin-top:8px">
+          <button class="small" onclick="exportBackup()">전체 저장</button>
+          <button class="small" onclick="document.getElementById('backupFile').click()">전체 불러오기</button>
+          <input type="file" id="backupFile" accept=".json,.vocabak" class="hide" onchange="importBackup(this)">
+        </div>
+        <p class="study-tip" style="margin-top:6px;color:#8a5a00">불러오면 현재 모든 데이터가 백업 파일 내용으로 <b>교체</b>됩니다.</p>
       </div>
-      <p class="study-tip" style="margin-top:6px;color:#8a5a00">불러오면 현재 모든 데이터가 백업 파일 내용으로 <b>교체</b>됩니다.</p>
-    </div>
-    <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
-      <div class="count" style="font-weight:700;color:var(--red)">전체 초기화</div>
-      <p class="study-tip" style="margin-top:4px">모든 단어장 · 캘린더 · 진도 · 설정 · 기록을 삭제하고 처음 상태로 되돌립니다. (되돌릴 수 없음)</p>
-      <button class="small danger" style="margin-top:8px" onclick="resetAll()">전체 초기화</button>
+      </div>
+    </details>
+
+    <details class="set-sec">
+      <summary style="color:var(--red)">⚠ 전체 초기화</summary>
+      <div class="set-body">
+      <p class="study-tip" style="margin-top:0">모든 단어장 · 캘린더 · 진도 · 설정 · 기록을 삭제하고 처음 상태로 되돌립니다. (되돌릴 수 없음)</p>
+      <button class="small danger" style="margin-top:4px" onclick="resetAll()">전체 초기화</button>
       <p class="study-tip" style="margin-top:6px;color:#8a5a00">먼저 ‘전체 저장’으로 백업해두는 걸 권장합니다.</p>
-    </div>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -1628,14 +1643,13 @@ function roundTestCount(r,from){
 function renderRoundTest(){
   var box=document.getElementById('roundTestBox'); if(!box)return; roundEnsure();
   var r=roundState.cur, head=document.getElementById('rtHead'), ctl=document.getElementById('rtCtl'), chunkRow=document.getElementById('testChunkRow');
+  if(chunkRow)chunkRow.classList.remove('hide'); /* 25개 구간 테스트는 모든 회독의 자유 테스트에서 사용 */
   if(r===1){
     if(head)head.innerHTML='<b>1회독 · 처음 익히기</b> · 아래 25개 구간별 테스트 (뜻 '+TEST_MEAN_GOAL+'회 + 단어 '+TEST_WORD_GOAL+'회 완료 시 구간 완료)';
     if(ctl)ctl.classList.add('hide');
-    if(chunkRow)chunkRow.classList.remove('hide');
     return;
   }
   if(ctl)ctl.classList.remove('hide');
-  if(chunkRow)chunkRow.classList.add('hide');
   var from=roundBlockStart(+((document.getElementById('rtDayFrom')||{}).value)||1, 2);
   var md=maxDay(), hi=Math.min(from+1, md||from);
   var min=rqGet('roundQuizTcseMin',2), target=rqGet('roundQuizCount',50);
