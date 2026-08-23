@@ -1010,7 +1010,7 @@ function exportCSV(){
 /* ================= 연습 테스트 기록 (설정창 전용) ================= */
 function PR_KEY(){return 'voca_practice_'+CUR;}
 function loadPractice(){try{return JSON.parse(localStorage.getItem(PR_KEY()))||[]}catch(e){return[]}}
-function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr))}catch(e){}}
+function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr));return true;}catch(e){var a=arr.slice();while(a.length>30){a=a.slice(Math.max(1,Math.ceil(a.length*0.2)));try{localStorage.setItem(PR_KEY(),JSON.stringify(a));return true;}catch(e2){}}try{localStorage.setItem(PR_KEY(),JSON.stringify(arr.slice(-30)));}catch(e3){}return false;}}
 /* 연습 테스트 구간별 완료 횟수 — 연습 기록에서 직접 집계 (3회 이상 = 완료) */
 const TEST_MEAN_GOAL=3, TEST_WORD_GOAL=1, TEST_GOAL=TEST_MEAN_GOAL+TEST_WORD_GOAL;
 function testChunkCounts(day,q){
@@ -1038,7 +1038,7 @@ function recordPractice(){
     chunk:quiz.chunk||null,
     freqDay:(quiz.freqDay!=null?quiz.freqDay:null),
     wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no}))});
-  if(arr.length>300)arr.splice(0,arr.length-300);
+  if(arr.length>2000)arr.splice(0,arr.length-2000);
   savePractice(arr);
   updatePracticeCount();
 }
