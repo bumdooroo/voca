@@ -637,10 +637,10 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 /* ================= 데이터 ================= */
 /* ---- 단어장(덱) 관리 ---- */
 function loadDecks(){try{const d=JSON.parse(localStorage.getItem('voca_decks'));if(Array.isArray(d)&&d.length)return d;}catch(e){}return[{id:'GRE',name:'GRE'}];}
-function saveDecks(){localStorage.setItem('voca_decks',JSON.stringify(decks));}
+function saveDecks(){try{localStorage.setItem('voca_decks',JSON.stringify(decks));}catch(e){quotaWarn();}}
 let decks=loadDecks();
 let CUR=(function(){const a=localStorage.getItem('voca_activeDeck');return (a&&decks.some(d=>d.id===a))?a:decks[0].id;})();
-function saveActive(){localStorage.setItem('voca_activeDeck',CUR);}
+function saveActive(){try{localStorage.setItem('voca_activeDeck',CUR);}catch(e){quotaWarn();}}
 function curDeck(){return decks.find(d=>d.id===CUR)||decks[0];}
 function WORD_KEY(){return 'voca_'+CUR;}
 function CAL_KEY(){return 'voca_calendar_'+CUR;}
@@ -652,14 +652,16 @@ function todayKey(){return dateKey(new Date());}
 function ymd(){return todayKey().slice(2).replace(/-/g,'');}
 
 function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
-function saveWords(){localStorage.setItem(WORD_KEY(),JSON.stringify(data));tcFreqCache=null;}
+var __quotaWarned=false;
+function quotaWarn(){if(__quotaWarned)return;__quotaWarned=true;try{alert('브라우저 저장 공간이 부족합니다.\n설정 → 기록·백업에서 [전체 저장]으로 백업한 뒤, 오래된 연습기록을 정리하거나 RC/TCSE 등 큰 데이터를 줄여주세요.\n(일부 변경이 저장되지 않을 수 있습니다)');}catch(e){}}
+function saveWords(){try{localStorage.setItem(WORD_KEY(),JSON.stringify(data));}catch(e){quotaWarn();}tcFreqCache=null;}
 function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY()))||{}}catch(e){return{}}}
-function saveCal(){localStorage.setItem(CAL_KEY(),JSON.stringify(calendar))}
+function saveCal(){try{localStorage.setItem(CAL_KEY(),JSON.stringify(calendar));}catch(e){quotaWarn();}}
 
 let data=loadWords();
 let calendar=loadCal();
 function loadChunk(){try{return JSON.parse(localStorage.getItem(CHUNK_KEY()))||{}}catch(e){return{}}}
-function saveChunk(){localStorage.setItem(CHUNK_KEY(),JSON.stringify(chunkProg))}
+function saveChunk(){try{localStorage.setItem(CHUNK_KEY(),JSON.stringify(chunkProg));}catch(e){quotaWarn();}}
 let chunkProg=loadChunk();
 function loadSettings(){const D={correctDelay:2,wrongDelay:2,chunkSize:25,choices:4,quizTime:10,roundQuizCount:50,roundQuizMeanPct:75,roundQuizTcseMin:2,roundQuizWeakPct:70,view:{m:1,s:1,y:1,p:1,e:1}};
   try{const o=Object.assign({},D,JSON.parse(localStorage.getItem(SET_KEY()))||{});o.view=Object.assign({},D.view,o.view||{});return o;}catch(e){return D}}
@@ -668,7 +670,7 @@ function toggleSettings(open){
   if(open){updatePracticeCount();syncStudySettings();const b=document.getElementById('practiceLog');
     if(b&&!b.classList.contains('hide'))renderPracticeLog();}
 }
-function saveSettings(){localStorage.setItem(SET_KEY(),JSON.stringify(settings))}
+function saveSettings(){try{localStorage.setItem(SET_KEY(),JSON.stringify(settings));}catch(e){quotaWarn();}}
 let settings=loadSettings();
 let QSIZE=settings.chunkSize||25;
 
@@ -1014,9 +1016,9 @@ function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr)
 /* 연습 테스트 구간별 완료 횟수 — 연습 기록에서 직접 집계 (3회 이상 = 완료) */
 const TEST_MEAN_GOAL=3, TEST_WORD_GOAL=1, TEST_GOAL=TEST_MEAN_GOAL+TEST_WORD_GOAL;
 function testChunkCounts(day,q){
-  const from=q*QSIZE+1; let m=0,w=0;
+  const from=q*QSIZE+1; let m=0,w=0; roundEnsure(); const cr=(roundState?roundState.cur:1);
   loadPractice().forEach(r=>{
-    if(r.chunk&&(+r.chunk.day===+day)&&(+r.chunk.from===from)){ if(r.mode==='word')w++; else m++; }
+    if(r.chunk&&(+r.chunk.day===+day)&&(+r.chunk.from===from)&&((r.round||1)===cr)){ if(r.mode==='word')w++; else m++; }
   });
   return {mean:m,word:w};
 }
@@ -1279,7 +1281,7 @@ function renderStudyMain(){
   var cr=document.getElementById('chunkRow'); if(cr)cr.classList.toggle('hide', r!==1);
   var rdf=document.getElementById('rDayFrom'); if(rdf){var pp=rPreset(r); if(pp.stagger){rdf.step=1;rdf.max=Math.max(1,maxDay()+((c.custom?c.span:3)-1));}else{rdf.step=c.span;rdf.removeAttribute('max');}}
   if(r===1)renderChunkRow();
-  updateSpanLbl(); renderRoundProgress();
+  updateSpanLbl(); renderRoundProgress(); if(typeof renderTestChunkRow==='function')renderTestChunkRow();
 }
 function roundStep(d){ roundEnsure(); roundState.cur=Math.max(1,(roundState.cur||1)+d); roundState.max=Math.max(roundState.max||1,roundState.cur); roundSave(); syncStudySettings(); renderStudyMain(); }
 function onCustomToggle(){
@@ -1552,7 +1554,8 @@ function renderTestChunkRow(){
   if(!dayWords.length){el.innerHTML='<span class="count">'+day+'일차 단어 없음</span>';return;}
   const maxNo=Math.max.apply(null,dayWords.map(w=>+w.no||0));
   const nq=Math.ceil(maxNo/QSIZE);
-  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩</span>';
+  roundEnsure(); const _cr=(roundState?roundState.cur:1);
+  let h='<span class="count" style="flex:0 0 auto">'+day+'일차 · 25개씩 · '+_cr+'회독 기록</span>';
   for(let q=0;q<nq;q++){
     const a=q*QSIZE+1,b=Math.min(q*QSIZE+QSIZE,maxNo);
     const p=testChunkProgress(day,q);
@@ -1567,7 +1570,8 @@ function startTestChunk(day,q){
   let pool=data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b);
   if(pool.length<4)return alert(day+'일차 '+a+'–'+b+' 구간 단어가 4개 미만입니다.');
   pool=[...pool].sort(()=>Math.random()-.5);
-  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',chunk:{day:day,q:q,from:a,to:Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
+  roundEnsure();
+  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',round:(roundState?roundState.cur:1),chunk:{day:day,q:q,from:a,to:Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
   setQuizMode(true);showQ();
 }
 function startQuiz(){
