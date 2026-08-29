@@ -46,6 +46,7 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;fon
 .dunno-wrong{background:#fdeaea!important;border-color:var(--red)!important;color:#b42323!important;font-weight:700}
 .qc-sub{color:var(--sub);font-style:italic;font-size:12px}
 .quiz-word{font-size:24px;font-weight:700}
+.quiz-prompt{font-size:24px;font-weight:700;line-height:1.45;white-space:pre-line;word-break:keep-all}
 .count{font-size:13px;color:var(--sub)}
 label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .study-shell{padding-top:4px}
@@ -1772,8 +1773,8 @@ function showQ(){
   const choices=[q,...others].sort(()=>Math.random()-.5);
   const ansIdx=data.indexOf(q);
   const prompt = qmode==='mean'
-    ? '<div class="quiz-word">'+esc(q.word)+'</div>'+(q.pron?'<span class="e-pron">'+esc(q.pron)+'</span>':'')
-    : '<div class="e-mean" style="font-size:16px">'+esc(q.mean)+'</div>';
+    ? '<div class="quiz-prompt">'+esc(q.word)+'</div>'+(q.pron?'<span class="e-pron">'+esc(q.pron)+'</span>':'')
+    : '<div class="quiz-prompt">'+esc(breakNumbered(q.mean))+'</div>';
   a.innerHTML='<div class="row" style="justify-content:space-between"><span class="count">'+(quiz.i+1)+'/'+quiz.pool.length+' · 점수 '+quiz.score+(quiz.official?' · 공식':'')+' <b id="qTimer" style="color:var(--acc);font-weight:700"></b></span><button class="small" onclick="'+(quiz.official?'backToCalendar()':'endQuiz()')+'">그만</button></div>'+prompt+
     choices.map(function(c,ci){
       const di=data.indexOf(c);
